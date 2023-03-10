@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Guerrilla Mail</string>
+    <string name="from">From: %1$s</string>
+    <string name="subject">Subject: %1$s</string>
+    <string name="date">Date: %1$s</string>
+    <string name="body">Body: %1$s</string>
+    <string name="your_temporary_email">Your temporary email: %1$s</string>
 </resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/emailFragment">
+    <fragment
+        android:id="@+id/emailFragment"
+        android:name="volovyk.guerrillamail.ui.EmailFragment"
+        android:label="fragment_email_list"
+        tools:layout="@layout/fragment_email_list" >
+        <action
+            android:id="@+id/action_emailFragment_to_specificEmailFragment2"
+            app:destination="@id/specificEmailFragment2"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"/>
+    </fragment>
+    <fragment
+        android:id="@+id/specificEmailFragment2"
+        android:name="volovyk.guerrillamail.ui.SpecificEmailFragment"
+        android:label="fragment_specific_email"
+        tools:layout="@layout/fragment_specific_email" />
+</navigation>
