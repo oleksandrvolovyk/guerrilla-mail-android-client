@@ -57,11 +57,13 @@ public class MyEmailRecyclerViewAdapter extends RecyclerView.Adapter<MyEmailRecy
             super(binding.getRoot());
             mFromView = binding.from;
             mSubjectView = binding.subject;
-            binding.emailFragmentLayout.setOnClickListener(v -> {
-                Bundle bundle = new Bundle();
-                bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL, getLayoutPosition());
-                Navigation.findNavController(binding.emailFragmentLayout).navigate(R.id.action_emailFragment_to_specificEmailFragment2, bundle);
-            });
+            binding.emailFragmentLayout.setOnClickListener(v -> openEmail(binding));
+        }
+
+        private void openEmail(FragmentEmailBinding binding) {
+            Bundle bundle = new Bundle();
+            bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL, getLayoutPosition());
+            Navigation.findNavController(binding.emailFragmentLayout).navigate(R.id.action_emailFragment_to_specificEmailFragment2, bundle);
         }
 
         @NonNull

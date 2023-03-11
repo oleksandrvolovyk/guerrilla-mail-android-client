@@ -1,17 +1,27 @@
 package volovyk.guerrillamail.data.model;
 
+import android.content.Intent;
+
+import com.google.gson.annotations.SerializedName;
+
 public class Email {
+    @SerializedName("mail_from")
     private final String from;
+    @SerializedName("mail_subject")
     private final String subject;
+    @SerializedName("mail_body")
     private final String body;
-
+    @SerializedName("mail_date")
     private final String date;
+    @SerializedName("mail_id")
+    private final Integer id;
 
-    public Email(String from, String subject, String body, String date) {
+    public Email(String from, String subject, String body, String date, Integer id) {
         this.from = from;
         this.subject = subject;
         this.body = body;
         this.date = date;
+        this.id = id;
     }
 
     public String getFrom() {
