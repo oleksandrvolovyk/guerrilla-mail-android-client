@@ -31,8 +31,6 @@ public class GuerrillaEmailDatabase {
 
     @Inject
     public GuerrillaEmailDatabase() {
-//        this.assignedEmail.setValue("myemail@example.com");
-//        this.emails.setValue(PlaceholderContent.ITEMS);
         apiInterface = APIClient.getClient().create(APIInterface.class);
         getEmailAddress();
     }
