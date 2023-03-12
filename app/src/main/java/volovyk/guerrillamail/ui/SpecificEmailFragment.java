@@ -1,6 +1,7 @@
 package volovyk.guerrillamail.ui;
 
 import android.os.Bundle;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +55,7 @@ public class SpecificEmailFragment extends Fragment {
             emailFromTextView.setText(getString(R.string.from, chosenEmail.getFrom()));
             emailSubjectTextView.setText(getString(R.string.subject, chosenEmail.getSubject()));
             emailDateTextView.setText(getString(R.string.date, chosenEmail.getDate()));
-            emailBodyTextView.setText(getString(R.string.body, chosenEmail.getBody()));
+            emailBodyTextView.setText(Html.fromHtml(chosenEmail.getBody(), Html.FROM_HTML_MODE_COMPACT));
         });
     }
 

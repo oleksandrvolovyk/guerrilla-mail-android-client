@@ -1,7 +1,5 @@
 package volovyk.guerrillamail.data.model;
 
-import android.content.Intent;
-
 import com.google.gson.annotations.SerializedName;
 
 public class Email {
@@ -10,7 +8,7 @@ public class Email {
     @SerializedName("mail_subject")
     private final String subject;
     @SerializedName("mail_body")
-    private final String body;
+    private String body;
     @SerializedName("mail_date")
     private final String date;
     @SerializedName("mail_id")
@@ -38,5 +36,13 @@ public class Email {
 
     public String getDate() {
         return date;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+
+    public Integer getId() {
+        return id;
     }
 }
