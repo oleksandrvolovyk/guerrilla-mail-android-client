@@ -5,7 +5,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,15 +14,14 @@ import androidx.lifecycle.ViewModelProvider;
 import dagger.hilt.android.AndroidEntryPoint;
 import volovyk.guerrillamail.R;
 import volovyk.guerrillamail.data.model.Email;
+import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding;
 
 @AndroidEntryPoint
 public class SpecificEmailFragment extends Fragment {
 
     public static final String ARG_CHOSEN_EMAIL = "email";
-
+    FragmentSpecificEmailBinding binding;
     private int chosenEmail = 1;
-
-    private MainViewModel mainViewModel;
 
     public SpecificEmailFragment() {
         // Required empty public constructor
@@ -41,21 +39,17 @@ public class SpecificEmailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        binding = FragmentSpecificEmailBinding.inflate(getLayoutInflater());
 
-        mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
-        TextView emailFromTextView = view.findViewById(R.id.fromTextView);
-        TextView emailSubjectTextView = view.findViewById(R.id.subjectTextView);
-        TextView emailDateTextView = view.findViewById(R.id.dateTextView);
-        TextView emailBodyTextView = view.findViewById(R.id.bodyTextView);
+        MainViewModel mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         mainViewModel.getEmails().observe(getViewLifecycleOwner(), emails -> {
             Email chosenEmail = emails.get(this.chosenEmail);
 
-            emailFromTextView.setText(getString(R.string.from, chosenEmail.getFrom()));
-            emailSubjectTextView.setText(getString(R.string.subject, chosenEmail.getSubject()));
-            emailDateTextView.setText(getString(R.string.date, chosenEmail.getDate()));
-            emailBodyTextView.setText(Html.fromHtml(chosenEmail.getBody(), Html.FROM_HTML_MODE_COMPACT));
+            binding.fromTextView.setText(getString(R.string.from, chosenEmail.getFrom()));
+            binding.subjectTextView.setText(getString(R.string.subject, chosenEmail.getSubject()));
+            binding.dateTextView.setText(getString(R.string.date, chosenEmail.getDate()));
+            binding.bodyTextView.setText(Html.fromHtml(chosenEmail.getBody(), Html.FROM_HTML_MODE_COMPACT));
         });
     }
 

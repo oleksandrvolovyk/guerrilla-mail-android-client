@@ -4,7 +4,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,28 +11,29 @@ import androidx.lifecycle.ViewModelProvider;
 
 import dagger.hilt.android.AndroidEntryPoint;
 import volovyk.guerrillamail.R;
+import volovyk.guerrillamail.databinding.ActivityMainBinding;
 
 @AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
 
     private String assignedEmail;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
-        TextView emailTextView = findViewById(R.id.emailTextView);
-
         mainViewModel.getAssignedEmail().observe(this,
                 email -> {
-                    emailTextView.setText(getString(R.string.your_temporary_email, email));
+                    binding.emailTextView.setText(getString(R.string.your_temporary_email, email));
                     assignedEmail = email;
                 });
 
-        emailTextView.setOnClickListener(v -> copyEmailToClipboard());
+        binding.emailTextView.setOnClickListener(v -> copyEmailToClipboard());
     }
 
     private void copyEmailToClipboard() {
