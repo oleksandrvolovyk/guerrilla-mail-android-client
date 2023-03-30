@@ -30,7 +30,7 @@ public class GuerrillaEmailDatabase {
 
     APIInterface apiInterface;
 
-    private final int refreshInterval = 5000; // 5 seconds
+    private final int REFRESH_INTERVAL = 5000; // 5 seconds
     private final Handler mHandler;
 
     @Inject
@@ -50,7 +50,7 @@ public class GuerrillaEmailDatabase {
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
-                mHandler.postDelayed(refresher, refreshInterval);
+                mHandler.postDelayed(refresher, REFRESH_INTERVAL);
             }
         }
     };

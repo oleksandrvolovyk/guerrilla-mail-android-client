@@ -2,9 +2,11 @@ package volovyk.guerrillamail.ui;
 
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +22,6 @@ import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding;
 public class SpecificEmailFragment extends Fragment {
 
     public static final String ARG_CHOSEN_EMAIL = "email";
-    FragmentSpecificEmailBinding binding;
     private int chosenEmail = 1;
 
     public SpecificEmailFragment() {
@@ -39,17 +40,15 @@ public class SpecificEmailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        binding = FragmentSpecificEmailBinding.inflate(getLayoutInflater());
 
         MainViewModel mainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         mainViewModel.getEmails().observe(getViewLifecycleOwner(), emails -> {
             Email chosenEmail = emails.get(this.chosenEmail);
-
-            binding.fromTextView.setText(getString(R.string.from, chosenEmail.getFrom()));
-            binding.subjectTextView.setText(getString(R.string.subject, chosenEmail.getSubject()));
-            binding.dateTextView.setText(getString(R.string.date, chosenEmail.getDate()));
-            binding.bodyTextView.setText(Html.fromHtml(chosenEmail.getBody(), Html.FROM_HTML_MODE_COMPACT));
+            ((TextView) view.findViewById(R.id.fromTextView)).setText(getString(R.string.from, chosenEmail.getFrom()));
+            ((TextView) view.findViewById(R.id.subjectTextView)).setText(getString(R.string.subject, chosenEmail.getSubject()));
+            ((TextView) view.findViewById(R.id.dateTextView)).setText(getString(R.string.date, chosenEmail.getDate()));
+            ((TextView) view.findViewById(R.id.bodyTextView)).setText(Html.fromHtml(chosenEmail.getBody(), Html.FROM_HTML_MODE_COMPACT));
         });
     }
 
