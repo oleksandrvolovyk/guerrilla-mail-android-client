@@ -13,13 +13,17 @@ import volovyk.guerrillamail.data.model.Email;
 
 @HiltViewModel
 public class MainViewModel extends ViewModel {
+    private final EmailRepository emailRepository;
     private final LiveData<String> assignedEmail;
     private final LiveData<List<Email>> emails;
+    private final LiveData<Boolean> refreshing;
 
     @Inject
     public MainViewModel(EmailRepository emailRepository) {
+        this.emailRepository = emailRepository;
         this.assignedEmail = emailRepository.getAssignedEmail();
         this.emails = emailRepository.getEmails();
+        this.refreshing = emailRepository.getRefreshing();
     }
 
     public LiveData<String> getAssignedEmail() {
@@ -28,5 +32,11 @@ public class MainViewModel extends ViewModel {
 
     public LiveData<List<Email>> getEmails() {
         return emails;
+    }
+
+    public LiveData<Boolean> getRefreshing(){ return refreshing;}
+
+    public void deleteEmail(Email email) {
+        emailRepository.deleteEmail(email);
     }
 }

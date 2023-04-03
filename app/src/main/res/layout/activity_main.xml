@@ -12,10 +12,20 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/your_temporary_email"
-        android:textColor="#000000"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <pl.droidsonroids.gif.GifImageView
+        android:id="@+id/refreshingSpinner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/spinner"
+        app:layout_constraintBottom_toTopOf="@+id/my_nav_host_fragment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/emailTextView"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.fragment.app.FragmentContainerView

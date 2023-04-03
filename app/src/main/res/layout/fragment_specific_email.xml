@@ -13,7 +13,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/from"
-        android:textColor="#000000"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,7 +25,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/subject"
-        android:textColor="#000000"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/fromTextView" />
@@ -37,7 +37,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="@string/date"
-        android:textColor="#000000"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/subjectTextView" />
@@ -59,7 +59,7 @@
             android:layout_marginTop="8dp"
             android:autoLink="web"
             android:text="@string/body"
-            android:textColor="#000000"
+            android:textColor="?android:attr/textColorPrimary"
             android:textSize="16sp" />
     </ScrollView>
 

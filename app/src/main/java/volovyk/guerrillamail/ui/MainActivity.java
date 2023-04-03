@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,6 +35,14 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         binding.emailTextView.setOnClickListener(v -> copyEmailToClipboard());
+
+        mainViewModel.getRefreshing().observe(this, refreshing -> {
+            if (refreshing) {
+                binding.refreshingSpinner.setVisibility(View.VISIBLE);
+            } else {
+                binding.refreshingSpinner.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private void copyEmailToClipboard() {

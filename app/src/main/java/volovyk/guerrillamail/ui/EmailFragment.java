@@ -58,7 +58,7 @@ public class EmailFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new MyEmailRecyclerViewAdapter(mainViewModel.getEmails(), getViewLifecycleOwner()));
+            recyclerView.setAdapter(new MyEmailRecyclerViewAdapter(mainViewModel, getViewLifecycleOwner()));
         }
         return view;
     }

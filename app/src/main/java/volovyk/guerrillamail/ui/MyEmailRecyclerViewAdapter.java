@@ -20,11 +20,13 @@ import volovyk.guerrillamail.databinding.FragmentEmailBinding;
 
 public class MyEmailRecyclerViewAdapter extends RecyclerView.Adapter<MyEmailRecyclerViewAdapter.ViewHolder> {
 
-    private List<Email> currentEmails = new ArrayList<>();
+    private static List<Email> currentEmails = new ArrayList<>();
+    private static MainViewModel viewModel;
 
-    public MyEmailRecyclerViewAdapter(LiveData<List<Email>> items, LifecycleOwner lifecycleOwner) {
+    public MyEmailRecyclerViewAdapter(MainViewModel viewModel, LifecycleOwner lifecycleOwner) {
+        MyEmailRecyclerViewAdapter.viewModel = viewModel;
 
-        items.observe(lifecycleOwner, emails -> {
+        viewModel.getEmails().observe(lifecycleOwner, emails -> {
             currentEmails = emails;
             notifyDataSetChanged();
         });
@@ -56,12 +58,17 @@ public class MyEmailRecyclerViewAdapter extends RecyclerView.Adapter<MyEmailRecy
             mFromView = binding.from;
             mSubjectView = binding.subject;
             binding.emailFragmentLayout.setOnClickListener(v -> openEmail(binding));
+            binding.deleteButton.setOnClickListener(v -> deleteEmail());
         }
 
         private void openEmail(FragmentEmailBinding binding) {
             Bundle bundle = new Bundle();
             bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL, getLayoutPosition());
             Navigation.findNavController(binding.emailFragmentLayout).navigate(R.id.action_emailFragment_to_specificEmailFragment2, bundle);
+        }
+
+        private void deleteEmail() {
+            viewModel.deleteEmail(currentEmails.get(getLayoutPosition()));
         }
 
         @NonNull

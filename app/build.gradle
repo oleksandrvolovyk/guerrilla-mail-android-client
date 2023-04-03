@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_9
+        targetCompatibility JavaVersion.VERSION_1_9
     }
     buildFeatures {
         viewBinding true
@@ -43,6 +43,14 @@ dependencies {
     // Hilt dependencies
     implementation 'com.google.dagger:hilt-android:2.45'
     annotationProcessor 'com.google.dagger:hilt-android-compiler:2.45'
+
+    // Room Database
+    implementation 'androidx.room:room-common:2.5.1'
+    implementation 'androidx.room:room-runtime:2.5.1'
+    annotationProcessor 'androidx.room:room-compiler:2.5.1'
+
+    // GIF view
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.17'
 
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.8.0'

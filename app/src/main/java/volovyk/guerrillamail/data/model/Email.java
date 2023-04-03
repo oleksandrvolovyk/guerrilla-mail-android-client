@@ -1,7 +1,11 @@
 package volovyk.guerrillamail.data.model;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import com.google.gson.annotations.SerializedName;
 
+@Entity
 public class Email {
     @SerializedName("mail_from")
     private final String from;
@@ -11,6 +15,7 @@ public class Email {
     private String body;
     @SerializedName("mail_date")
     private final String date;
+    @PrimaryKey
     @SerializedName("mail_id")
     private final Integer id;
 
