@@ -43,12 +43,25 @@ public class MainActivity extends AppCompatActivity {
                 binding.refreshingSpinner.setVisibility(View.INVISIBLE);
             }
         });
+
+        mainViewModel.getErrorLiveData().observe(this, errorEvent -> {
+            if (errorEvent != null && !errorEvent.hasBeenHandled()) {
+                String errorText = errorEvent.getContentIfNotHandled();
+                if (errorText != null ) {
+                    Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
     }
 
     private void copyEmailToClipboard() {
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText(getString(R.string.app_name), assignedEmail);
-        clipboard.setPrimaryClip(clip);
-        Toast.makeText(this, R.string.email_in_clipboard, Toast.LENGTH_SHORT).show();
+        if (assignedEmail != null) {
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(getString(R.string.app_name), assignedEmail);
+            clipboard.setPrimaryClip(clip);
+            Toast.makeText(this, R.string.email_in_clipboard, Toast.LENGTH_SHORT).show();
+        }
     }
 }

@@ -15,6 +15,7 @@ import javax.inject.Singleton;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import volovyk.guerrillamail.data.SingleEvent;
 import volovyk.guerrillamail.data.model.Email;
 import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse;
 import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse;
@@ -25,6 +26,8 @@ public class GuerrillaEmailDatabase {
     private final MutableLiveData<String> assignedEmail = new MutableLiveData<>();
     private final MutableLiveData<List<Email>> emails = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
+
+    private final MutableLiveData<SingleEvent<String>> errorLiveData = new MutableLiveData<>();
 
     private String sidToken;
     private Integer seq = 0;
@@ -79,7 +82,7 @@ public class GuerrillaEmailDatabase {
 
             @Override
             public void onFailure(Call<GetEmailAddressResponse> call, Throwable t) {
-
+                setError(t.getLocalizedMessage());
             }
         });
     }
@@ -102,7 +105,7 @@ public class GuerrillaEmailDatabase {
 
             @Override
             public void onFailure(Call<CheckForNewEmailsResponse> call, Throwable t) {
-
+                setError(t.getLocalizedMessage());
             }
         });
     }
@@ -127,7 +130,7 @@ public class GuerrillaEmailDatabase {
 
                 @Override
                 public void onFailure(Call<Email> call, Throwable t) {
-
+                    setError(t.getLocalizedMessage());
                 }
             });
         }
@@ -147,5 +150,13 @@ public class GuerrillaEmailDatabase {
 
     public LiveData<Boolean> getRefreshing() {
         return refreshing;
+    }
+
+    public LiveData<SingleEvent<String>> getErrorLiveData() {
+        return errorLiveData;
+    }
+
+    private void setError(String errorMessage) {
+        errorLiveData.setValue(new SingleEvent<>(errorMessage));
     }
 }

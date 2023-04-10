@@ -24,6 +24,7 @@ public class EmailRepository implements LifecycleOwner {
     private final LiveData<String> assignedEmail;
     private final LiveData<List<Email>> emails;
     private final LiveData<Boolean> refreshing;
+    private final LiveData<SingleEvent<String>> errorLiveData;
 
     private final LocalEmailDatabase localEmailDatabase;
 
@@ -36,6 +37,7 @@ public class EmailRepository implements LifecycleOwner {
         this.emails = localEmailDatabase.emailDao().getAll();
         LiveData<List<Email>> remoteEmails = guerrillaEmailDatabase.getEmails();
         this.refreshing = guerrillaEmailDatabase.getRefreshing();
+        this.errorLiveData = guerrillaEmailDatabase.getErrorLiveData();
 
         lifecycleRegistry = new LifecycleRegistry(this);
         lifecycleRegistry.setCurrentState(Lifecycle.State.CREATED);
@@ -71,5 +73,9 @@ public class EmailRepository implements LifecycleOwner {
 
     public LiveData<Boolean> getRefreshing() {
         return refreshing;
+    }
+
+    public LiveData<SingleEvent<String>> getErrorLiveData() {
+        return errorLiveData;
     }
 }

@@ -4,6 +4,7 @@
     <string name="subject">Subject: %1$s</string>
     <string name="date">Date: %1$s</string>
     <string name="body">Body: %1$s</string>
+    <string name="getting_temporary_email">Your temporary email will appear here</string>
     <string name="your_temporary_email">Your temporary email:\n%1$s</string>
     <string name="email_in_clipboard">Email copied to clipboard!</string>
     <string name="delete">Delete</string>
