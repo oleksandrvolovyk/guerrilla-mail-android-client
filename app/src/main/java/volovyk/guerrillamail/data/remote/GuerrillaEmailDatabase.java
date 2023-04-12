@@ -123,7 +123,7 @@ public class GuerrillaEmailDatabase {
 
                     fullEmail.setBody(formatEmailBody(fullEmail.getBody()));
 
-                    emails.postValue(List.of(fullEmail));
+                    emails.setValue(List.of(fullEmail));
 
                     seq = Math.max(seq, fullEmail.getId());
                 }
