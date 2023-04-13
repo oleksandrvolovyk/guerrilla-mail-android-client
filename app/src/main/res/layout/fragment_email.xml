@@ -12,21 +12,20 @@
     android:textColor="?android:attr/textColorPrimary"
     android:orientation="vertical">
 
-    <Button
+    <ImageButton
         android:id="@+id/deleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="8dp"
-        android:text="@string/delete"
-        android:textSize="11sp"
-        app:icon="@android:drawable/ic_menu_delete"
-        app:iconPadding="0dp"
+        android:background="?attr/colorPrimaryVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@android:drawable/ic_delete"
+        android:contentDescription="@string/delete_button" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/constraintLayout"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -40,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:textAppearance="?attr/textAppearanceListItem"
-            android:textSize="14sp"
+            android:textSize="16sp"
+            android:textStyle="bold"
             tools:text="example@example.com" />
 
         <TextView
@@ -49,6 +49,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
             android:textAppearance="?attr/textAppearanceListItem"
+            android:textSize="14sp"
+            android:textStyle="bold"
             tools:text="This is an example" />
     </LinearLayout>
 
