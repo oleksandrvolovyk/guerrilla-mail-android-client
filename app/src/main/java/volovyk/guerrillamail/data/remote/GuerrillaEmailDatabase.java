@@ -73,11 +73,13 @@ public class GuerrillaEmailDatabase {
                 Log.d(TAG, response.code() + "");
                 GetEmailAddressResponse getEmailAddressResponse = response.body();
 
-                sidToken = getEmailAddressResponse.getSidToken();
-                assignedEmail.postValue(getEmailAddressResponse.getEmailAddress());
-                refreshing.postValue(false);
+                if (getEmailAddressResponse != null) {
+                    sidToken = getEmailAddressResponse.getSidToken();
+                    assignedEmail.postValue(getEmailAddressResponse.getEmailAddress());
+                    refreshing.postValue(false);
 
-                Log.d(TAG, "Assigned email: " + getEmailAddressResponse.getEmailAddress());
+                    Log.d(TAG, "Assigned email: " + getEmailAddressResponse.getEmailAddress());
+                }
             }
 
             @Override
@@ -95,11 +97,13 @@ public class GuerrillaEmailDatabase {
                 Log.d(TAG, response.code() + "");
                 CheckForNewEmailsResponse checkForNewEmailsResponse = response.body();
 
-                if (checkForNewEmailsResponse.getEmails() != null) {
-                    if (!checkForNewEmailsResponse.getEmails().isEmpty()) {
-                        fetchAllEmails(checkForNewEmailsResponse.getEmails());
+                if (checkForNewEmailsResponse != null) {
+                    if (checkForNewEmailsResponse.getEmails() != null) {
+                        if (!checkForNewEmailsResponse.getEmails().isEmpty()) {
+                            fetchAllEmails(checkForNewEmailsResponse.getEmails());
+                        }
+                        refreshing.postValue(false);
                     }
-                    refreshing.postValue(false);
                 }
             }
 
@@ -121,11 +125,13 @@ public class GuerrillaEmailDatabase {
 
                     Email fullEmail = response.body();
 
-                    fullEmail.setBody(formatEmailBody(fullEmail.getBody()));
+                    if (fullEmail != null) {
+                        fullEmail.setBody(formatEmailBody(fullEmail.getBody()));
 
-                    emails.setValue(List.of(fullEmail));
+                        emails.setValue(List.of(fullEmail));
 
-                    seq = Math.max(seq, fullEmail.getId());
+                        seq = Math.max(seq, fullEmail.getId());
+                    }
                 }
 
                 @Override
