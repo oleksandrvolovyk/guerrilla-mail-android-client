@@ -37,11 +37,11 @@ public class GuerrillaEmailDatabase {
     private final int REFRESH_INTERVAL = 5000; // 5 seconds
     private final Handler mHandler;
 
+    private boolean gotEmailAssigned = false;
+
     @Inject
     public GuerrillaEmailDatabase() {
         apiInterface = APIClient.getClient().create(APIInterface.class);
-        refreshing.postValue(true);
-        getEmailAddress();
 
         mHandler = new Handler();
         startRepeatingTask();
@@ -52,7 +52,11 @@ public class GuerrillaEmailDatabase {
         public void run() {
             try {
                 refreshing.postValue(true);
-                checkForNewEmails();
+                if (!gotEmailAssigned) {
+                    getEmailAddress();
+                } else {
+                    checkForNewEmails();
+                }
             } finally {
                 // 100% guarantee that this always happens, even if
                 // your update method throws an exception
@@ -76,6 +80,7 @@ public class GuerrillaEmailDatabase {
                 if (getEmailAddressResponse != null) {
                     sidToken = getEmailAddressResponse.getSidToken();
                     assignedEmail.postValue(getEmailAddressResponse.getEmailAddress());
+                    gotEmailAssigned = true;
                     refreshing.postValue(false);
 
                     Log.d(TAG, "Assigned email: " + getEmailAddressResponse.getEmailAddress());
