@@ -30,6 +30,10 @@ public class MainViewModel extends ViewModel {
         this.errorLiveData = emailRepository.getErrorLiveData();
     }
 
+    public void getNewAddress() {
+        emailRepository.getNewAddress();
+    }
+
     public LiveData<String> getAssignedEmail() {
         return assignedEmail;
     }

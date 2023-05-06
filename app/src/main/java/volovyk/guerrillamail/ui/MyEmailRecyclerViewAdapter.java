@@ -1,13 +1,14 @@
 package volovyk.guerrillamail.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -68,7 +69,18 @@ public class MyEmailRecyclerViewAdapter extends RecyclerView.Adapter<MyEmailRecy
         }
 
         private void deleteEmail() {
-            viewModel.deleteEmail(currentEmails.get(getLayoutPosition()));
+            Context context = itemView.getContext();
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(R.string.app_name);
+            builder.setMessage(context.getString(R.string.confirm_deleting_email));
+            builder.setIcon(R.drawable.ic_launcher_icon);
+            builder.setPositiveButton(context.getString(R.string.yes), (dialog, id) -> {
+                dialog.dismiss();
+                viewModel.deleteEmail(currentEmails.get(getLayoutPosition()));
+            });
+            builder.setNegativeButton(context.getString(R.string.no), (dialog, id) -> dialog.dismiss());
+            AlertDialog alert = builder.create();
+            alert.show();
         }
 
         @NonNull

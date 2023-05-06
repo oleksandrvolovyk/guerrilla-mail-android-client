@@ -2,7 +2,6 @@ package volovyk.guerrillamail.ui;
 
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider;
 import dagger.hilt.android.AndroidEntryPoint;
 import volovyk.guerrillamail.R;
 import volovyk.guerrillamail.data.model.Email;
-import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding;
 
 @AndroidEntryPoint
 public class SpecificEmailFragment extends Fragment {

@@ -69,6 +69,12 @@ public class GuerrillaEmailDatabase {
         refresher.run();
     }
 
+    public void getNewAddress() {
+        refreshing.postValue(true);
+        gotEmailAssigned = false;
+        assignedEmail.postValue(null);
+    }
+
     private void getEmailAddress() {
         Call<GetEmailAddressResponse> call = apiInterface.getEmailAddress();
         call.enqueue(new Callback<>() {

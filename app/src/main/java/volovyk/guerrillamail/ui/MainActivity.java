@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String assignedEmail;
     private ActivityMainBinding binding;
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,15 +28,21 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        MainViewModel mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
+        mainViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         mainViewModel.getAssignedEmail().observe(this,
                 email -> {
-                    binding.emailTextView.setText(getString(R.string.your_temporary_email, email));
-                    assignedEmail = email;
+                    if (email != null) {
+                        binding.emailTextView.setText(getString(R.string.your_temporary_email, email));
+                        assignedEmail = email;
+                    } else {
+                        binding.emailTextView.setText(getString(R.string.getting_temporary_email));
+                    }
                 });
 
         binding.emailTextView.setOnClickListener(v -> copyEmailToClipboard());
+
+        binding.getNewAddressButton.setOnClickListener(v -> getNewAddress());
 
         mainViewModel.getRefreshing().observe(this, refreshing -> {
             if (refreshing) {
@@ -54,6 +62,20 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void getNewAddress() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.app_name);
+        builder.setMessage(getString(R.string.confirm_getting_new_address));
+        builder.setIcon(R.drawable.ic_launcher_icon);
+        builder.setPositiveButton(getString(R.string.yes), (dialog, id) -> {
+            dialog.dismiss();
+            mainViewModel.getNewAddress();
+        });
+        builder.setNegativeButton(getString(R.string.no), (dialog, id) -> dialog.dismiss());
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     private void copyEmailToClipboard() {

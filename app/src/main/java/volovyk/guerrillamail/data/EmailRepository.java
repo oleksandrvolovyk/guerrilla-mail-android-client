@@ -5,9 +5,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LifecycleRegistry;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -26,11 +24,13 @@ public class EmailRepository implements LifecycleOwner {
     private final LiveData<Boolean> refreshing;
     private final LiveData<SingleEvent<String>> errorLiveData;
 
+    private final GuerrillaEmailDatabase guerrillaEmailDatabase;
     private final LocalEmailDatabase localEmailDatabase;
 
     @Inject
     public EmailRepository(GuerrillaEmailDatabase guerrillaEmailDatabase,
                            LocalEmailDatabase localEmailDatabase) {
+        this.guerrillaEmailDatabase = guerrillaEmailDatabase;
         this.localEmailDatabase = localEmailDatabase;
 
         this.assignedEmail = guerrillaEmailDatabase.getAssignedEmail();
@@ -44,6 +44,10 @@ public class EmailRepository implements LifecycleOwner {
         lifecycleRegistry.setCurrentState(Lifecycle.State.STARTED);
 
         remoteEmails.observe(this, this::insertAllToLocalDatabase);
+    }
+
+    public void getNewAddress() {
+        guerrillaEmailDatabase.getNewAddress();
     }
 
     public LiveData<String> getAssignedEmail() {
