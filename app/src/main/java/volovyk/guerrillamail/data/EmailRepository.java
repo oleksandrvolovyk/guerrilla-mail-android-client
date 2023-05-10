@@ -50,6 +50,10 @@ public class EmailRepository implements LifecycleOwner {
         guerrillaEmailDatabase.getNewAddress();
     }
 
+    public void setEmailAddress(String newAddress) {
+        guerrillaEmailDatabase.setEmailAddress(newAddress);
+    }
+
     public LiveData<String> getAssignedEmail() {
         return assignedEmail;
     }
@@ -64,7 +68,7 @@ public class EmailRepository implements LifecycleOwner {
     }
 
     // Must be called on a non-UI thread or Room will throw an exception.
-    public void insertAllToLocalDatabase(Collection<Email> emails) {
+    private void insertAllToLocalDatabase(Collection<Email> emails) {
         LocalEmailDatabase.databaseExecutorService.execute(() ->
                 localEmailDatabase.emailDao().insertAll(emails));
     }

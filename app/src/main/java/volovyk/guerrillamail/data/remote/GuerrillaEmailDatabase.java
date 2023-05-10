@@ -1,8 +1,8 @@
 package volovyk.guerrillamail.data.remote;
 
 import android.os.Handler;
-import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -19,10 +19,10 @@ import volovyk.guerrillamail.data.SingleEvent;
 import volovyk.guerrillamail.data.model.Email;
 import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse;
 import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse;
+import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse;
 
 @Singleton
 public class GuerrillaEmailDatabase {
-    private static final String TAG = "GuerrillaEmailDatabase";
     private final MutableLiveData<String> assignedEmail = new MutableLiveData<>();
     private final MutableLiveData<List<Email>> emails = new MutableLiveData<>(new ArrayList<>());
     private final MutableLiveData<Boolean> refreshing = new MutableLiveData<>(false);
@@ -35,9 +35,13 @@ public class GuerrillaEmailDatabase {
     APIInterface apiInterface;
 
     private final int REFRESH_INTERVAL = 5000; // 5 seconds
+    private final String SITE = "guerrillamail.com";
+    private final String LANG = "en";
     private final Handler mHandler;
 
     private boolean gotEmailAssigned = false;
+    private boolean needNewEmailAddress = false;
+    private String requestedEmailAddress;
 
     @Inject
     public GuerrillaEmailDatabase() {
@@ -54,6 +58,8 @@ public class GuerrillaEmailDatabase {
                 refreshing.postValue(true);
                 if (!gotEmailAssigned) {
                     getEmailAddress();
+                } else if (needNewEmailAddress) {
+                    makeSetEmailAddressRequest(requestedEmailAddress);
                 } else {
                     checkForNewEmails();
                 }
@@ -75,12 +81,53 @@ public class GuerrillaEmailDatabase {
         assignedEmail.postValue(null);
     }
 
+    public void setEmailAddress(String requestedEmailAddress) {
+        refreshing.postValue(true);
+        needNewEmailAddress = true;
+        assignedEmail.postValue(null);
+        this.requestedEmailAddress = requestedEmailAddress;
+    }
+
+    private void makeSetEmailAddressRequest(String requestedEmailAddress) {
+        Call<SetEmailAddressResponse> call = apiInterface
+                .setEmailAddress(sidToken,
+                        LANG,
+                        SITE,
+                        requestedEmailAddress);
+        call.enqueue(new Callback<>() {
+            @Override
+            public void onResponse(@NonNull Call<SetEmailAddressResponse> call,
+                                   @NonNull Response<SetEmailAddressResponse> response) {
+                SetEmailAddressResponse setEmailAddressResponse = response.body();
+
+                if (setEmailAddressResponse != null) {
+                    if (setEmailAddressResponse.getSidToken() != null) {
+                        sidToken = setEmailAddressResponse.getSidToken();
+                    }
+                    if (setEmailAddressResponse.getEmailAddress() != null) {
+                        String newEmailAddress = setEmailAddressResponse.getEmailAddress();
+                        assignedEmail.postValue(newEmailAddress);
+                        needNewEmailAddress = false;
+                        gotEmailAssigned = true;
+                    }
+                    refreshing.postValue(false);
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<SetEmailAddressResponse> call,
+                                  @NonNull Throwable t) {
+                setError(t.getLocalizedMessage());
+            }
+        });
+    }
+
     private void getEmailAddress() {
         Call<GetEmailAddressResponse> call = apiInterface.getEmailAddress();
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<GetEmailAddressResponse> call, Response<GetEmailAddressResponse> response) {
-                Log.d(TAG, response.code() + "");
+            public void onResponse(@NonNull Call<GetEmailAddressResponse> call,
+                                   @NonNull Response<GetEmailAddressResponse> response) {
                 GetEmailAddressResponse getEmailAddressResponse = response.body();
 
                 if (getEmailAddressResponse != null) {
@@ -88,13 +135,11 @@ public class GuerrillaEmailDatabase {
                     assignedEmail.postValue(getEmailAddressResponse.getEmailAddress());
                     gotEmailAssigned = true;
                     refreshing.postValue(false);
-
-                    Log.d(TAG, "Assigned email: " + getEmailAddressResponse.getEmailAddress());
                 }
             }
 
             @Override
-            public void onFailure(Call<GetEmailAddressResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<GetEmailAddressResponse> call, @NonNull Throwable t) {
                 setError(t.getLocalizedMessage());
             }
         });
@@ -104,11 +149,14 @@ public class GuerrillaEmailDatabase {
         Call<CheckForNewEmailsResponse> call = apiInterface.checkForNewEmails(sidToken, seq);
         call.enqueue(new Callback<>() {
             @Override
-            public void onResponse(Call<CheckForNewEmailsResponse> call, Response<CheckForNewEmailsResponse> response) {
-                Log.d(TAG, response.code() + "");
+            public void onResponse(@NonNull Call<CheckForNewEmailsResponse> call,
+                                   @NonNull Response<CheckForNewEmailsResponse> response) {
                 CheckForNewEmailsResponse checkForNewEmailsResponse = response.body();
 
                 if (checkForNewEmailsResponse != null) {
+                    if (checkForNewEmailsResponse.getSidToken() != null) {
+                        sidToken = checkForNewEmailsResponse.getSidToken();
+                    }
                     if (checkForNewEmailsResponse.getEmails() != null) {
                         if (!checkForNewEmailsResponse.getEmails().isEmpty()) {
                             fetchAllEmails(checkForNewEmailsResponse.getEmails());
@@ -119,7 +167,8 @@ public class GuerrillaEmailDatabase {
             }
 
             @Override
-            public void onFailure(Call<CheckForNewEmailsResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<CheckForNewEmailsResponse> call,
+                                  @NonNull Throwable t) {
                 setError(t.getLocalizedMessage());
             }
         });
@@ -131,9 +180,8 @@ public class GuerrillaEmailDatabase {
 
             call.enqueue(new Callback<>() {
                 @Override
-                public void onResponse(Call<Email> call, Response<Email> response) {
-                    Log.d(TAG, response.code() + "");
-
+                public void onResponse(@NonNull Call<Email> call,
+                                       @NonNull Response<Email> response) {
                     Email fullEmail = response.body();
 
                     if (fullEmail != null) {
@@ -146,7 +194,7 @@ public class GuerrillaEmailDatabase {
                 }
 
                 @Override
-                public void onFailure(Call<Email> call, Throwable t) {
+                public void onFailure(@NonNull Call<Email> call, @NonNull Throwable t) {
                     setError(t.getLocalizedMessage());
                 }
             });

@@ -34,6 +34,10 @@ public class MainViewModel extends ViewModel {
         emailRepository.getNewAddress();
     }
 
+    public void setEmailAddress(String newAddress) {
+        emailRepository.setEmailAddress(newAddress);
+    }
+
     public LiveData<String> getAssignedEmail() {
         return assignedEmail;
     }
