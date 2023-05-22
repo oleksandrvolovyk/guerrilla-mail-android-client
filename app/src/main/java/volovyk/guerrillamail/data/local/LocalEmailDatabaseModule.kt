@@ -1,26 +1,24 @@
-package volovyk.guerrillamail.data.local;
+package volovyk.guerrillamail.data.local
 
-import android.content.Context;
+import android.content.Context
+import androidx.room.Room.databaseBuilder
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
-import androidx.room.Room;
-
-import dagger.Module;
-import dagger.Provides;
-import dagger.hilt.InstallIn;
-import dagger.hilt.android.qualifiers.ApplicationContext;
-import dagger.hilt.components.SingletonComponent;
-
-@InstallIn(SingletonComponent.class)
+@InstallIn(SingletonComponent::class)
 @Module
-public class LocalEmailDatabaseModule {
+object LocalEmailDatabaseModule {
     @Provides
-    public LocalEmailDatabase provideDatabase(@ApplicationContext Context appContext) {
-        return Room.databaseBuilder(appContext, LocalEmailDatabase.class, "email-database")
-                .build();
+    fun provideDatabase(@ApplicationContext appContext: Context): LocalEmailDatabase {
+        return databaseBuilder(appContext, LocalEmailDatabase::class.java, "email-database")
+            .build()
     }
 
     @Provides
-    public EmailDao provideEmailDao(LocalEmailDatabase localEmailDatabase) {
-        return  localEmailDatabase.emailDao();
+    fun provideEmailDao(localEmailDatabase: LocalEmailDatabase): EmailDao {
+        return localEmailDatabase.emailDao()
     }
 }
