@@ -79,7 +79,7 @@ class GuerrillaEmailDatabase @Inject constructor() {
             )
 
         try {
-            val response = call!!.execute()
+            val response = call.execute()
 
             val setEmailAddressResponse = response.body()
             if (response.isSuccessful && setEmailAddressResponse != null) {
@@ -102,7 +102,7 @@ class GuerrillaEmailDatabase @Inject constructor() {
             val call = apiInterface.emailAddress
 
             try {
-                val response = call!!.execute()
+                val response = call.execute()
 
                 val getEmailAddressResponse = response.body()
                 if (response.isSuccessful && getEmailAddressResponse != null) {
@@ -123,7 +123,7 @@ class GuerrillaEmailDatabase @Inject constructor() {
         val call = apiInterface.checkForNewEmails(sidToken, seq)
 
         try {
-            val response = call!!.execute()
+            val response = call.execute()
 
             val checkForNewEmailsResponse = response.body()
             if (response.isSuccessful && checkForNewEmailsResponse != null) {
@@ -147,7 +147,7 @@ class GuerrillaEmailDatabase @Inject constructor() {
         for (email in emailsList) {
             val call = apiInterface.fetchEmail(sidToken, email.id)
             try {
-                val response = call!!.execute()
+                val response = call.execute()
 
                 val fullEmail = response.body()
                 if (response.isSuccessful && fullEmail != null) {
