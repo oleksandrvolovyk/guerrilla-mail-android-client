@@ -28,7 +28,7 @@ class SpecificEmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mainViewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
-        mainViewModel.emails?.observe(viewLifecycleOwner) { emails: List<Email?>? ->
+        mainViewModel.emails.observe(viewLifecycleOwner) { emails: List<Email?>? ->
             val chosenEmail = emails?.get(chosenEmail)
             if (chosenEmail != null) {
                 binding.fromTextView.text = getString(R.string.from, chosenEmail.from)

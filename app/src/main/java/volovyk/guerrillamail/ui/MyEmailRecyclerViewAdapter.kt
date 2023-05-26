@@ -17,7 +17,7 @@ class MyEmailRecyclerViewAdapter(viewModel: MainViewModel, lifecycleOwner: Lifec
     RecyclerView.Adapter<MyEmailRecyclerViewAdapter.ViewHolder>() {
     init {
         Companion.viewModel = viewModel
-        viewModel.emails?.observe(lifecycleOwner) { emails: List<Email?>? ->
+        viewModel.emails.observe(lifecycleOwner) { emails: List<Email?>? ->
             currentEmails = emails
             notifyDataSetChanged()
         }
