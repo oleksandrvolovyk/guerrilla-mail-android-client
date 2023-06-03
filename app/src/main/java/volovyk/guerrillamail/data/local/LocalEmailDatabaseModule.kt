@@ -14,6 +14,7 @@ object LocalEmailDatabaseModule {
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): LocalEmailDatabase {
         return databaseBuilder(appContext, LocalEmailDatabase::class.java, "email-database")
+            .fallbackToDestructiveMigration()
             .build()
     }
 

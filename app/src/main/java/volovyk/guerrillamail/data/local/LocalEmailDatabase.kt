@@ -6,7 +6,7 @@ import volovyk.guerrillamail.data.model.Email
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-@Database(entities = [Email::class], version = 1)
+@Database(entities = [Email::class], version = 2)
 abstract class LocalEmailDatabase : RoomDatabase() {
     abstract fun emailDao(): EmailDao
 
