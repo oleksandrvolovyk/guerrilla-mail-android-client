@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GuerrillaEmailDatabase @Inject constructor() {
+class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiInterface) {
 
     private val _assignedEmail = MutableLiveData<String?>()
     val assignedEmail: LiveData<String?> = _assignedEmail
@@ -48,7 +48,6 @@ class GuerrillaEmailDatabase @Inject constructor() {
 
     private var sidToken: String? = null
     private var seq = 0
-    private val apiInterface: APIInterface = APIClient.client.create(APIInterface::class.java)
 
     private var gotEmailAssigned = false
     private var needNewEmailAddress = false
