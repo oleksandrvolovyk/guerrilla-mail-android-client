@@ -14,12 +14,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiInterface) {
+class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiInterface) :
+    RemoteEmailDatabase {
 
     private val _assignedEmail = MutableLiveData<String?>()
-    val assignedEmail: LiveData<String?> = _assignedEmail
+    override val assignedEmail: LiveData<String?> = _assignedEmail
 
-    val emails: Flow<List<Email>> = flow {
+    override val emails: Flow<List<Email>> = flow {
         while (true) {
             if (!gotEmailAssigned) {
                 _refreshing.postValue(true)
@@ -38,9 +39,9 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     }.flowOn(Dispatchers.IO)
 
     private val _refreshing = MutableLiveData(false)
-    val refreshing: LiveData<Boolean> = _refreshing
+    override val refreshing: LiveData<Boolean> = _refreshing
     private val _errorLiveData = MutableLiveData<SingleEvent<String>>()
-    val errorLiveData: LiveData<SingleEvent<String>> = _errorLiveData
+    override val errorLiveData: LiveData<SingleEvent<String>> = _errorLiveData
 
     private var sidToken: String? = null
     private var seq = 0
@@ -60,7 +61,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
         private const val LANG = "en"
     }
 
-    fun setEmailAddress(requestedEmailAddress: String) {
+    override fun setEmailAddress(requestedEmailAddress: String) {
         val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
 
         _assignedEmail.postValue(assignedEmailAddress)

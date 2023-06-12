@@ -8,26 +8,27 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import volovyk.guerrillamail.data.local.LocalEmailDatabase
+import volovyk.guerrillamail.data.local.RoomEmailDatabase
 import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.GuerrillaEmailDatabase
+import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class EmailRepository @Inject constructor(
-    private val guerrillaEmailDatabase: GuerrillaEmailDatabase,
+    private val remoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase
 ) : LifecycleOwner {
     private val lifecycleRegistry: LifecycleRegistry
-    val assignedEmail: LiveData<String?> = guerrillaEmailDatabase.assignedEmail
-    val emails: Flow<List<Email>> = localEmailDatabase.emailDao().all
+    val assignedEmail: LiveData<String?> = remoteEmailDatabase.assignedEmail
+    val emails: Flow<List<Email>> = localEmailDatabase.getEmailDao().all
     val refreshing: LiveData<Boolean>
     val errorLiveData: LiveData<SingleEvent<String>>
 
     init {
-        val remoteEmails = guerrillaEmailDatabase.emails
-        refreshing = guerrillaEmailDatabase.refreshing
-        errorLiveData = guerrillaEmailDatabase.errorLiveData
+        val remoteEmails = remoteEmailDatabase.emails
+        refreshing = remoteEmailDatabase.refreshing
+        errorLiveData = remoteEmailDatabase.errorLiveData
         lifecycleRegistry = LifecycleRegistry(this)
         lifecycleRegistry.currentState = Lifecycle.State.CREATED
         lifecycleRegistry.currentState = Lifecycle.State.STARTED
@@ -39,19 +40,19 @@ class EmailRepository @Inject constructor(
     }
 
     fun setEmailAddress(newAddress: String) {
-        guerrillaEmailDatabase.setEmailAddress(newAddress)
+        remoteEmailDatabase.setEmailAddress(newAddress)
     }
 
     fun deleteEmail(email: Email?) {
-        LocalEmailDatabase.databaseExecutorService.execute {
-            localEmailDatabase.emailDao().delete(email)
+        RoomEmailDatabase.databaseExecutorService.execute {
+            localEmailDatabase.getEmailDao().delete(email)
         }
     }
 
     // Must be called on a non-UI thread or Room will throw an exception.
     private fun insertAllToLocalDatabase(emails: Collection<Email?>?) {
-        LocalEmailDatabase.databaseExecutorService.execute {
-            localEmailDatabase.emailDao().insertAll(emails)
+        RoomEmailDatabase.databaseExecutorService.execute {
+            localEmailDatabase.getEmailDao().insertAll(emails)
         }
     }
 

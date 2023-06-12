@@ -13,13 +13,13 @@ import dagger.hilt.components.SingletonComponent
 object LocalEmailDatabaseModule {
     @Provides
     fun provideDatabase(@ApplicationContext appContext: Context): LocalEmailDatabase {
-        return databaseBuilder(appContext, LocalEmailDatabase::class.java, "email-database")
+        return databaseBuilder(appContext, RoomEmailDatabase::class.java, "email-database")
             .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
     fun provideEmailDao(localEmailDatabase: LocalEmailDatabase): EmailDao {
-        return localEmailDatabase.emailDao()
+        return localEmailDatabase.getEmailDao()
     }
 }
