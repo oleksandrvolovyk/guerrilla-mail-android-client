@@ -2,13 +2,11 @@ package volovyk.guerrillamail.ui
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        mainViewModel.assignedEmail?.observe(
+        mainViewModel.assignedEmail.observe(
             this
         ) { email: String? ->
             if (email != null) {
@@ -85,18 +83,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun getNewAddress(newAddress: String) {
         if (isValidEmailAddress(newAddress)) {
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle(R.string.app_name)
-            builder.setMessage(getString(R.string.confirm_getting_new_address, newAddress))
-            builder.setIcon(R.drawable.ic_launcher_icon)
-            builder.setPositiveButton(getString(R.string.yes)) { dialog: DialogInterface, _: Int ->
-                dialog.dismiss()
+            val confirmationDialog = UiHelper.createConfirmationDialog(
+                this,
+                getString(R.string.confirm_getting_new_address, newAddress)
+            ) {
                 mainViewModel.setEmailAddress(newAddress.substring(0, newAddress.indexOf("@")))
                 binding.getNewAddressButton.visibility = View.GONE
             }
-            builder.setNegativeButton(getString(R.string.no)) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-            val alert = builder.create()
-            alert.show()
+
+            confirmationDialog.show()
         } else {
             Toast.makeText(this, R.string.email_invalid, Toast.LENGTH_SHORT).show()
         }

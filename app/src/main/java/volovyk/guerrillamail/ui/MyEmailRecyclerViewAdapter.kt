@@ -1,11 +1,9 @@
 package volovyk.guerrillamail.ui
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.Navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
@@ -64,17 +62,13 @@ class MyEmailRecyclerViewAdapter(viewModel: MainViewModel, lifecycleOwner: Lifec
 
         private fun deleteEmail() {
             val context = itemView.context
-            val builder = AlertDialog.Builder(context)
-            builder.setTitle(R.string.app_name)
-            builder.setMessage(context.getString(R.string.confirm_deleting_email))
-            builder.setIcon(R.drawable.ic_launcher_icon)
-            builder.setPositiveButton(context.getString(R.string.yes)) { dialog: DialogInterface, _: Int ->
-                dialog.dismiss()
+            val confirmationDialog = UiHelper.createConfirmationDialog(
+                context,
+                context.getString(R.string.confirm_deleting_email)
+            ) {
                 viewModel!!.deleteEmail(currentEmails!![layoutPosition])
             }
-            builder.setNegativeButton(context.getString(R.string.no)) { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-            val alert = builder.create()
-            alert.show()
+            confirmationDialog.show()
         }
 
         override fun toString(): String {

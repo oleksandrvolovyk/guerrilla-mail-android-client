@@ -23,12 +23,8 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
         while (true) {
             if (!gotEmailAssigned) {
                 _refreshing.postValue(true)
-                emailAddress
-                _refreshing.postValue(false)
-                delay(EMAIL_ASSIGNMENT_INTERVAL) // Suspends the coroutine for some time
-            } else if (needNewEmailAddress) {
-                _refreshing.postValue(true)
-                makeSetEmailAddressRequest(requestedEmailAddress)
+                _assignedEmail.postValue(getEmailAddress())
+                gotEmailAssigned = true
                 _refreshing.postValue(false)
                 delay(EMAIL_ASSIGNMENT_INTERVAL) // Suspends the coroutine for some time
             } else {
@@ -49,9 +45,11 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     private var sidToken: String? = null
     private var seq = 0
 
+    fun getSidToken() = sidToken
+
+    fun getSeq() = seq
+
     private var gotEmailAssigned = false
-    private var needNewEmailAddress = false
-    private var requestedEmailAddress: String = ""
 
     companion object {
         private const val REFRESH_INTERVAL = 5000L // 5 seconds
@@ -63,12 +61,12 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     }
 
     fun setEmailAddress(requestedEmailAddress: String) {
-        needNewEmailAddress = true
-        _assignedEmail.postValue(null)
-        this.requestedEmailAddress = requestedEmailAddress
+        val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
+
+        _assignedEmail.postValue(assignedEmailAddress)
     }
 
-    private fun makeSetEmailAddressRequest(requestedEmailAddress: String) {
+    private fun makeSetEmailAddressRequest(requestedEmailAddress: String): String? {
         val call = apiInterface
             .setEmailAddress(
                 sidToken,
@@ -79,44 +77,45 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
 
         try {
             val response = call.execute()
-
             val setEmailAddressResponse = response.body()
-            if (response.isSuccessful && setEmailAddressResponse != null) {
+            return if (response.isSuccessful && setEmailAddressResponse != null) {
                 sidToken = setEmailAddressResponse.sidToken
-                _assignedEmail.postValue(setEmailAddressResponse.emailAddress)
-                needNewEmailAddress = false
-                gotEmailAssigned = true
+                setEmailAddressResponse.emailAddress
             } else {
                 setError("Something went wrong!")
+                null
             }
         } catch (e: IOException) {
             e.localizedMessage?.let { setError(it) }
+            return null
         } catch (e: RuntimeException) {
             e.localizedMessage?.let { setError(it) }
+            return null
         }
     }
 
-    private val emailAddress: Unit
-        get() {
-            val call = apiInterface.emailAddress
+    private fun getEmailAddress(): String? {
+        val call = apiInterface.emailAddress
 
-            try {
-                val response = call.execute()
+        try {
+            val response = call.execute()
 
-                val getEmailAddressResponse = response.body()
-                if (response.isSuccessful && getEmailAddressResponse != null) {
-                    sidToken = getEmailAddressResponse.sidToken
-                    _assignedEmail.postValue(getEmailAddressResponse.emailAddress)
-                    gotEmailAssigned = true
-                } else {
-                    setError("Something went wrong!")
-                }
-            } catch (e: IOException) {
-                e.localizedMessage?.let { setError(it) }
-            } catch (e: RuntimeException) {
-                e.localizedMessage?.let { setError(it) }
+            val getEmailAddressResponse = response.body()
+            return if (response.isSuccessful && getEmailAddressResponse != null) {
+                sidToken = getEmailAddressResponse.sidToken
+                getEmailAddressResponse.emailAddress
+            } else {
+                setError("Something went wrong!")
+                null
             }
+        } catch (e: IOException) {
+            e.localizedMessage?.let { setError(it) }
+            return null
+        } catch (e: RuntimeException) {
+            e.localizedMessage?.let { setError(it) }
+            return null
         }
+    }
 
     private fun checkForNewEmails(): List<Email> {
         val call = apiInterface.checkForNewEmails(sidToken, seq)

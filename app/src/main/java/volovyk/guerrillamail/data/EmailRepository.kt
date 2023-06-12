@@ -19,14 +19,12 @@ class EmailRepository @Inject constructor(
     private val localEmailDatabase: LocalEmailDatabase
 ) : LifecycleOwner {
     private val lifecycleRegistry: LifecycleRegistry
-    val assignedEmail: LiveData<String?>?
-    val emails: Flow<List<Email>>
+    val assignedEmail: LiveData<String?> = guerrillaEmailDatabase.assignedEmail
+    val emails: Flow<List<Email>> = localEmailDatabase.emailDao().all
     val refreshing: LiveData<Boolean>
     val errorLiveData: LiveData<SingleEvent<String>>
 
     init {
-        assignedEmail = guerrillaEmailDatabase.assignedEmail
-        emails = localEmailDatabase.emailDao().all
         val remoteEmails = guerrillaEmailDatabase.emails
         refreshing = guerrillaEmailDatabase.refreshing
         errorLiveData = guerrillaEmailDatabase.errorLiveData
