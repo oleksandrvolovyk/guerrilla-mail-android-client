@@ -24,8 +24,11 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
         while (true) {
             if (!gotEmailAssigned) {
                 _refreshing.postValue(true)
-                _assignedEmail.postValue(getEmailAddress())
-                gotEmailAssigned = true
+                val email = getEmailAddress()
+                _assignedEmail.postValue(email)
+                if (email != null) {
+                    gotEmailAssigned = true
+                }
                 _refreshing.postValue(false)
                 delay(EMAIL_ASSIGNMENT_INTERVAL) // Suspends the coroutine for some time
             } else {
