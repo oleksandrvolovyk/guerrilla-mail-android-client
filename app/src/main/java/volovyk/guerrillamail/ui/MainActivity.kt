@@ -7,11 +7,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.SingleEvent
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
 
@@ -19,19 +18,42 @@ import java.util.regex.Pattern
 class MainActivity : AppCompatActivity() {
     private var assignedEmail: String? = null
     private lateinit var binding: ActivityMainBinding
-    private lateinit var mainViewModel: MainViewModel
+    private val mainViewModel: MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
-        mainViewModel.assignedEmail.observe(
-            this
-        ) { email: String? ->
+
+        binding.apply {
+            emailTextView.setOnClickListener { copyEmailToClipboard() }
+            emailDomainTextView.setOnClickListener { copyEmailToClipboard() }
+            getNewAddressButton.setOnClickListener {
+                getNewAddress(
+                    "${emailUsernameEditText.text}${emailDomainTextView.text}"
+                )
+            }
+            emailUsernameEditText.addTextChangedListener(object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable) {
+                    if (assignedEmail != null) {
+                        getNewAddressButton.visibility =
+                            if (assignedEmail!!.emailUsernamePart() != s.toString()) {
+                                View.VISIBLE
+                            } else {
+                                View.GONE
+                            }
+                    }
+                }
+            })
+        }
+
+        mainViewModel.assignedEmail.observe(this) { email ->
             if (email != null) {
                 binding.emailTextView.text = getString(R.string.your_temporary_email)
-                binding.emailUsernameEditText.setText(email.substring(0, email.indexOf("@")))
-                binding.emailDomainTextView.text = email.substring(email.indexOf("@"))
+                binding.emailUsernameEditText.setText(email.emailUsernamePart())
+                binding.emailDomainTextView.text = email.emailDomainPart()
                 assignedEmail = email
                 binding.getNewAddressButton.visibility = View.GONE
             } else {
@@ -39,55 +61,28 @@ class MainActivity : AppCompatActivity() {
                 binding.emailUsernameEditText.setText("")
             }
         }
-        binding.emailTextView.setOnClickListener { copyEmailToClipboard() }
-        binding.emailDomainTextView.setOnClickListener { copyEmailToClipboard() }
-        binding.getNewAddressButton.setOnClickListener {
-            getNewAddress(
-                binding.emailUsernameEditText.text.toString() +
-                        binding.emailDomainTextView.text.toString()
-            )
-        }
-        binding.emailUsernameEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable) {
-                if (assignedEmail != null) {
-                    if (assignedEmail!!.substring(
-                            0,
-                            assignedEmail!!.indexOf("@")
-                        ) != s.toString()
-                    ) {
-                        binding.getNewAddressButton.visibility = View.VISIBLE
-                    } else {
-                        binding.getNewAddressButton.visibility = View.GONE
-                    }
-                }
-            }
-        })
-        mainViewModel.refreshing.observe(this) { refreshing: Boolean? ->
-            if (refreshing!!) {
-                binding.refreshingSpinner.visibility = View.VISIBLE
+
+        mainViewModel.refreshing.observe(this) { refreshing ->
+            binding.refreshingSpinner.visibility = if (refreshing == true) {
+                View.VISIBLE
             } else {
-                binding.refreshingSpinner.visibility = View.INVISIBLE
+                View.INVISIBLE
             }
         }
-        mainViewModel.errorLiveData.observe(this) { errorEvent: SingleEvent<String> ->
-            if (!errorEvent.hasBeenHandled()) {
-                val errorText = errorEvent.contentIfNotHandled
-                if (errorText != null) {
-                    Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show()
-                }
+
+        mainViewModel.errorLiveData.observe(this) { errorEvent ->
+            errorEvent.contentIfNotHandled.let { errorText ->
+                Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     private fun getNewAddress(newAddress: String) {
-        if (isValidEmailAddress(newAddress)) {
+        if (newAddress.isValidEmailAddress()) {
             val confirmationDialog = UiHelper.createConfirmationDialog(
-                this,
-                getString(R.string.confirm_getting_new_address, newAddress)
+                this, getString(R.string.confirm_getting_new_address, newAddress)
             ) {
-                mainViewModel.setEmailAddress(newAddress.substring(0, newAddress.indexOf("@")))
+                mainViewModel.setEmailAddress(newAddress.emailUsernamePart())
                 binding.getNewAddressButton.visibility = View.GONE
             }
 
@@ -97,16 +92,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isValidEmailAddress(email: String): Boolean {
+    private fun String.isValidEmailAddress(): Boolean {
         val pattern = Pattern.compile("^.+@.+\\..+$")
-        val matcher = pattern.matcher(email)
+        val matcher = pattern.matcher(this)
         return matcher.matches()
     }
 
+    private fun String.emailUsernamePart(): String {
+        return this.substringBefore("@")
+    }
+
+    private fun String.emailDomainPart(): String {
+        return "@" + this.substringAfter("@")
+    }
+
     private fun copyEmailToClipboard() {
-        if (assignedEmail != null) {
+        assignedEmail?.let { email ->
             val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText(getString(R.string.app_name), assignedEmail)
+            val clip = ClipData.newPlainText(getString(R.string.app_name), email)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, R.string.email_in_clipboard, Toast.LENGTH_SHORT).show()
         }
