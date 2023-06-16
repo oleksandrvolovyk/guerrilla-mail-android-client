@@ -5,10 +5,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import volovyk.guerrillamail.data.local.LocalEmailDatabase
-import volovyk.guerrillamail.data.local.RoomEmailDatabase
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import javax.inject.Inject
@@ -39,19 +40,21 @@ class EmailRepository @Inject constructor(
         }
     }
 
-    fun setEmailAddress(newAddress: String) {
-        remoteEmailDatabase.setEmailAddress(newAddress)
+    suspend fun setEmailAddress(newAddress: String) {
+        withContext(Dispatchers.IO) {
+            remoteEmailDatabase.setEmailAddress(newAddress)
+        }
     }
 
-    fun deleteEmail(email: Email?) {
-        RoomEmailDatabase.databaseExecutorService.execute {
+    suspend fun deleteEmail(email: Email?) {
+        withContext(Dispatchers.IO) {
             localEmailDatabase.getEmailDao().delete(email)
         }
     }
 
     // Must be called on a non-UI thread or Room will throw an exception.
-    private fun insertAllToLocalDatabase(emails: Collection<Email?>?) {
-        RoomEmailDatabase.databaseExecutorService.execute {
+    private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) {
+        withContext(Dispatchers.IO) {
             localEmailDatabase.getEmailDao().insertAll(emails)
         }
     }

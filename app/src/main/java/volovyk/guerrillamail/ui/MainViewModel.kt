@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import volovyk.guerrillamail.data.EmailRepository
 import volovyk.guerrillamail.data.SingleEvent
 import volovyk.guerrillamail.data.model.Email
@@ -32,13 +30,13 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
 
     fun setEmailAddress(newAddress: String) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                emailRepository.setEmailAddress(newAddress)
-            }
+            emailRepository.setEmailAddress(newAddress)
         }
     }
 
     fun deleteEmail(email: Email?) {
-        emailRepository.deleteEmail(email)
+        viewModelScope.launch {
+            emailRepository.deleteEmail(email)
+        }
     }
 }
