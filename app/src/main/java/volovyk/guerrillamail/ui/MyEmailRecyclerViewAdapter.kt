@@ -1,22 +1,28 @@
 package volovyk.guerrillamail.ui
 
-import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.Navigation.findNavController
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.databinding.FragmentEmailBinding
 
-class MyEmailRecyclerViewAdapter(viewModel: MainViewModel, lifecycleOwner: LifecycleOwner) :
-    RecyclerView.Adapter<MyEmailRecyclerViewAdapter.ViewHolder>() {
+class MyEmailRecyclerViewAdapter(
+    emails: LiveData<List<Email>>,
+    lifecycleOwner: LifecycleOwner,
+    private val onItemClick: (Int) -> Unit,
+    private val onItemDeleteButtonClick: (Email) -> Unit
+) : RecyclerView.Adapter<MyEmailRecyclerViewAdapter.ViewHolder>() {
+
+    private var currentEmails: List<Email> = emptyList()
+
     init {
-        Companion.viewModel = viewModel
-        viewModel.emails.observe(lifecycleOwner) { emails: List<Email?>? ->
-            currentEmails = emails
+        emails.observe(lifecycleOwner) {
+            currentEmails = it
             notifyDataSetChanged()
         }
     }
@@ -32,52 +38,31 @@ class MyEmailRecyclerViewAdapter(viewModel: MainViewModel, lifecycleOwner: Lifec
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.mFromView.text = currentEmails!![position]?.from ?: "Unknown"
-        holder.mSubjectView.text = currentEmails!![position]?.subject ?: "Unknown"
+        holder.mFromView.text = currentEmails[position].from
+        holder.mSubjectView.text = currentEmails[position].subject
+        holder.mEmailFragmentLayout.setOnClickListener {
+            onItemClick(position)
+        }
+        holder.mDeleteButton.setOnClickListener {
+            onItemDeleteButtonClick(currentEmails[position])
+        }
     }
 
     override fun getItemCount(): Int {
-        return currentEmails!!.size
+        return currentEmails.size
     }
 
     class ViewHolder(binding: FragmentEmailBinding) : RecyclerView.ViewHolder(binding.root) {
         val mFromView: TextView
         val mSubjectView: TextView
+        val mEmailFragmentLayout: ConstraintLayout
+        val mDeleteButton: ImageButton
 
         init {
             mFromView = binding.from
             mSubjectView = binding.subject
-            binding.emailFragmentLayout.setOnClickListener { openEmail(binding) }
-            binding.deleteButton.setOnClickListener { deleteEmail() }
+            mEmailFragmentLayout = binding.emailFragmentLayout
+            mDeleteButton = binding.deleteButton
         }
-
-        private fun openEmail(binding: FragmentEmailBinding) {
-            val bundle = Bundle()
-            bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL, layoutPosition)
-            findNavController(binding.emailFragmentLayout).navigate(
-                R.id.action_emailFragment_to_specificEmailFragment2,
-                bundle
-            )
-        }
-
-        private fun deleteEmail() {
-            val context = itemView.context
-            val confirmationDialog = UiHelper.createConfirmationDialog(
-                context,
-                context.getString(R.string.confirm_deleting_email)
-            ) {
-                viewModel!!.deleteEmail(currentEmails!![layoutPosition])
-            }
-            confirmationDialog.show()
-        }
-
-        override fun toString(): String {
-            return super.toString() + " '" + mSubjectView.text + "'"
-        }
-    }
-
-    companion object {
-        private var currentEmails: List<Email?>? = ArrayList()
-        private var viewModel: MainViewModel? = null
     }
 }
