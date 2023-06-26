@@ -34,59 +34,44 @@ class MyEmailRecyclerViewAdapter(
         private val newList: List<Email>
     ) : DiffUtil.Callback() {
 
-        override fun getOldListSize(): Int {
-            return oldList.size
-        }
+        override fun getOldListSize(): Int = oldList.size
 
-        override fun getNewListSize(): Int {
-            return newList.size
-        }
+        override fun getNewListSize(): Int = newList.size
 
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition].id == newList[newItemPosition].id
-        }
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition].id == newList[newItemPosition].id
 
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldList[oldItemPosition] == newList[newItemPosition]
-        }
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition] == newList[newItemPosition]
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
+        ViewHolder(
             FragmentEmailBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
         )
-    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.mFromView.text = currentEmails[position].from
-        holder.mSubjectView.text = currentEmails[position].subject
+        val email = currentEmails[position]
+        holder.mFromView.text = email.from
+        holder.mSubjectView.text = email.subject
         holder.mEmailFragmentLayout.setOnClickListener {
             onItemClick(position)
         }
         holder.mDeleteButton.setOnClickListener {
-            onItemDeleteButtonClick(currentEmails[position])
+            onItemDeleteButtonClick(email)
         }
     }
 
-    override fun getItemCount(): Int {
-        return currentEmails.size
-    }
+    override fun getItemCount(): Int = currentEmails.size
 
     class ViewHolder(binding: FragmentEmailBinding) : RecyclerView.ViewHolder(binding.root) {
-        val mFromView: TextView
-        val mSubjectView: TextView
-        val mEmailFragmentLayout: ConstraintLayout
-        val mDeleteButton: ImageButton
-
-        init {
-            mFromView = binding.from
-            mSubjectView = binding.subject
-            mEmailFragmentLayout = binding.emailFragmentLayout
-            mDeleteButton = binding.deleteButton
-        }
+        val mFromView: TextView = binding.from
+        val mSubjectView: TextView = binding.subject
+        val mEmailFragmentLayout: ConstraintLayout = binding.emailFragmentLayout
+        val mDeleteButton: ImageButton = binding.deleteButton
     }
 }
