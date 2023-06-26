@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Entity
-class Email(
+data class Email(
     @field:SerializedName("mail_from") val from: String,
     @field:SerializedName("mail_subject") val subject: String,
     @field:SerializedName("mail_body") var body: String,
