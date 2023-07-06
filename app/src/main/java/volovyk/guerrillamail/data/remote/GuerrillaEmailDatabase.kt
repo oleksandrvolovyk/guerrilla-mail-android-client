@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiInterface) :
+class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInterface: GuerrillaMailApiInterface) :
     RemoteEmailDatabase {
 
     private val _assignedEmail = MutableLiveData<String?>()
@@ -71,7 +71,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     }
 
     private fun makeSetEmailAddressRequest(requestedEmailAddress: String): String? {
-        val call = apiInterface
+        val call = guerrillaMailApiInterface
             .setEmailAddress(
                 sidToken,
                 LANG,
@@ -99,7 +99,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     }
 
     private fun getEmailAddress(): String? {
-        val call = apiInterface.emailAddress
+        val call = guerrillaMailApiInterface.emailAddress
 
         try {
             val response = call.execute()
@@ -122,7 +122,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     }
 
     private fun checkForNewEmails(): List<Email> {
-        val call = apiInterface.checkForNewEmails(sidToken, seq)
+        val call = guerrillaMailApiInterface.checkForNewEmails(sidToken, seq)
 
         try {
             val response = call.execute()
@@ -147,7 +147,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val apiInterface: ApiIn
     private fun fetchAllEmails(emailsList: List<Email>): List<Email> {
         val fetchedEmailsList: MutableList<Email> = mutableListOf()
         for (email in emailsList) {
-            val call = apiInterface.fetchEmail(sidToken, email.id)
+            val call = guerrillaMailApiInterface.fetchEmail(sidToken, email.id)
             try {
                 val response = call.execute()
 

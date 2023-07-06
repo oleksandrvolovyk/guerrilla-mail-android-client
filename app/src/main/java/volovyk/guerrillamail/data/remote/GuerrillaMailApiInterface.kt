@@ -8,7 +8,7 @@ import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse
 import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse
 import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse
 
-interface ApiInterface {
+interface GuerrillaMailApiInterface {
     @get:GET("ajax.php?f=get_email_address")
     val emailAddress: Call<GetEmailAddressResponse>
 

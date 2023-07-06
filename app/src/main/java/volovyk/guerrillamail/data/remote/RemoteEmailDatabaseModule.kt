@@ -11,13 +11,13 @@ import javax.inject.Singleton
 object RemoteEmailDatabaseModule {
     @Provides
     @Singleton
-    fun provideApiInterface(): ApiInterface {
-        return ApiClient.client.create(ApiInterface::class.java)
+    fun provideApiInterface(): GuerrillaMailApiInterface {
+        return GuerrillaMailApiClient.client.create(GuerrillaMailApiInterface::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideRemoteEmailDatabase(apiInterface: ApiInterface): RemoteEmailDatabase {
-        return GuerrillaEmailDatabase(apiInterface)
+    fun provideRemoteEmailDatabase(guerrillaMailApiInterface: GuerrillaMailApiInterface): RemoteEmailDatabase {
+        return GuerrillaEmailDatabase(guerrillaMailApiInterface)
     }
 }

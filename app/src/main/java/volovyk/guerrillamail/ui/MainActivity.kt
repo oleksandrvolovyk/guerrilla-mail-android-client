@@ -9,10 +9,13 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
+
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -24,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        initAdMob()
 
         binding.apply {
             emailTextView.setOnClickListener { copyEmailToClipboard() }
@@ -75,6 +80,19 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    private fun initAdMob() {
+        val requestConfiguration = MobileAds.getRequestConfiguration()
+            .toBuilder()
+            .setTagForChildDirectedTreatment(
+                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+            )
+            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+            .build()
+        MobileAds.setRequestConfiguration(requestConfiguration)
+
+        MobileAds.initialize(this)
     }
 
     private fun getNewAddress(newAddress: String) {

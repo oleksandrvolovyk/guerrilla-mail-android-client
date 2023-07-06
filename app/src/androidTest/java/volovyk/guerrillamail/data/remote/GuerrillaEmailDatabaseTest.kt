@@ -27,9 +27,9 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun setEmailAddressShouldUpdateAssignedEmailAndSidToken() {
-        // Create a mock ApiInterface
-        val apiInterface = mock<ApiInterface>()
-        val database = GuerrillaEmailDatabase(apiInterface)
+        // Create a mock GuerrillaMailApiInterface
+        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
+        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
         val requestedEmailAddress = "testytest@guerrillamailblock.com"
         val sidToken = "setEmailAddressShouldUpdateAssignedEmailAddressAndSidToken"
 
@@ -38,7 +38,7 @@ class GuerrillaEmailDatabaseTest {
             SetEmailAddressResponse(requestedEmailAddress, sidToken)
         )
         `when`(
-            apiInterface.setEmailAddress(
+            guerrillaMailApiInterface.setEmailAddress(
                 anyOrNull(),
                 anyOrNull(),
                 anyOrNull(),
@@ -63,9 +63,9 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun emailsFlowCollectShouldTryToGetAnEmailAddress() = runTest {
-        // Create a mock ApiInterface
-        val apiInterface = mock<ApiInterface>()
-        val database = GuerrillaEmailDatabase(apiInterface)
+        // Create a mock GuerrillaMailApiInterface
+        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
+        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
 
         val emailAddress = "testytest@guerrillamailblock.com"
         val sidToken = "newSidToken"
@@ -77,7 +77,7 @@ class GuerrillaEmailDatabaseTest {
             )
         )
 
-        `when`(apiInterface.emailAddress).thenReturn(Calls.response(response))
+        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(response))
 
         database.emails.first()
 
@@ -92,9 +92,9 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun emailsFlowEmitsCorrectEmails() = runTest {
-        // Create a mock ApiInterface
-        val apiInterface = mock<ApiInterface>()
-        val database = GuerrillaEmailDatabase(apiInterface)
+        // Create a mock GuerrillaMailApiInterface
+        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
+        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
 
         val emailAddress = "testytest@guerrillamailblock.com"
         val sidToken = "newSidToken"
@@ -104,7 +104,7 @@ class GuerrillaEmailDatabaseTest {
             GetEmailAddressResponse(emailAddress, sidToken)
         )
 
-        `when`(apiInterface.emailAddress).thenReturn(Calls.response(getEmailAddressResponse))
+        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(getEmailAddressResponse))
 
         val remoteEmails = listOf(
             Email("from0", "subject0", "body0", "date0", 0),
@@ -123,17 +123,17 @@ class GuerrillaEmailDatabaseTest {
         )
 
         `when`(
-            apiInterface.checkForNewEmails(
+            guerrillaMailApiInterface.checkForNewEmails(
                 anyOrNull(),
                 anyInt()
             )
         ).thenReturn(Calls.response(checkForNewEmailsResponse))
 
-        `when`(apiInterface.fetchEmail(anyOrNull(), eq(0)))
+        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(0)))
             .thenReturn(Calls.response(remoteFullEmails[0]))
-        `when`(apiInterface.fetchEmail(anyOrNull(), eq(1)))
+        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(1)))
             .thenReturn(Calls.response(remoteFullEmails[1]))
-        `when`(apiInterface.fetchEmail(anyOrNull(), eq(2)))
+        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(2)))
             .thenReturn(Calls.response(remoteFullEmails[2]))
 
         val emittedEmails = database.emails.first()

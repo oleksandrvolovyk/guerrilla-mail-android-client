@@ -9,7 +9,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdError
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
+import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.model.Email
 
@@ -19,6 +26,8 @@ import volovyk.guerrillamail.data.model.Email
 @AndroidEntryPoint
 class EmailFragment : Fragment() {
     private val mainViewModel: MainViewModel by viewModels()
+
+    private var mInterstitialAd: InterstitialAd? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +46,54 @@ class EmailFragment : Fragment() {
                 onItemDeleteButtonClick = { email -> deleteEmail(email) })
         }
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val adRequest = AdRequest.Builder().build()
+
+        val adId = if (BuildConfig.DEBUG) {
+            BuildConfig.ADMOB_TEST_AD_ID
+        } else {
+            BuildConfig.ADMOB_MY_AD_ID
+        }
+
+        context?.let {
+            InterstitialAd.load(
+                it,
+                adId,
+                adRequest,
+                object : InterstitialAdLoadCallback() {
+                    override fun onAdFailedToLoad(adError: LoadAdError) {
+                        mInterstitialAd = null
+                    }
+
+                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
+                        mInterstitialAd = interstitialAd
+                    }
+                })
+        }
+
+        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                mInterstitialAd = null
+            }
+
+            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+                mInterstitialAd = null
+            }
+        }
+
+        val navController = Navigation.findNavController(view)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.emailFragment) {
+                // User has navigated back to the email list
+                if (mInterstitialAd != null) {
+                    activity?.let { mInterstitialAd?.show(it) }
+                }
+            }
+        }
     }
 
     private fun navigateToSpecificEmail(position: Int) {

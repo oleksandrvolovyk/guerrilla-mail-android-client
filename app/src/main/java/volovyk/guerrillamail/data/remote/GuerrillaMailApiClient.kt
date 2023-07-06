@@ -5,7 +5,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object ApiClient {
+object GuerrillaMailApiClient {
     val client: Retrofit
         get() {
             val interceptor = HttpLoggingInterceptor()
