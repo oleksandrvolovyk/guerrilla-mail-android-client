@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import volovyk.guerrillamail.data.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import javax.inject.Singleton
@@ -14,9 +15,10 @@ object EmailRepositoryModule {
     @Provides
     @Singleton
     fun provideEmailRepository(
+        externalScope: CoroutineScope,
         remoteEmailDatabase: RemoteEmailDatabase,
         localEmailDatabase: LocalEmailDatabase
     ): EmailRepository {
-        return EmailRepositoryImpl(remoteEmailDatabase, localEmailDatabase)
+        return EmailRepositoryImpl(externalScope, remoteEmailDatabase, localEmailDatabase)
     }
 }

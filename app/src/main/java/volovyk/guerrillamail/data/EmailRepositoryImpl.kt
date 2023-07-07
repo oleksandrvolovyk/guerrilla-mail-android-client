@@ -1,10 +1,7 @@
 package volovyk.guerrillamail.data
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -17,24 +14,18 @@ import javax.inject.Singleton
 
 @Singleton
 class EmailRepositoryImpl @Inject constructor (
+    externalScope: CoroutineScope,
     private val remoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase
-) : LifecycleOwner, EmailRepository {
-    private val lifecycleRegistry: LifecycleRegistry
+) : EmailRepository {
     override val assignedEmail: LiveData<String?> = remoteEmailDatabase.assignedEmail
     override val emails: Flow<List<Email>> = localEmailDatabase.getEmailDao().all
-    override val refreshing: LiveData<Boolean>
-    override val errorLiveData: LiveData<SingleEvent<String>>
+    override val refreshing: LiveData<Boolean> = remoteEmailDatabase.refreshing
+    override val errorLiveData: LiveData<SingleEvent<String>> = remoteEmailDatabase.errorLiveData
 
     init {
-        val remoteEmails = remoteEmailDatabase.emails
-        refreshing = remoteEmailDatabase.refreshing
-        errorLiveData = remoteEmailDatabase.errorLiveData
-        lifecycleRegistry = LifecycleRegistry(this)
-        lifecycleRegistry.currentState = Lifecycle.State.CREATED
-        lifecycleRegistry.currentState = Lifecycle.State.STARTED
-        lifecycleScope.launch {
-            remoteEmails.collect { emails ->
+        externalScope.launch {
+            remoteEmailDatabase.emails.collect { emails ->
                 insertAllToLocalDatabase(emails)
             }
         }
@@ -58,7 +49,4 @@ class EmailRepositoryImpl @Inject constructor (
             localEmailDatabase.getEmailDao().insertAll(emails)
         }
     }
-
-    override val lifecycle: Lifecycle
-        get() = lifecycleRegistry
 }

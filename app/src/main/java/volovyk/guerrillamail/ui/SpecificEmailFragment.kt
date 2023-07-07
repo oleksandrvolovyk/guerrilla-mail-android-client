@@ -13,7 +13,7 @@ import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding
 
 @AndroidEntryPoint
 class SpecificEmailFragment : Fragment() {
-    private var chosenEmailIndex = 1
+    private var chosenEmailIndex = 0
     private var _binding: FragmentSpecificEmailBinding? = null
     private val binding get() = _binding!!
 
