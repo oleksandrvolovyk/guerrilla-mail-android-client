@@ -3,6 +3,7 @@ package volovyk.guerrillamail.data
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -41,7 +42,7 @@ class EmailRepositoryImplTest {
         `when`(remoteEmailDatabase.emails).thenReturn(flow { })
         `when`(localEmailDatabase.getEmailDao()).thenReturn(emailDao)
 
-        emailRepository = EmailRepositoryImpl(remoteEmailDatabase, localEmailDatabase)
+        emailRepository = EmailRepositoryImpl(TestScope(), remoteEmailDatabase, localEmailDatabase)
     }
 
     @Test
