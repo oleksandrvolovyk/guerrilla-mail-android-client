@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +17,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.model.Email
@@ -29,6 +31,12 @@ class EmailFragment : Fragment() {
 
     private var mInterstitialAd: InterstitialAd? = null
 
+    private val emailListAdapter by lazy {
+        EmailListAdapter(
+            onItemClick = { position -> navigateToSpecificEmail(position) },
+            onItemDeleteButtonClick = { email -> deleteEmail(email) })
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -39,11 +47,7 @@ class EmailFragment : Fragment() {
         if (view is RecyclerView) {
             val context = view.getContext()
             view.layoutManager = LinearLayoutManager(context)
-            view.adapter = MyEmailRecyclerViewAdapter(
-                mainViewModel.emails,
-                viewLifecycleOwner,
-                onItemClick = { position -> navigateToSpecificEmail(position) },
-                onItemDeleteButtonClick = { email -> deleteEmail(email) })
+            view.adapter = emailListAdapter
         }
         return view
     }
@@ -94,11 +98,17 @@ class EmailFragment : Fragment() {
                 }
             }
         }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.emails.observe(viewLifecycleOwner) { emails ->
+                emailListAdapter.submitList(emails)
+            }
+        }
     }
 
-    private fun navigateToSpecificEmail(position: Int) {
+    private fun navigateToSpecificEmail(email: Email) {
         val bundle = Bundle()
-        bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL, position)
+        bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL_ID, email.id)
         view?.let {
             Navigation.findNavController(it).navigate(
                 R.id.action_emailFragment_to_specificEmailFragment2,
