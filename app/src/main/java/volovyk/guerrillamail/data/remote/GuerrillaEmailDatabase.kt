@@ -7,6 +7,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import retrofit2.Call
 import volovyk.guerrillamail.data.SingleEvent
 import volovyk.guerrillamail.data.model.Email
 import java.io.IOException
@@ -79,68 +80,41 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
                 requestedEmailAddress
             )
 
-        try {
-            val response = call.execute()
-            val setEmailAddressResponse = response.body()
-            return if (response.isSuccessful && setEmailAddressResponse != null) {
-                sidToken = setEmailAddressResponse.sidToken
-                setEmailAddressResponse.emailAddress
-            } else {
-                setError("Something went wrong!")
-                null
-            }
-        } catch (e: IOException) {
-            e.localizedMessage?.let { setError(it) }
-            return null
-        } catch (e: RuntimeException) {
-            e.localizedMessage?.let { setError(it) }
-            return null
+        val setEmailAddressResponse = call.executeAndCatchErrors()
+
+        setEmailAddressResponse?.let {
+            sidToken = setEmailAddressResponse.sidToken
+            return setEmailAddressResponse.emailAddress
         }
+
+        return null
     }
 
     private fun getEmailAddress(): String? {
         val call = guerrillaMailApiInterface.emailAddress
 
-        try {
-            val response = call.execute()
+        val getEmailAddressResponse = call.executeAndCatchErrors()
 
-            val getEmailAddressResponse = response.body()
-            return if (response.isSuccessful && getEmailAddressResponse != null) {
-                sidToken = getEmailAddressResponse.sidToken
-                getEmailAddressResponse.emailAddress
-            } else {
-                setError("Something went wrong!")
-                null
-            }
-        } catch (e: IOException) {
-            e.localizedMessage?.let { setError(it) }
-            return null
-        } catch (e: RuntimeException) {
-            e.localizedMessage?.let { setError(it) }
-            return null
+        getEmailAddressResponse?.let {
+            sidToken = getEmailAddressResponse.sidToken
+            return getEmailAddressResponse.emailAddress
         }
+
+        return null
     }
 
     private fun checkForNewEmails(): List<Email> {
         val call = guerrillaMailApiInterface.checkForNewEmails(sidToken, seq)
 
-        try {
-            val response = call.execute()
+        val checkForNewEmailsResponse = call.executeAndCatchErrors()
 
-            val checkForNewEmailsResponse = response.body()
-            if (response.isSuccessful && checkForNewEmailsResponse != null) {
-                sidToken = checkForNewEmailsResponse.sidToken
-                if (!checkForNewEmailsResponse.emails.isNullOrEmpty()) {
-                    return fetchAllEmails(checkForNewEmailsResponse.emails)
-                }
-            } else {
-                setError("Something went wrong!")
+        checkForNewEmailsResponse?.let {
+            sidToken = checkForNewEmailsResponse.sidToken
+            if (!checkForNewEmailsResponse.emails.isNullOrEmpty()) {
+                return fetchAllEmails(checkForNewEmailsResponse.emails)
             }
-        } catch (e: IOException) {
-            e.localizedMessage?.let { setError(it) }
-        } catch (e: RuntimeException) {
-            e.localizedMessage?.let { setError(it) }
         }
+
         return emptyList()
     }
 
@@ -148,23 +122,14 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         val fetchedEmailsList: MutableList<Email> = mutableListOf()
         for (email in emailsList) {
             val call = guerrillaMailApiInterface.fetchEmail(sidToken, email.id)
-            try {
-                val response = call.execute()
 
-                val fullEmail = response.body()
-                if (response.isSuccessful && fullEmail != null) {
-                    fullEmail.body = formatEmailBody(fullEmail.body)
-                    fetchedEmailsList.add(fullEmail)
-                    seq = seq.coerceAtLeast(fullEmail.id)
-                } else {
-                    setError("Something went wrong!")
-                }
-            } catch (e: IOException) {
-                e.localizedMessage?.let { setError(it) }
-            } catch (e: RuntimeException) {
-                e.localizedMessage?.let { setError(it) }
+            val fullEmail = call.executeAndCatchErrors()
+
+            fullEmail?.let {
+                fullEmail.body = formatEmailBody(fullEmail.body)
+                fetchedEmailsList.add(fullEmail)
+                seq = seq.coerceAtLeast(fullEmail.id)
             }
-
         }
         return fetchedEmailsList
     }
@@ -175,5 +140,25 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
     private fun setError(errorMessage: String) {
         _errorLiveData.postValue(SingleEvent(errorMessage))
+    }
+
+    private fun <T> Call<T>.executeAndCatchErrors(): T? {
+        return try {
+            val response = this.execute()
+
+            val responseBody = response.body()
+            if (response.isSuccessful && responseBody != null) {
+                return responseBody
+            } else {
+                setError("Something went wrong!")
+                return null
+            }
+        } catch (e: IOException) {
+            e.localizedMessage?.let { setError(it) }
+            null
+        } catch (e: RuntimeException) {
+            e.localizedMessage?.let { setError(it) }
+            null
+        }
     }
 }
