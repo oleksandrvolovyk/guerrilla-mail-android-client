@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +19,8 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.R
@@ -100,9 +104,13 @@ class EmailFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            mainViewModel.emails.observe(viewLifecycleOwner) { emails ->
-                emailListAdapter.submitList(emails)
-            }
+            mainViewModel.uiState
+                .map { it.emails }
+                .distinctUntilChanged()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.CREATED)
+                .collect { emails ->
+                    emailListAdapter.submitList(emails)
+                }
         }
     }
 

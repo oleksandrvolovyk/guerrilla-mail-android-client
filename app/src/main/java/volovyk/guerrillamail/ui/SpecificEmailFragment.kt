@@ -7,7 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding
 
@@ -25,14 +31,20 @@ class SpecificEmailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mainViewModel: MainViewModel by viewModels()
-        mainViewModel.emails.observe(viewLifecycleOwner) { emails ->
-            val chosenEmail = emails?.find { email -> email.id == chosenEmailId }
-            chosenEmail?.let {
-                binding.fromTextView.text = getString(R.string.from, it.from)
-                binding.subjectTextView.text = getString(R.string.subject, it.subject)
-                binding.dateTextView.text = getString(R.string.date, it.date)
-                binding.bodyTextView.text = Html.fromHtml(it.body, Html.FROM_HTML_MODE_COMPACT)
-            }
+        viewLifecycleOwner.lifecycleScope.launch {
+            mainViewModel.uiState
+                .map { it.emails }
+                .distinctUntilChanged()
+                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.CREATED)
+                .collect { emails ->
+                    val chosenEmail = emails.find { email -> email.id == chosenEmailId }
+                    chosenEmail?.let {
+                        binding.fromTextView.text = getString(R.string.from, it.from)
+                        binding.subjectTextView.text = getString(R.string.subject, it.subject)
+                        binding.dateTextView.text = getString(R.string.date, it.date)
+                        binding.bodyTextView.text = Html.fromHtml(it.body, Html.FROM_HTML_MODE_COMPACT)
+                    }
+                }
         }
     }
 

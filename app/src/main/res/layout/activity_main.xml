@@ -10,6 +10,7 @@
         android:id="@+id/refreshingSpinner"
         android:layout_width="32dp"
         android:layout_height="32dp"
+        android:visibility="gone"
         android:src="@drawable/spinner"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

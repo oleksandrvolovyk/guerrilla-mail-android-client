@@ -1,6 +1,5 @@
 package volovyk.guerrillamail.data
 
-import androidx.lifecycle.LiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,14 +17,10 @@ class EmailRepositoryImpl @Inject constructor (
     private val remoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase
 ) : EmailRepository {
-    override val assignedEmail: LiveData<String?> = remoteEmailDatabase.assignedEmail
-    override val emails: Flow<List<Email>> = localEmailDatabase.getEmailDao().all
-    override val refreshing: LiveData<Boolean> = remoteEmailDatabase.refreshing
-    override val errorLiveData: LiveData<SingleEvent<String>> = remoteEmailDatabase.errorLiveData
 
     init {
         externalScope.launch {
-            remoteEmailDatabase.emails.collect { emails ->
+            remoteEmailDatabase.observeEmails().collect { emails ->
                 insertAllToLocalDatabase(emails)
             }
         }
@@ -42,6 +37,10 @@ class EmailRepositoryImpl @Inject constructor (
             localEmailDatabase.getEmailDao().delete(email)
         }
     }
+
+    override fun observeAssignedEmail(): Flow<String?> = remoteEmailDatabase.observeAssignedEmail()
+    override fun observeEmails(): Flow<List<Email>> = localEmailDatabase.getEmailDao().all
+    override fun observeState(): Flow<RemoteEmailDatabase.State> = remoteEmailDatabase.observeState()
 
     // Must be called on a non-UI thread or Room will throw an exception.
     private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) {

@@ -9,10 +9,18 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
 
@@ -30,6 +38,8 @@ class MainActivity : AppCompatActivity() {
 
         initAdMob()
 
+        val errorToast = Toast.makeText(this, R.string.error_message, Toast.LENGTH_SHORT)
+
         binding.apply {
             emailTextView.setOnClickListener { copyEmailToClipboard() }
             emailDomainTextView.setOnClickListener { copyEmailToClipboard() }
@@ -43,42 +53,53 @@ class MainActivity : AppCompatActivity() {
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
                     if (assignedEmail != null) {
-                        getNewAddressButton.visibility =
-                            if (assignedEmail!!.emailUsernamePart() != s.toString()) {
-                                View.VISIBLE
-                            } else {
-                                View.GONE
-                            }
+                        getNewAddressButton.isVisible =
+                            assignedEmail!!.emailUsernamePart() != s.toString()
                     }
                 }
             })
         }
 
-        mainViewModel.assignedEmail.observe(this) { email ->
-            if (email != null) {
-                binding.emailTextView.text = getString(R.string.your_temporary_email)
-                binding.emailUsernameEditText.setText(email.emailUsernamePart())
-                binding.emailDomainTextView.text = email.emailDomainPart()
-                assignedEmail = email
-                binding.getNewAddressButton.visibility = View.GONE
-            } else {
-                binding.emailTextView.text = getString(R.string.getting_temporary_email)
-                binding.emailUsernameEditText.setText("")
-            }
+        lifecycleScope.launch {
+            mainViewModel.uiState
+                .map { it.assignedEmail }
+                .distinctUntilChanged()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
+                .collect { email ->
+                    if (email != null) {
+                        binding.emailTextView.text = getString(R.string.your_temporary_email)
+                        binding.emailUsernameEditText.setText(email.emailUsernamePart())
+                        binding.emailDomainTextView.text = email.emailDomainPart()
+                        assignedEmail = email
+                        binding.getNewAddressButton.visibility = View.GONE
+                    } else {
+                        binding.emailTextView.text = getString(R.string.getting_temporary_email)
+                        binding.emailUsernameEditText.setText("")
+                    }
+                }
         }
 
-        mainViewModel.refreshing.observe(this) { refreshing ->
-            binding.refreshingSpinner.visibility = if (refreshing == true) {
-                View.VISIBLE
-            } else {
-                View.INVISIBLE
-            }
-        }
+        lifecycleScope.launch {
+            mainViewModel.uiState
+                .map { it.state }
+                .distinctUntilChanged()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { state ->
+                    when (state) {
+                        RemoteEmailDatabase.State.Loading -> {
+                            binding.refreshingSpinner.isVisible = true
+                        }
 
-        mainViewModel.errorLiveData.observe(this) { errorEvent ->
-            errorEvent.contentIfNotHandled.let { errorText ->
-                Toast.makeText(this, errorText, Toast.LENGTH_SHORT).show()
-            }
+                        RemoteEmailDatabase.State.Error -> {
+                            errorToast.show()
+                            binding.refreshingSpinner.isVisible = false
+                        }
+
+                        RemoteEmailDatabase.State.Success -> {
+                            binding.refreshingSpinner.isVisible = false
+                        }
+                    }
+                }
         }
     }
 

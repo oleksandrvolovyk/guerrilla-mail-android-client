@@ -1,12 +1,10 @@
 package volovyk.guerrillamail.data
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.verify
@@ -19,9 +17,6 @@ import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 
 @ExperimentalCoroutinesApi
 class EmailRepositoryImplTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @Mock
     private lateinit var remoteEmailDatabase: RemoteEmailDatabase
@@ -39,7 +34,7 @@ class EmailRepositoryImplTest {
         MockitoAnnotations.openMocks(this)
 
         `when`(emailDao.all).thenReturn(flow { })
-        `when`(remoteEmailDatabase.emails).thenReturn(flow { })
+        `when`(remoteEmailDatabase.observeEmails()).thenReturn(flow { })
         `when`(localEmailDatabase.getEmailDao()).thenReturn(emailDao)
 
         emailRepository = EmailRepositoryImpl(TestScope(), remoteEmailDatabase, localEmailDatabase)

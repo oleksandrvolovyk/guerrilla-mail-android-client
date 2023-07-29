@@ -1,10 +1,8 @@
 package volovyk.guerrillamail.data.remote
 
-import androidx.arch.core.executor.testing.CountingTaskExecutorRule
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.mock
@@ -17,16 +15,11 @@ import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse
 import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse
 import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse
-import java.util.concurrent.TimeUnit
-
 
 class GuerrillaEmailDatabaseTest {
 
-    @get:Rule
-    val countingTaskExecutorRule = CountingTaskExecutorRule()
-
     @Test
-    fun setEmailAddressShouldUpdateAssignedEmailAndSidToken() {
+    fun setEmailAddressShouldUpdateAssignedEmailAndSidToken() = runTest {
         // Create a mock GuerrillaMailApiInterface
         val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
         val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
@@ -48,11 +41,9 @@ class GuerrillaEmailDatabaseTest {
 
         database.setEmailAddress(requestedEmailAddress)
 
-        countingTaskExecutorRule.drainTasks(1, TimeUnit.SECONDS)
-
         assertEquals(
             requestedEmailAddress,
-            database.assignedEmail.value
+            database.observeAssignedEmail().first()
         )
 
         assertEquals(
@@ -79,14 +70,12 @@ class GuerrillaEmailDatabaseTest {
 
         `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(response))
 
-        database.emails.first()
-
-        countingTaskExecutorRule.drainTasks(1, TimeUnit.SECONDS)
+        database.observeEmails().first()
 
         // Assert assignedEmail is equal to the one that API returned
         assertEquals(
             emailAddress,
-            database.assignedEmail.value
+            database.observeAssignedEmail().first()
         )
     }
 
@@ -104,7 +93,11 @@ class GuerrillaEmailDatabaseTest {
             GetEmailAddressResponse(emailAddress, sidToken)
         )
 
-        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(getEmailAddressResponse))
+        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(
+            Calls.response(
+                getEmailAddressResponse
+            )
+        )
 
         val remoteEmails = listOf(
             Email("from0", "subject0", "body0", "date0", 0),
@@ -136,7 +129,7 @@ class GuerrillaEmailDatabaseTest {
         `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(2)))
             .thenReturn(Calls.response(remoteFullEmails[2]))
 
-        val emittedEmails = database.emails.first()
+        val emittedEmails = database.observeEmails().first()
 
         // Assert emittedEmails are equal to remote emails
         assertEquals(
