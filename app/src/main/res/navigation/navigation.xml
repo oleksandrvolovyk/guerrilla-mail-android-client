@@ -8,18 +8,22 @@
         android:id="@+id/emailFragment"
         android:name="volovyk.guerrillamail.ui.EmailFragment"
         android:label="fragment_email_list"
-        tools:layout="@layout/fragment_email_list" >
+        tools:layout="@layout/fragment_email_list">
         <action
-            android:id="@+id/action_emailFragment_to_specificEmailFragment2"
-            app:destination="@id/specificEmailFragment2"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"
+            android:id="@+id/action_open_email"
+            app:destination="@id/specificEmailFragment"
             app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"/>
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
-        android:id="@+id/specificEmailFragment2"
+        android:id="@+id/specificEmailFragment"
         android:name="volovyk.guerrillamail.ui.SpecificEmailFragment"
         android:label="fragment_specific_email"
-        tools:layout="@layout/fragment_specific_email" />
+        tools:layout="@layout/fragment_specific_email">
+        <argument
+            android:name="emailId"
+            app:argType="integer" />
+    </fragment>
 </navigation>

@@ -4,6 +4,7 @@ plugins {
 
     id 'kotlin-kapt'
     id 'com.google.dagger.hilt.android'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 def keysPropertiesFile = rootProject.file("keys.properties")
@@ -57,8 +58,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
 
     // Hilt dependencies
-    implementation "com.google.dagger:hilt-android:2.45"
-    kapt "com.google.dagger:hilt-compiler:2.45"
+    implementation "com.google.dagger:hilt-android:2.47"
+    kapt "com.google.dagger:hilt-compiler:2.47"
 
     // Room Database
     implementation "androidx.room:room-ktx:2.5.1"

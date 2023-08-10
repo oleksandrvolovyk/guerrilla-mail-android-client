@@ -3,7 +3,6 @@ package volovyk.guerrillamail.ui
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,15 +58,8 @@ class EmailFragment : BaseFragment<FragmentEmailListBinding>(FragmentEmailListBi
     }
 
     private fun navigateToSpecificEmail(email: Email) {
-        val bundle = Bundle()
-        bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL_ID, email.id)
-        view?.let {
-            Timber.d("Opening email ${email.id}")
-            Navigation.findNavController(it).navigate(
-                R.id.action_emailFragment_to_specificEmailFragment2,
-                bundle
-            )
-        }
+        val action = EmailFragmentDirections.actionOpenEmail(email.id)
+        findNavController().navigate(action)
     }
 
     private fun deleteEmail(email: Email) {
