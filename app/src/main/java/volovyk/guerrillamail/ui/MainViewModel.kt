@@ -8,14 +8,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import volovyk.guerrillamail.data.EmailRepository
-import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import javax.inject.Inject
 
 data class UiState(
     val assignedEmail: String? = null,
-    val emails: List<Email> = emptyList(),
     val state: RemoteEmailDatabase.State = RemoteEmailDatabase.State.Loading
 )
 
@@ -23,18 +22,15 @@ data class UiState(
 class MainViewModel @Inject constructor(private val emailRepository: EmailRepository) :
     ViewModel() {
 
+    init {
+        Timber.d("init ${hashCode()}")
+    }
+
     private val assignedEmail =
         emailRepository.observeAssignedEmail().stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
             null
-        )
-
-    private val emails =
-        emailRepository.observeEmails().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            emptyList()
         )
 
     private val state =
@@ -45,8 +41,8 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
         )
 
     val uiState: StateFlow<UiState> =
-        combine(assignedEmail, emails, state) { assignedEmail, emails, state ->
-            UiState(assignedEmail, emails, state)
+        combine(assignedEmail, state) { assignedEmail, state ->
+            UiState(assignedEmail, state)
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
@@ -56,12 +52,6 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
     fun setEmailAddress(newAddress: String) {
         viewModelScope.launch {
             emailRepository.setEmailAddress(newAddress)
-        }
-    }
-
-    fun deleteEmail(email: Email?) {
-        viewModelScope.launch {
-            emailRepository.deleteEmail(email)
         }
     }
 }

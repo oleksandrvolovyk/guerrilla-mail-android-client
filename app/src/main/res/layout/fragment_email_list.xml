@@ -9,5 +9,5 @@
     android:layout_marginLeft="4dp"
     android:layout_marginRight="4dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context=".ui.EmailFragment"
+    tools:context=".ui.list.EmailListFragment"
     tools:listitem="@layout/fragment_email" />

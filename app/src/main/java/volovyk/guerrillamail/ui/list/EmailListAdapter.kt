@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui
+package volovyk.guerrillamail.ui.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -11,9 +11,7 @@ import volovyk.guerrillamail.databinding.FragmentEmailBinding
 class EmailListAdapter(
     private val onItemClick: (Email) -> Unit,
     private val onItemDeleteButtonClick: (Email) -> Unit
-) : ListAdapter<Email, EmailListAdapter.EmailViewHolder>(
-    EmailDiffCallBack()
-) {
+) : ListAdapter<Email, EmailListAdapter.EmailViewHolder>(EmailDiffCallBack()) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,

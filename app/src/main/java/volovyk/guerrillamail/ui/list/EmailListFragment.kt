@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui
+package volovyk.guerrillamail.ui.list
 
 import android.os.Bundle
 import android.view.View
@@ -12,14 +12,18 @@ import volovyk.guerrillamail.data.ads.Ad
 import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.databinding.FragmentEmailListBinding
+import volovyk.guerrillamail.ui.BaseFragment
+import volovyk.guerrillamail.ui.UiHelper
 import javax.inject.Inject
 
 /**
  * A fragment representing a list of Emails.
  */
 @AndroidEntryPoint
-class EmailFragment : BaseFragment<FragmentEmailListBinding>(FragmentEmailListBinding::inflate) {
-    private val mainViewModel: MainViewModel by viewModels()
+class EmailListFragment :
+    BaseFragment<FragmentEmailListBinding>(FragmentEmailListBinding::inflate) {
+
+    private val viewModel: EmailListViewModel by viewModels()
 
     @Inject
     lateinit var adManager: AdManager
@@ -34,7 +38,7 @@ class EmailFragment : BaseFragment<FragmentEmailListBinding>(FragmentEmailListBi
         super.onCreate(savedInstanceState)
 
         findNavController().addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.emailFragment) {
+            if (destination.id == R.id.emailListFragment) {
                 // User has navigated back to the email list
                 activity?.let { adManager.tryToShowAd(it, Ad.Interstitial) }
             }
@@ -52,13 +56,14 @@ class EmailFragment : BaseFragment<FragmentEmailListBinding>(FragmentEmailListBi
 
         context?.let { adManager.loadAd(it, Ad.Interstitial) }
 
-        mainViewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
+        viewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
             emailListAdapter.submitList(emails)
         }
     }
 
     private fun navigateToSpecificEmail(email: Email) {
-        val action = EmailFragmentDirections.actionOpenEmail(email.id)
+        Timber.d("Opening email: ${email.subject}")
+        val action = EmailListFragmentDirections.actionOpenEmail(email.id)
         findNavController().navigate(action)
     }
 
@@ -68,7 +73,7 @@ class EmailFragment : BaseFragment<FragmentEmailListBinding>(FragmentEmailListBi
                 it,
                 it.getString(R.string.confirm_deleting_email)
             ) {
-                mainViewModel.deleteEmail(email)
+                viewModel.deleteEmail(email)
             }
         }
         confirmationDialog?.show()

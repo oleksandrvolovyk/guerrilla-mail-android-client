@@ -12,7 +12,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EmailRepositoryImpl @Inject constructor (
+class EmailRepositoryImpl @Inject constructor(
     externalScope: CoroutineScope,
     private val remoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase
@@ -23,6 +23,12 @@ class EmailRepositoryImpl @Inject constructor (
             remoteEmailDatabase.observeEmails().collect { emails ->
                 insertAllToLocalDatabase(emails)
             }
+        }
+    }
+
+    override suspend fun getEmailById(emailId: Int): Email? {
+        return withContext(Dispatchers.IO) {
+            localEmailDatabase.getEmailDao().getById(emailId)
         }
     }
 

@@ -13,6 +13,9 @@ interface EmailDao {
     @get:Query("SELECT * FROM email")
     val all: Flow<List<Email>>
 
+    @Query("SELECT * FROM email WHERE id = :emailId")
+    fun getById(emailId: Int): Email?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(emails: Collection<Email?>?)
 

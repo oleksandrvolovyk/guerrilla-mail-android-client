@@ -6,6 +6,7 @@ import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 
 interface EmailRepository {
 
+    suspend fun getEmailById(emailId: Int): Email?
     suspend fun setEmailAddress(newAddress: String)
     suspend fun deleteEmail(email: Email?)
 
