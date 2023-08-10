@@ -16,4 +16,5 @@
     <string name="confirm_deleting_email">Are you sure you want to delete this email?</string>
     <string name="email_invalid">The email you entered is invalid!</string>
     <string name="error_message">Something went wrong! Check your Internet conncetion</string>
+    <string name="title_list_of_emails">Emails</string>
 </resources>

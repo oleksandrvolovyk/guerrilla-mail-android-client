@@ -13,6 +13,9 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -42,6 +45,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         adManager.initialize(this)
+
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+
+        setupActionBarWithNavController(navController)
 
         val errorToast = Toast.makeText(this, R.string.error_message, Toast.LENGTH_SHORT)
 
@@ -144,5 +153,12 @@ class MainActivity : AppCompatActivity() {
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, R.string.email_in_clipboard, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        Timber.d("onSupportNavigateUp")
+        val navController = findNavController(R.id.my_nav_host_fragment)
+
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

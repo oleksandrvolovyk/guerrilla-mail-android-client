@@ -63,7 +63,7 @@ class EmailListFragment :
 
     private fun navigateToSpecificEmail(email: Email) {
         Timber.d("Opening email: ${email.subject}")
-        val action = EmailListFragmentDirections.actionOpenEmail(email.id)
+        val action = EmailListFragmentDirections.actionOpenEmail(email.id, email.subject)
         findNavController().navigate(action)
     }
 
