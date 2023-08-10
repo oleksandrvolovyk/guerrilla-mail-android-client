@@ -14,6 +14,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.databinding.FragmentSpecificEmailBinding
 
@@ -24,11 +25,13 @@ class SpecificEmailFragment : Fragment() {
     private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("onCreate")
         super.onCreate(savedInstanceState)
         arguments?.getInt(ARG_CHOSEN_EMAIL_ID)?.let { chosenEmailId = it }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
         val mainViewModel: MainViewModel by viewModels()
         viewLifecycleOwner.lifecycleScope.launch {
@@ -52,11 +55,13 @@ class SpecificEmailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Timber.d("onCreateView")
         _binding = FragmentSpecificEmailBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onDestroyView() {
+        Timber.d("onDestroyView")
         super.onDestroyView()
         _binding = null
     }

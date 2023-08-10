@@ -13,16 +13,17 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -31,12 +32,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
 
+    @Inject
+    lateinit var adManager: AdManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("onCreate")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        initAdMob()
+        adManager.initialize(this)
 
         val errorToast = Toast.makeText(this, R.string.error_message, Toast.LENGTH_SHORT)
 
@@ -101,19 +106,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         }
-    }
-
-    private fun initAdMob() {
-        val requestConfiguration = MobileAds.getRequestConfiguration()
-            .toBuilder()
-            .setTagForChildDirectedTreatment(
-                RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
-            )
-            .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
-            .build()
-        MobileAds.setRequestConfiguration(requestConfiguration)
-
-        MobileAds.initialize(this)
     }
 
     private fun getNewAddress(newAddress: String) {

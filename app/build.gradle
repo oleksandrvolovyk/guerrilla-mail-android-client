@@ -96,6 +96,9 @@ dependencies {
 
     // Ads
     implementation 'com.google.android.gms:play-services-ads:22.1.0'
+
+    // Timber
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
 
 // Allow references to generated code

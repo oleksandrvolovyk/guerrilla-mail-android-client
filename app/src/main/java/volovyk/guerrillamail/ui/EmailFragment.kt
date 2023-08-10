@@ -10,21 +10,19 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.gms.ads.AdError
-import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.FullScreenContentCallback
-import com.google.android.gms.ads.LoadAdError
-import com.google.android.gms.ads.interstitial.InterstitialAd
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import volovyk.guerrillamail.BuildConfig
+import timber.log.Timber
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.data.ads.Ad
+import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.model.Email
+import javax.inject.Inject
 
 /**
  * A fragment representing a list of Emails.
@@ -33,7 +31,8 @@ import volovyk.guerrillamail.data.model.Email
 class EmailFragment : Fragment() {
     private val mainViewModel: MainViewModel by viewModels()
 
-    private var mInterstitialAd: InterstitialAd? = null
+    @Inject
+    lateinit var adManager: AdManager
 
     private val emailListAdapter by lazy {
         EmailListAdapter(
@@ -41,10 +40,22 @@ class EmailFragment : Fragment() {
             onItemDeleteButtonClick = { email -> deleteEmail(email) })
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        findNavController().addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.emailFragment) {
+                // User has navigated back to the email list
+                activity?.let { adManager.tryToShowAd(it, Ad.Interstitial) }
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Timber.d("onCreateView")
         val view = inflater.inflate(R.layout.fragment_email_list, container, false)
 
         // Set the adapter
@@ -57,51 +68,10 @@ class EmailFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
-        val adRequest = AdRequest.Builder().build()
-
-        val adId = if (BuildConfig.DEBUG) {
-            BuildConfig.ADMOB_TEST_AD_ID
-        } else {
-            BuildConfig.ADMOB_MY_AD_ID
-        }
-
-        context?.let {
-            InterstitialAd.load(
-                it,
-                adId,
-                adRequest,
-                object : InterstitialAdLoadCallback() {
-                    override fun onAdFailedToLoad(adError: LoadAdError) {
-                        mInterstitialAd = null
-                    }
-
-                    override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                        mInterstitialAd = interstitialAd
-                    }
-                })
-        }
-
-        mInterstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdDismissedFullScreenContent() {
-                mInterstitialAd = null
-            }
-
-            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                mInterstitialAd = null
-            }
-        }
-
-        val navController = Navigation.findNavController(view)
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.emailFragment) {
-                // User has navigated back to the email list
-                if (mInterstitialAd != null) {
-                    activity?.let { mInterstitialAd?.show(it) }
-                }
-            }
-        }
+        context?.let { adManager.loadAd(it, Ad.Interstitial) }
 
         viewLifecycleOwner.lifecycleScope.launch {
             mainViewModel.uiState
@@ -118,6 +88,7 @@ class EmailFragment : Fragment() {
         val bundle = Bundle()
         bundle.putInt(SpecificEmailFragment.ARG_CHOSEN_EMAIL_ID, email.id)
         view?.let {
+            Timber.d("Opening email ${email.id}")
             Navigation.findNavController(it).navigate(
                 R.id.action_emailFragment_to_specificEmailFragment2,
                 bundle
