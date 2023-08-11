@@ -2,6 +2,8 @@
 
 This is an Android client for [Guerrilla Mail](https://www.guerrillamail.com), a disposable temporary email service. This app is powered by the Guerrilla Mail public API, which allows users to create and manage temporary email addresses.
 
+<a href='https://play.google.com/store/apps/details?id=volovyk.guerrillamail&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height="80"/></a>
+
 ## Features
 
 - Get temporary email addresses
