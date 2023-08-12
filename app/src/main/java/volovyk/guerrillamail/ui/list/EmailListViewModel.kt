@@ -33,4 +33,10 @@ class EmailListViewModel @Inject constructor(private val emailRepository: EmailR
             emailRepository.deleteEmail(email)
         }
     }
+
+    fun deleteAllEmails() {
+        viewModelScope.launch {
+            emailRepository.deleteAllEmails()
+        }
+    }
 }

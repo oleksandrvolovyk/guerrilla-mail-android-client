@@ -21,4 +21,7 @@ interface EmailDao {
 
     @Delete
     fun delete(email: Email?)
+
+    @Query("DELETE FROM email")
+    fun deleteAll()
 }

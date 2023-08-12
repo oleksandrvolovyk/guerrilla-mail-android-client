@@ -31,7 +31,8 @@ class EmailListFragment :
     private val emailListAdapter by lazy {
         EmailListAdapter(
             onItemClick = { email -> navigateToSpecificEmail(email) },
-            onItemDeleteButtonClick = { email -> deleteEmail(email) })
+            onItemDeleteButtonClick = { email -> deleteEmail(email) },
+            onItemDeleteButtonLongClick = { deleteAllEmails() })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,14 +69,26 @@ class EmailListFragment :
     }
 
     private fun deleteEmail(email: Email) {
-        val confirmationDialog = context?.let {
-            UiHelper.createConfirmationDialog(
+        context?.let {
+            val confirmationDialog = UiHelper.createConfirmationDialog(
                 it,
                 it.getString(R.string.confirm_deleting_email)
             ) {
                 viewModel.deleteEmail(email)
             }
+            confirmationDialog.show()
         }
-        confirmationDialog?.show()
+    }
+
+    private fun deleteAllEmails() {
+        context?.let {
+            val confirmationDialog = UiHelper.createConfirmationDialog(
+                it,
+                it.getString(R.string.confirm_deleting_all_emails)
+            ) {
+                viewModel.deleteAllEmails()
+            }
+            confirmationDialog.show()
+        }
     }
 }

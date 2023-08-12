@@ -10,7 +10,8 @@ import volovyk.guerrillamail.databinding.FragmentEmailBinding
 
 class EmailListAdapter(
     private val onItemClick: (Email) -> Unit,
-    private val onItemDeleteButtonClick: (Email) -> Unit
+    private val onItemDeleteButtonClick: (Email) -> Unit,
+    private val onItemDeleteButtonLongClick: (Email) -> Unit
 ) : ListAdapter<Email, EmailListAdapter.EmailViewHolder>(EmailDiffCallBack()) {
 
     override fun onCreateViewHolder(
@@ -22,7 +23,7 @@ class EmailListAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ), onItemClick, onItemDeleteButtonClick
+            ), onItemClick, onItemDeleteButtonClick, onItemDeleteButtonLongClick
         )
     }
 
@@ -32,17 +33,26 @@ class EmailListAdapter(
     class EmailViewHolder(
         private val binding: FragmentEmailBinding,
         private val onItemClick: (Email) -> Unit,
-        private val onItemDeleteButtonClick: (Email) -> Unit
+        private val onItemDeleteButtonClick: (Email) -> Unit,
+        private val onItemDeleteButtonLongClick: (Email) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(email: Email) {
-            binding.from.text = email.from
-            binding.subject.text = email.subject
-            binding.emailFragmentLayout.setOnClickListener {
-                onItemClick(email)
-            }
-            binding.deleteButton.setOnClickListener {
-                onItemDeleteButtonClick(email)
+            binding.apply {
+                from.text = email.from
+                subject.text = email.subject
+                emailFragmentLayout.setOnClickListener {
+                    onItemClick(email)
+                }
+                deleteButton.apply {
+                    setOnClickListener {
+                        onItemDeleteButtonClick(email)
+                    }
+                    setOnLongClickListener {
+                        onItemDeleteButtonLongClick(email)
+                        true
+                    }
+                }
             }
         }
     }

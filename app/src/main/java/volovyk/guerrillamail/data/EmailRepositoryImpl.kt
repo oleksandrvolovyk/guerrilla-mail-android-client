@@ -66,6 +66,12 @@ class EmailRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAllEmails() {
+        withContext(Dispatchers.IO) {
+            localEmailDatabase.getEmailDao().deleteAll()
+        }
+    }
+
     override fun observeAssignedEmail(): Flow<String?> = remoteEmailDatabase.observeAssignedEmail()
     override fun observeEmails(): Flow<List<Email>> = localEmailDatabase.getEmailDao().all
     override fun observeState(): Flow<RemoteEmailDatabase.State> = remoteEmailDatabase.observeState()
