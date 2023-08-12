@@ -41,22 +41,29 @@ class EmailRepositoryImplTest {
     }
 
     @Test
-    fun setEmailAddressShouldCallRemoteEmailDatabase() =
-        runTest {
-            val newAddress = "test@example.com"
+    fun `getEmailById should call LocalEmailDatabase`() = runTest {
+        val emailId = 123
 
-            emailRepository.setEmailAddress(newAddress)
+        emailRepository.getEmailById(emailId)
 
-            verify(remoteEmailDatabase).setEmailAddress(newAddress)
-        }
+        verify(localEmailDatabase.getEmailDao()).getById(emailId)
+    }
 
     @Test
-    fun deleteEmailShouldCallLocalEmailDatabase() =
-        runTest {
-            val email = Email("test", "test", "","",1)
+    fun `setEmailAddress should call RemoteEmailDatabase`() = runTest {
+        val newAddress = "test@example.com"
 
-            emailRepository.deleteEmail(email)
+        emailRepository.setEmailAddress(newAddress)
 
-            verify(localEmailDatabase.getEmailDao()).delete(email)
-        }
+        verify(remoteEmailDatabase).setEmailAddress(newAddress)
+    }
+
+    @Test
+    fun `deleteEmail should call LocalEmailDatabase`() = runTest {
+        val email = Email("test", "test", "", "", 1)
+
+        emailRepository.deleteEmail(email)
+
+        verify(localEmailDatabase.getEmailDao()).delete(email)
+    }
 }

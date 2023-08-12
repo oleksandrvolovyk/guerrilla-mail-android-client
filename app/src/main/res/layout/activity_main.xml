@@ -6,16 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <pl.droidsonroids.gif.GifImageView
-        android:id="@+id/refreshingSpinner"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:visibility="gone"
-        android:src="@drawable/spinner"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
@@ -33,18 +23,26 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
+            <pl.droidsonroids.gif.GifImageView
+                android:id="@+id/refreshingSpinner"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/spinner"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/emailTextView"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
+                android:labelFor="@+id/emailUsernameEditText"
                 android:text="@string/getting_temporary_email"
                 android:textAlignment="center"
-                android:labelFor="@+id/emailUsernameEditText"
                 android:textColor="?android:attr/textColorPrimary"
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -81,10 +79,10 @@
                 android:layout_height="wrap_content"
                 android:text="@string/get_new_address"
                 android:visibility="gone"
-                tools:visibility="visible"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emailLinearLayout"/>
+                app:layout_constraintTop_toBottomOf="@+id/emailLinearLayout"
+                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -5,6 +5,9 @@ import volovyk.guerrillamail.data.model.Email
 
 interface RemoteEmailDatabase {
 
+    fun updateEmails()
+    fun hasEmailAddressAssigned(): Boolean
+    fun getRandomEmailAddress()
     fun setEmailAddress(requestedEmailAddress: String)
 
     fun observeAssignedEmail(): Flow<String?>

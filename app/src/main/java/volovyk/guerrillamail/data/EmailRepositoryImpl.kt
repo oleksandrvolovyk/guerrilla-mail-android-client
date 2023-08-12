@@ -2,7 +2,9 @@ package volovyk.guerrillamail.data
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import volovyk.guerrillamail.data.local.LocalEmailDatabase
@@ -20,10 +22,30 @@ class EmailRepositoryImpl @Inject constructor(
 
     init {
         externalScope.launch {
-            remoteEmailDatabase.observeEmails().collect { emails ->
-                insertAllToLocalDatabase(emails)
+            withContext(Dispatchers.IO) {
+                while (isActive) {
+                    if (remoteEmailDatabase.hasEmailAddressAssigned()) {
+                        remoteEmailDatabase.updateEmails()
+                        delay(REFRESH_INTERVAL)
+                    } else {
+                        remoteEmailDatabase.getRandomEmailAddress()
+                        delay(EMAIL_ASSIGNMENT_INTERVAL)
+                    }
+                }
             }
         }
+        externalScope.launch {
+            withContext(Dispatchers.IO) {
+                remoteEmailDatabase.observeEmails().collect { emails ->
+                    insertAllToLocalDatabase(emails)
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val REFRESH_INTERVAL = 5000L // 5 seconds
+        private const val EMAIL_ASSIGNMENT_INTERVAL = 1000L // 1 second, interval between attempts
     }
 
     override suspend fun getEmailById(emailId: Int): Email? {

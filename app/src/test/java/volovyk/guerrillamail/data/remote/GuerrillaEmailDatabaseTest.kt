@@ -3,10 +3,12 @@ package volovyk.guerrillamail.data.remote
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
+import org.mockito.Mock
 import org.mockito.Mockito.anyInt
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import retrofit2.Response
@@ -18,13 +20,23 @@ import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse
 
 class GuerrillaEmailDatabaseTest {
 
+    @Mock
+    private lateinit var guerrillaMailApiInterface: GuerrillaMailApiInterface
+
+    private lateinit var database: GuerrillaEmailDatabase
+
+    @Before
+    fun setup() {
+        MockitoAnnotations.openMocks(this)
+
+        database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
+    }
+
     @Test
-    fun setEmailAddressShouldUpdateAssignedEmailAndSidToken() = runTest {
-        // Create a mock GuerrillaMailApiInterface
-        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
-        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
-        val requestedEmailAddress = "testytest@guerrillamailblock.com"
-        val sidToken = "setEmailAddressShouldUpdateAssignedEmailAddressAndSidToken"
+    fun `setEmailAddress should update assignedEmail and sidToken`() = runTest {
+
+        val requestedEmailAddress = "test@guerrillamailblock.com"
+        val sidToken = "new sidToken"
 
         // Mock the response from the API call
         val response = Response.success(
@@ -53,13 +65,10 @@ class GuerrillaEmailDatabaseTest {
     }
 
     @Test
-    fun emailsFlowCollectShouldTryToGetAnEmailAddress() = runTest {
-        // Create a mock GuerrillaMailApiInterface
-        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
-        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
+    fun `getRandomEmailAddress should update assignedEmail and sidToken`() = runTest {
 
-        val emailAddress = "testytest@guerrillamailblock.com"
-        val sidToken = "newSidToken"
+        val emailAddress = "test@guerrillamailblock.com"
+        val sidToken = "new sidToken"
 
         // Mock the response from the API call
         val response = Response.success(
@@ -70,23 +79,26 @@ class GuerrillaEmailDatabaseTest {
 
         `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(response))
 
-        database.observeEmails().first()
+        database.getRandomEmailAddress()
 
         // Assert assignedEmail is equal to the one that API returned
         assertEquals(
             emailAddress,
             database.observeAssignedEmail().first()
         )
+
+        // Assert sidToken value is equal to the one returned in GetEmailAddressResponse
+        assertEquals(
+            sidToken,
+            database.getSidToken()
+        )
     }
 
     @Test
-    fun emailsFlowEmitsCorrectEmails() = runTest {
-        // Create a mock GuerrillaMailApiInterface
-        val guerrillaMailApiInterface = mock<GuerrillaMailApiInterface>()
-        val database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
+    fun `updateEmails should emit correct emails, update sidToken and seq values`() = runTest {
 
-        val emailAddress = "testytest@guerrillamailblock.com"
-        val sidToken = "newSidToken"
+        val emailAddress = "test@guerrillamailblock.com"
+        val sidToken = "new sidToken"
 
         // Mock the response from the API call
         val getEmailAddressResponse = Response.success(
@@ -99,17 +111,21 @@ class GuerrillaEmailDatabaseTest {
             )
         )
 
-        val remoteEmails = listOf(
-            Email("from0", "subject0", "body0", "date0", 0),
-            Email("from1", "subject1", "body1", "date1", 1),
-            Email("from2", "subject2", "body2", "date2", 2)
-        )
+        val remoteEmails = mutableListOf<Email>()
 
-        val remoteFullEmails = listOf(
-            Email("fromFull0", "subjectFull0", "bodyFull0", "dateFull0", 0),
-            Email("fromFull1", "subjectFull1", "bodyFull1", "dateFull1", 1),
-            Email("fromFull2", "subjectFull2", "bodyFull2", "dateFull2", 2)
-        )
+        repeat(3) { i ->
+            remoteEmails.add(Email("from$i", "subject$i", "body$i", "date$i", i))
+        }
+
+        val fullRemoteEmails = remoteEmails.map {
+            Email(
+                "Full ${it.from}",
+                "Full ${it.subject}",
+                "Full ${it.body}",
+                "Full ${it.date}",
+                it.id
+            )
+        }
 
         val checkForNewEmailsResponse = Response.success(
             CheckForNewEmailsResponse(remoteEmails, sidToken)
@@ -122,19 +138,32 @@ class GuerrillaEmailDatabaseTest {
             )
         ).thenReturn(Calls.response(checkForNewEmailsResponse))
 
-        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(0)))
-            .thenReturn(Calls.response(remoteFullEmails[0]))
-        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(1)))
-            .thenReturn(Calls.response(remoteFullEmails[1]))
-        `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(2)))
-            .thenReturn(Calls.response(remoteFullEmails[2]))
+        fullRemoteEmails.forEach { email ->
+            `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(email.id)))
+                .thenReturn(Calls.response(email))
+        }
+
+        database.getRandomEmailAddress()
+        database.updateEmails()
 
         val emittedEmails = database.observeEmails().first()
 
-        // Assert emittedEmails are equal to remote emails
+        // Assert emittedEmails are equal to full remote emails
         assertEquals(
-            remoteFullEmails,
+            fullRemoteEmails,
             emittedEmails
+        )
+
+        // Assert sidToken value is equal to the one returned in CheckForNewEmailsResponse
+        assertEquals(
+            sidToken,
+            database.getSidToken()
+        )
+
+        // Assert seq value is equal to the highest email id value
+        assertEquals(
+            fullRemoteEmails.map { it.id }.maxOf { it },
+            database.getSeq()
         )
     }
 }

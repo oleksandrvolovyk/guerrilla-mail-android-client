@@ -1,11 +1,7 @@
 package volovyk.guerrillamail.data.remote
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import volovyk.guerrillamail.data.model.Email
@@ -17,68 +13,66 @@ import javax.inject.Singleton
 class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInterface: GuerrillaMailApiInterface) :
     RemoteEmailDatabase {
 
-    private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow("")
+    companion object {
+        private const val SITE = "guerrillamail.com"
+        private const val LANG = "en"
+    }
 
-    private val emails: Flow<List<Email>> = flow {
-        while (true) {
-            if (!gotEmailAssigned) {
-                state.update { RemoteEmailDatabase.State.Loading }
-                try {
-                    val email = getEmailAddress()
-                    assignedEmail.update { email }
-                    if (email != null) {
-                        gotEmailAssigned = true
-                        state.update { RemoteEmailDatabase.State.Success }
-                    }
-                } catch (e: RuntimeException) {
-                    state.update { RemoteEmailDatabase.State.Error }
-                }
-                delay(EMAIL_ASSIGNMENT_INTERVAL) // Suspends the coroutine for some time
-            } else {
-                state.update { RemoteEmailDatabase.State.Loading }
-                try {
-                    val emailsList = checkForNewEmails()
-                    emit(emailsList)
-                    state.update { RemoteEmailDatabase.State.Success }
-                } catch (e: RuntimeException) {
-                    state.update { RemoteEmailDatabase.State.Error }
-                }
-                delay(REFRESH_INTERVAL) // Suspends the coroutine for some time
-            }
-        }
-    }.flowOn(Dispatchers.IO)
-
+    private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
+    private val emails = MutableStateFlow(emptyList<Email>())
     private val state: MutableStateFlow<RemoteEmailDatabase.State> =
         MutableStateFlow(RemoteEmailDatabase.State.Loading)
 
     private var sidToken: String? = null
     private var seq = 0
 
-    fun getSidToken() = sidToken
+    override fun updateEmails() {
+        if (assignedEmail.value != null) {
+            state.update { RemoteEmailDatabase.State.Loading }
+            try {
+                val emailsList = checkForNewEmails()
+                emails.update { emailsList }
+                state.update { RemoteEmailDatabase.State.Success }
+            } catch (e: RuntimeException) {
+                state.update { RemoteEmailDatabase.State.Error }
+            }
+        } else {
+            throw RuntimeException("It is not possible to check for new e-mails if no e-mail address is assigned")
+        }
+    }
 
-    fun getSeq() = seq
+    override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
-    private var gotEmailAssigned = false
-
-    companion object {
-        private const val REFRESH_INTERVAL = 5000L // 5 seconds
-        private const val EMAIL_ASSIGNMENT_INTERVAL = 1000L // 1 second, interval between attempts
-
-        private const val SITE = "guerrillamail.com"
-        private const val LANG = "en"
+    override fun getRandomEmailAddress() {
+        state.update { RemoteEmailDatabase.State.Loading }
+        try {
+            val email = getEmailAddress()
+            assignedEmail.update { email }
+            state.update { RemoteEmailDatabase.State.Success }
+        } catch (e: RuntimeException) {
+            state.update { RemoteEmailDatabase.State.Error }
+        }
     }
 
     override fun setEmailAddress(requestedEmailAddress: String) {
-        val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
-
-        assignedEmail.update { assignedEmailAddress }
+        state.update { RemoteEmailDatabase.State.Loading }
+        try {
+            val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
+            assignedEmail.update { assignedEmailAddress }
+            state.update { RemoteEmailDatabase.State.Success }
+        } catch (e: RuntimeException) {
+            state.update { RemoteEmailDatabase.State.Error }
+        }
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
     override fun observeEmails(): Flow<List<Email>> = emails
     override fun observeState(): Flow<RemoteEmailDatabase.State> = state
 
-    private fun makeSetEmailAddressRequest(requestedEmailAddress: String): String? {
+    fun getSidToken() = sidToken
+    fun getSeq() = seq
+
+    private fun makeSetEmailAddressRequest(requestedEmailAddress: String): String {
         val call = guerrillaMailApiInterface
             .setEmailAddress(
                 sidToken,
@@ -90,16 +84,25 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         val setEmailAddressResponse = call.executeAndCatchErrors()
 
         sidToken = setEmailAddressResponse.sidToken
-        return setEmailAddressResponse.emailAddress
+        seq = 0
+        if (setEmailAddressResponse.emailAddress != null) {
+            return setEmailAddressResponse.emailAddress
+        } else {
+            throw RuntimeException()
+        }
     }
 
-    private fun getEmailAddress(): String? {
+    private fun getEmailAddress(): String {
         val call = guerrillaMailApiInterface.emailAddress
 
         val getEmailAddressResponse = call.executeAndCatchErrors()
 
         sidToken = getEmailAddressResponse.sidToken
-        return getEmailAddressResponse.emailAddress
+        if (getEmailAddressResponse.emailAddress != null) {
+            return getEmailAddressResponse.emailAddress
+        } else {
+            throw RuntimeException()
+        }
     }
 
     private fun checkForNewEmails(): List<Email> {
