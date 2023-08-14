@@ -100,6 +100,9 @@ dependencies {
 
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    // LeakCanary
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 }
 
 // Allow references to generated code

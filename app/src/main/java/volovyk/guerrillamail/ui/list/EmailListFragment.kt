@@ -28,13 +28,6 @@ class EmailListFragment :
     @Inject
     lateinit var adManager: AdManager
 
-    private val emailListAdapter by lazy {
-        EmailListAdapter(
-            onItemClick = { email -> navigateToSpecificEmail(email) },
-            onItemDeleteButtonClick = { email -> deleteEmail(email) },
-            onItemDeleteButtonLongClick = { deleteAllEmails() })
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -50,12 +43,18 @@ class EmailListFragment :
         Timber.d("onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
+        val emailListAdapter = EmailListAdapter(
+            onItemClick = ::navigateToSpecificEmail,
+            onItemDeleteButtonClick = ::deleteEmail,
+            onItemDeleteButtonLongClick = { deleteAllEmails() }
+        )
+
         binding.list.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = emailListAdapter
         }
 
-        context?.let { adManager.loadAd(it, Ad.Interstitial) }
+        context?.let { adManager.loadAd(it.applicationContext, Ad.Interstitial) }
 
         viewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
             emailListAdapter.submitList(emails)
