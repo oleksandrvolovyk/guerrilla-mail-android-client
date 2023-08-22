@@ -23,7 +23,10 @@ class EmailListAdapter(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ), onItemClick, onItemDeleteButtonClick, onItemDeleteButtonLongClick
+            ),
+            onItemClick,
+            onItemDeleteButtonClick,
+            onItemDeleteButtonLongClick
         )
     }
 

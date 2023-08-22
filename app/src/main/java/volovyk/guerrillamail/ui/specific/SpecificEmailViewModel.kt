@@ -39,5 +39,4 @@ class SpecificEmailViewModel @Inject constructor(
             }
         }
     }
-
 }

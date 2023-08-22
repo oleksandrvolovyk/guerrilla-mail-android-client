@@ -28,7 +28,6 @@ import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
 import javax.inject.Inject
 
-
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private var assignedEmail: String? = null
@@ -63,8 +62,8 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             emailUsernameEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) = Unit
                 override fun afterTextChanged(s: Editable) {
                     if (assignedEmail != null) {
                         getNewAddressButton.isVisible =
@@ -120,7 +119,8 @@ class MainActivity : AppCompatActivity() {
     private fun getNewAddress(newAddress: String) {
         if (newAddress.isValidEmailAddress()) {
             val confirmationDialog = UiHelper.createConfirmationDialog(
-                this, getString(R.string.confirm_getting_new_address, newAddress)
+                this,
+                getString(R.string.confirm_getting_new_address, newAddress)
             ) {
                 mainViewModel.setEmailAddress(newAddress.emailUsernamePart())
                 binding.getNewAddressButton.visibility = View.GONE

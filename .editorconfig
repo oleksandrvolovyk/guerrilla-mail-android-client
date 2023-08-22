@@ -1,0 +1,6 @@
+# https://editorconfig.org
+root = true
+
+[*.{kt,kts}]
+ktlint_code_style = android
+insert_final_newline = false

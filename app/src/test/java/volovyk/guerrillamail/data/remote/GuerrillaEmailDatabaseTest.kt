@@ -34,7 +34,6 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun `setEmailAddress should update assignedEmail and sidToken`() = runTest {
-
         val requestedEmailAddress = "test@guerrillamailblock.com"
         val sidToken = "new sidToken"
 
@@ -66,14 +65,14 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun `getRandomEmailAddress should update assignedEmail and sidToken`() = runTest {
-
         val emailAddress = "test@guerrillamailblock.com"
         val sidToken = "new sidToken"
 
         // Mock the response from the API call
         val response = Response.success(
             GetEmailAddressResponse(
-                emailAddress, sidToken
+                emailAddress,
+                sidToken
             )
         )
 
@@ -96,7 +95,6 @@ class GuerrillaEmailDatabaseTest {
 
     @Test
     fun `updateEmails should emit correct emails, update sidToken and seq values`() = runTest {
-
         val emailAddress = "test@guerrillamailblock.com"
         val sidToken = "new sidToken"
 

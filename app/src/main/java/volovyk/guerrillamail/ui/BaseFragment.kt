@@ -22,7 +22,8 @@ abstract class BaseFragment<T : ViewBinding>(
     protected val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = viewBindingInflater.invoke(inflater, container, false)
@@ -46,5 +47,4 @@ abstract class BaseFragment<T : ViewBinding>(
                 .collect(action)
         }
     }
-
 }

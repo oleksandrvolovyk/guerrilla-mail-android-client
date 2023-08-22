@@ -37,10 +37,11 @@ class AdManagerImpl : AdManager {
             if (ad == Ad.Interstitial) {
                 val adRequest = AdRequest.Builder().build()
 
-                val adId = if (BuildConfig.DEBUG)
+                val adId = if (BuildConfig.DEBUG) {
                     BuildConfig.ADMOB_TEST_AD_ID
-                else
+                } else {
                     BuildConfig.ADMOB_MY_AD_ID
+                }
 
                 InterstitialAd.load(
                     context,
@@ -66,7 +67,8 @@ class AdManagerImpl : AdManager {
                                     }
                                 }
                         }
-                    })
+                    }
+                )
             }
         }
     }
