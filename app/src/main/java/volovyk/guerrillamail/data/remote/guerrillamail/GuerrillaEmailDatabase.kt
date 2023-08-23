@@ -1,10 +1,14 @@
-package volovyk.guerrillamail.data.remote
+package volovyk.guerrillamail.data.remote.guerrillamail
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import volovyk.guerrillamail.data.model.Email
+import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.remote.exception.EmailFetchException
+import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,11 +37,11 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
                 val emailsList = checkForNewEmails()
                 emails.update { emailsList }
                 state.update { RemoteEmailDatabase.State.Success }
-            } catch (e: RuntimeException) {
-                state.update { RemoteEmailDatabase.State.Error }
+            } catch (e: IOException) {
+                state.update { RemoteEmailDatabase.State.Failure(EmailFetchException(e)) }
             }
         } else {
-            throw RuntimeException("It is not possible to check for new e-mails if no e-mail address is assigned")
+            throw NoEmailAddressAssignedException()
         }
     }
 
@@ -49,8 +53,8 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             val email = getEmailAddress()
             assignedEmail.update { email }
             state.update { RemoteEmailDatabase.State.Success }
-        } catch (e: RuntimeException) {
-            state.update { RemoteEmailDatabase.State.Error }
+        } catch (e: IOException) {
+            state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
 
@@ -60,8 +64,8 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
             assignedEmail.update { assignedEmailAddress }
             state.update { RemoteEmailDatabase.State.Success }
-        } catch (e: RuntimeException) {
-            state.update { RemoteEmailDatabase.State.Error }
+        } catch (e: IOException) {
+            state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
 
@@ -88,7 +92,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         if (setEmailAddressResponse.emailAddress != null) {
             return setEmailAddressResponse.emailAddress
         } else {
-            throw RuntimeException()
+            throw IOException("API did not return an email address")
         }
     }
 
@@ -101,7 +105,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         if (getEmailAddressResponse.emailAddress != null) {
             return getEmailAddressResponse.emailAddress
         } else {
-            throw RuntimeException()
+            throw IOException("API did not return an email address")
         }
     }
 
@@ -144,12 +148,10 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             if (response.isSuccessful && responseBody != null) {
                 return responseBody
             } else {
-                throw RuntimeException()
+                throw IOException("Request was not successful or response body is null")
             }
-        } catch (e: IOException) {
-            throw RuntimeException()
         } catch (e: RuntimeException) {
-            throw e
+            throw IOException(e)
         }
     }
 }

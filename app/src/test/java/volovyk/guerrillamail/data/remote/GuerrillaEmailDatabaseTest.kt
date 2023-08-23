@@ -14,9 +14,11 @@ import org.mockito.kotlin.eq
 import retrofit2.Response
 import retrofit2.mock.Calls
 import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse
-import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse
-import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaEmailDatabase
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiInterface
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.CheckForNewEmailsResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.GetEmailAddressResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.SetEmailAddressResponse
 
 class GuerrillaEmailDatabaseTest {
 

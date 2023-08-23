@@ -1,12 +1,12 @@
-package volovyk.guerrillamail.data.remote
+package volovyk.guerrillamail.data.remote.guerrillamail
 
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.pojo.CheckForNewEmailsResponse
-import volovyk.guerrillamail.data.remote.pojo.GetEmailAddressResponse
-import volovyk.guerrillamail.data.remote.pojo.SetEmailAddressResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.CheckForNewEmailsResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.GetEmailAddressResponse
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.SetEmailAddressResponse
 
 interface GuerrillaMailApiInterface {
     @get:GET("ajax.php?f=get_email_address")

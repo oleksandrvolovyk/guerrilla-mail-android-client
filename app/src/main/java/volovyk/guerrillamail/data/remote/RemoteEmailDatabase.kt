@@ -14,9 +14,9 @@ interface RemoteEmailDatabase {
     fun observeEmails(): Flow<List<Email>>
     fun observeState(): Flow<State>
 
-    enum class State {
-        Success,
-        Loading,
-        Error
+    sealed class State {
+        object Success : State()
+        object Loading : State()
+        data class Failure(val error: Throwable) : State()
     }
 }

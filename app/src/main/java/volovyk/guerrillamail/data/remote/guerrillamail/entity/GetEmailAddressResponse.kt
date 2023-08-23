@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.data.remote.pojo
+package volovyk.guerrillamail.data.remote.guerrillamail.entity
 
 import com.google.gson.annotations.SerializedName
 

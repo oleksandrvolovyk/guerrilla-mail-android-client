@@ -24,6 +24,8 @@ import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -51,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
         setupActionBarWithNavController(navController)
 
-        val errorToast = Toast.makeText(this, R.string.error_message, Toast.LENGTH_SHORT)
+        val errorToast = Toast.makeText(this, R.string.common_failure, Toast.LENGTH_SHORT)
 
         binding.apply {
             emailTextView.setOnClickListener { copyEmailToClipboard() }
@@ -62,8 +64,16 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             emailUsernameEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) = Unit
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) = Unit
+                override fun beforeTextChanged(
+                    s: CharSequence,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) = Unit
+
+                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) =
+                    Unit
+
                 override fun afterTextChanged(s: Editable) {
                     if (assignedEmail != null) {
                         getNewAddressButton.isVisible =
@@ -98,21 +108,30 @@ class MainActivity : AppCompatActivity() {
                 .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { state ->
-                    when (state) {
-                        RemoteEmailDatabase.State.Loading -> {
-                            binding.refreshingSpinner.isVisible = true
-                        }
-
-                        RemoteEmailDatabase.State.Error -> {
-                            errorToast.show()
-                            binding.refreshingSpinner.isVisible = false
-                        }
-
-                        RemoteEmailDatabase.State.Success -> {
-                            binding.refreshingSpinner.isVisible = false
-                        }
+                    binding.refreshingSpinner.isVisible = state is RemoteEmailDatabase.State.Loading
+                    if (state is RemoteEmailDatabase.State.Failure) {
+                        showFailureMessage(state.error, errorToast)
                     }
                 }
+        }
+    }
+
+    private fun showFailureMessage(error: Throwable, errorToast: Toast) {
+        when (error) {
+            is EmailAddressAssignmentException -> {
+                errorToast.setText(getString(R.string.email_address_assignment_failure, error.message))
+                errorToast.show()
+            }
+
+            is EmailFetchException -> {
+                errorToast.setText(getString(R.string.email_fetch_failure, error.message))
+                errorToast.show()
+            }
+
+            else -> {
+                errorToast.setText(R.string.common_failure)
+                errorToast.show()
+            }
         }
     }
 

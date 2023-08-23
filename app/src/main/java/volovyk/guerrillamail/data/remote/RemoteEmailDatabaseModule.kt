@@ -4,6 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaEmailDatabase
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiClient
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiInterface
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
