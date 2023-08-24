@@ -60,7 +60,7 @@ class EmailRepositoryImplTest {
 
     @Test
     fun `deleteEmail should call LocalEmailDatabase`() = runTest {
-        val email = Email("test", "test", "", "", 1)
+        val email = Email(1, "test", "test", "", "")
 
         emailRepository.deleteEmail(email)
 
