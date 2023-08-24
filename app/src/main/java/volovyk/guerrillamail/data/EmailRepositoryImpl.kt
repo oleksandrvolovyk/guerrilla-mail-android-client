@@ -50,6 +50,7 @@ class EmailRepositoryImpl @Inject constructor(
 
     override suspend fun getEmailById(emailId: Int): Email? {
         return withContext(Dispatchers.IO) {
+            localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
             localEmailDatabase.getEmailDao().getById(emailId)
         }
     }

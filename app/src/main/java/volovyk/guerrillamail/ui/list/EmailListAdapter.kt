@@ -1,5 +1,6 @@
 package volovyk.guerrillamail.ui.list
 
+import android.graphics.PorterDuff
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -42,6 +43,12 @@ class EmailListAdapter(
 
         fun bind(email: Email) {
             binding.apply {
+                if (email.viewed) {
+                    cardView.background.setTint(0xFFD3D3D3.toInt())
+                    cardView.background.setTintMode(PorterDuff.Mode.MULTIPLY)
+                } else {
+                    cardView.background.setTintList(null)
+                }
                 from.text = email.from
                 subject.text = email.subject
                 emailFragmentLayout.setOnClickListener {

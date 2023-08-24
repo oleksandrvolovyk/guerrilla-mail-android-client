@@ -26,22 +26,11 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
         Timber.d("init ${hashCode()}")
     }
 
-    private val assignedEmail =
-        emailRepository.observeAssignedEmail().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            null
-        )
-
-    private val state =
-        emailRepository.observeState().stateIn(
-            viewModelScope,
-            SharingStarted.WhileSubscribed(5000),
-            RemoteEmailDatabase.State.Loading
-        )
-
     val uiState: StateFlow<UiState> =
-        combine(assignedEmail, state) { assignedEmail, state ->
+        combine(
+            emailRepository.observeAssignedEmail(),
+            emailRepository.observeState()
+        ) { assignedEmail, state ->
             UiState(assignedEmail, state)
         }.stateIn(
             viewModelScope,

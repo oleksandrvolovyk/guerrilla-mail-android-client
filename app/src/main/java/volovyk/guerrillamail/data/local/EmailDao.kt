@@ -16,6 +16,9 @@ interface EmailDao {
     @Query("SELECT * FROM email WHERE id = :emailId")
     fun getById(emailId: Int): Email?
 
+    @Query("UPDATE email SET viewed = :viewed WHERE id = :emailId")
+    fun setEmailViewed(emailId: Int, viewed: Boolean)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(emails: Collection<Email?>?)
 
