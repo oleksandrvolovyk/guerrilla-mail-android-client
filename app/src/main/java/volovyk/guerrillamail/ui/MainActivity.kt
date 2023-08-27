@@ -27,7 +27,7 @@ import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
-import java.util.regex.Pattern
+import volovyk.guerrillamail.util.EmailValidator
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var adManager: AdManager
+
+    @Inject
+    lateinit var emailValidator: EmailValidator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
@@ -119,7 +122,12 @@ class MainActivity : AppCompatActivity() {
     private fun showFailureMessage(error: Throwable, errorToast: Toast) {
         when (error) {
             is EmailAddressAssignmentException -> {
-                errorToast.setText(getString(R.string.email_address_assignment_failure, error.message))
+                errorToast.setText(
+                    getString(
+                        R.string.email_address_assignment_failure,
+                        error.message
+                    )
+                )
                 errorToast.show()
             }
 
@@ -136,7 +144,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getNewAddress(newAddress: String) {
-        if (newAddress.isValidEmailAddress()) {
+        if (emailValidator.isValidEmailAddress(newAddress)) {
             val confirmationDialog = UiHelper.createConfirmationDialog(
                 this,
                 getString(R.string.confirm_getting_new_address, newAddress)
@@ -149,12 +157,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             Toast.makeText(this, R.string.email_invalid, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun String.isValidEmailAddress(): Boolean {
-        val pattern = Pattern.compile("^.+@.+\\..+$")
-        val matcher = pattern.matcher(this)
-        return matcher.matches()
     }
 
     private fun String.emailUsernamePart(): String {

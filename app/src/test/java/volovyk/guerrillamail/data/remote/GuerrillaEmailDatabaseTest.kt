@@ -114,7 +114,7 @@ class GuerrillaEmailDatabaseTest {
         val remoteEmails = mutableListOf<Email>()
 
         repeat(3) { i ->
-            remoteEmails.add(Email(i,"from$i", "subject$i", "body$i", "date$i"))
+            remoteEmails.add(Email(i, "from$i", "subject$i", "body$i", "date$i"))
         }
 
         val fullRemoteEmails = remoteEmails.map {
