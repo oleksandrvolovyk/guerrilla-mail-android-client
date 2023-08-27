@@ -28,6 +28,7 @@ import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentExcepti
 import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import volovyk.guerrillamail.util.EmailValidator
+import volovyk.guerrillamail.util.MessageHandler
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var emailValidator: EmailValidator
 
+    @Inject
+    lateinit var messageHandler: MessageHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
@@ -55,8 +59,6 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
 
         setupActionBarWithNavController(navController)
-
-        val errorToast = Toast.makeText(this, R.string.common_failure, Toast.LENGTH_SHORT)
 
         binding.apply {
             emailTextView.setOnClickListener { copyEmailToClipboard() }
@@ -113,33 +115,30 @@ class MainActivity : AppCompatActivity() {
                 .collect { state ->
                     binding.refreshingSpinner.isVisible = state is RemoteEmailDatabase.State.Loading
                     if (state is RemoteEmailDatabase.State.Failure) {
-                        showFailureMessage(state.error, errorToast)
+                        showFailureMessage(state.error)
                     }
                 }
         }
     }
 
-    private fun showFailureMessage(error: Throwable, errorToast: Toast) {
+    private fun showFailureMessage(error: Throwable) {
         when (error) {
-            is EmailAddressAssignmentException -> {
-                errorToast.setText(
+            is EmailAddressAssignmentException ->
+                messageHandler.showMessage(
                     getString(
                         R.string.email_address_assignment_failure,
                         error.message
                     )
                 )
-                errorToast.show()
-            }
 
-            is EmailFetchException -> {
-                errorToast.setText(getString(R.string.email_fetch_failure, error.message))
-                errorToast.show()
-            }
+            is EmailFetchException -> messageHandler.showMessage(
+                getString(
+                    R.string.email_fetch_failure,
+                    error.message
+                )
+            )
 
-            else -> {
-                errorToast.setText(R.string.common_failure)
-                errorToast.show()
-            }
+            else -> messageHandler.showMessage(getString(R.string.common_failure))
         }
     }
 
