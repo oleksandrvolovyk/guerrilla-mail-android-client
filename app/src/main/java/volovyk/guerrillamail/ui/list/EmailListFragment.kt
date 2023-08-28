@@ -54,7 +54,7 @@ class EmailListFragment :
             adapter = emailListAdapter
         }
 
-        context?.let { adManager.loadAd(it.applicationContext, Ad.Interstitial) }
+        context?.let { adManager.loadAd(Ad.Interstitial) }
 
         viewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
             emailListAdapter.submitList(emails)

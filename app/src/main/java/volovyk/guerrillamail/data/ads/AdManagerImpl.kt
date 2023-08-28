@@ -13,12 +13,12 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import timber.log.Timber
 import volovyk.guerrillamail.BuildConfig
 
-class AdManagerImpl : AdManager {
+class AdManagerImpl(private val appContext: Context) : AdManager {
 
-    val loadedAds = HashMap<Ad, InterstitialAd>()
+    private val loadedAds = HashMap<Ad, InterstitialAd>()
 
-    override fun initialize(context: Context) {
-        Timber.d("initialize")
+    init {
+        Timber.d("init")
         val requestConfiguration = MobileAds.getRequestConfiguration()
             .toBuilder()
             .setTagForChildDirectedTreatment(
@@ -28,10 +28,10 @@ class AdManagerImpl : AdManager {
             .build()
         MobileAds.setRequestConfiguration(requestConfiguration)
 
-        MobileAds.initialize(context)
+        MobileAds.initialize(appContext)
     }
 
-    override fun loadAd(context: Context, ad: Ad) {
+    override fun loadAd(ad: Ad) {
         if (!loadedAds.containsKey(ad)) { // If Ad is not already loaded
             Timber.d("Loading ad: $ad")
             if (ad == Ad.Interstitial) {
@@ -44,7 +44,7 @@ class AdManagerImpl : AdManager {
                 }
 
                 InterstitialAd.load(
-                    context,
+                    appContext,
                     adId,
                     adRequest,
                     object : InterstitialAdLoadCallback() {
