@@ -5,6 +5,8 @@ import volovyk.guerrillamail.data.model.Email
 
 interface RemoteEmailDatabase {
 
+    fun isAvailable(): Boolean
+
     fun updateEmails()
     fun hasEmailAddressAssigned(): Boolean
     fun getRandomEmailAddress()
@@ -15,8 +17,8 @@ interface RemoteEmailDatabase {
     fun observeState(): Flow<State>
 
     sealed class State {
-        object Success : State()
-        object Loading : State()
+        data object Success : State()
+        data object Loading : State()
         data class Failure(val error: Throwable) : State()
     }
 }

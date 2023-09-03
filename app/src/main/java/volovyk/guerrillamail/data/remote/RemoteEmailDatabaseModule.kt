@@ -4,22 +4,35 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaEmailDatabase
+import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiInterface
 import volovyk.guerrillamail.data.remote.mailtm.MailTmApiInterface
 import volovyk.guerrillamail.data.remote.mailtm.MailTmEmailDatabase
+import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
 object RemoteEmailDatabaseModule {
-//    @Provides
-//    @Singleton
-//    fun provideRemoteEmailDatabase(guerrillaMailApiInterface: GuerrillaMailApiInterface): RemoteEmailDatabase {
-//        return GuerrillaEmailDatabase(guerrillaMailApiInterface)
-//    }
+    @Provides
+    @MainRemoteEmailDatabase
+    @Singleton
+    fun provideMainRemoteEmailDatabase(guerrillaMailApiInterface: GuerrillaMailApiInterface): RemoteEmailDatabase {
+        return GuerrillaEmailDatabase(guerrillaMailApiInterface)
+    }
 
     @Provides
+    @BackupRemoteEmailDatabase
     @Singleton
-    fun provideRemoteEmailDatabase(mailTmEmailInterface: MailTmApiInterface): RemoteEmailDatabase {
+    fun provideBackupRemoteEmailDatabase(mailTmEmailInterface: MailTmApiInterface): RemoteEmailDatabase {
         return MailTmEmailDatabase(mailTmEmailInterface)
     }
 }
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MainRemoteEmailDatabase
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class BackupRemoteEmailDatabase

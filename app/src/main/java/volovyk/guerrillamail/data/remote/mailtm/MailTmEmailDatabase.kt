@@ -12,6 +12,9 @@ import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedExcepti
 import volovyk.guerrillamail.data.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.remote.mailtm.entity.Message
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.URL
 import kotlin.random.Random
 
 class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
@@ -28,6 +31,19 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         MutableStateFlow(RemoteEmailDatabase.State.Loading)
 
     private var token: String? = null
+
+    override fun isAvailable(): Boolean = try {
+        val connection = URL("https://api.mail.tm/").openConnection() as HttpURLConnection
+        connection.connect()
+        connection.disconnect()
+        true
+    } catch (e: IOException) {
+        state.update { RemoteEmailDatabase.State.Failure(e) }
+        false
+    } catch (e: SocketTimeoutException) {
+        state.update { RemoteEmailDatabase.State.Failure(e) }
+        false
+    }
 
     override fun updateEmails() = try {
         state.update { RemoteEmailDatabase.State.Loading }

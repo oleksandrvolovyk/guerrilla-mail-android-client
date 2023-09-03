@@ -10,6 +10,9 @@ import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentExcepti
 import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +32,19 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
     private var sidToken: String? = null
     private var seq = 0
+
+    override fun isAvailable(): Boolean = try {
+        val connection = URL("https://api.guerrillamail.com/").openConnection() as HttpURLConnection
+        connection.connect()
+        connection.disconnect()
+        true
+    } catch (e: IOException) {
+        state.update { RemoteEmailDatabase.State.Failure(e) }
+        false
+    } catch (e: SocketTimeoutException) {
+        state.update { RemoteEmailDatabase.State.Failure(e) }
+        false
+    }
 
     override fun updateEmails() {
         if (assignedEmail.value != null) {
