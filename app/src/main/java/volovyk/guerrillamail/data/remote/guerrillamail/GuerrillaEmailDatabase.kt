@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
+import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
@@ -34,7 +35,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
     private var seq = 0
 
     override fun isAvailable(): Boolean = try {
-        val connection = URL("https://api.guerrillamail.com/").openConnection() as HttpURLConnection
+        val connection = URL(BuildConfig.GUERRILLAMAIL_API_BASE_URL).openConnection() as HttpURLConnection
         connection.connect()
         connection.disconnect()
         true

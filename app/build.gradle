@@ -31,6 +31,9 @@ android {
         resValue("string", "ADMOB_APP_ID", keysProperties['ADMOB_APP_ID'])
         buildConfigField("String", "ADMOB_TEST_AD_ID", keysProperties['ADMOB_TEST_AD_ID'])
         buildConfigField("String", "ADMOB_MY_AD_ID", keysProperties['ADMOB_MY_AD_ID'])
+
+        buildConfigField("String", "GUERRILLAMAIL_API_BASE_URL", "\"https://api.guerrillamail.com/\"")
+        buildConfigField("String", "MAILTM_API_BASE_URL", "\"https://api.mail.tm/\"")
     }
 
     buildTypes {

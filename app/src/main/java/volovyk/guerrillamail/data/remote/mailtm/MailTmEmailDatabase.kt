@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
+import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
@@ -33,7 +34,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
     private var token: String? = null
 
     override fun isAvailable(): Boolean = try {
-        val connection = URL("https://api.mail.tm/").openConnection() as HttpURLConnection
+        val connection = URL(BuildConfig.MAILTM_API_BASE_URL).openConnection() as HttpURLConnection
         connection.connect()
         connection.disconnect()
         true
@@ -105,21 +106,9 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         val domain = listOfDomains.domains[0].domain
 
         val username = generateRandomLatinString(USERNAME_LENGTH)
-        val password = generateRandomLatinString(PASSWORD_LENGTH)
         val address = "$username@$domain"
 
-        val createAccountCall = mailTmApiInterface.createAccount(AuthRequest(address, password))
-
-        createAccountCall.executeAndCatchErrors()
-
-        // 3. Login
-        val loginCall = mailTmApiInterface.login(AuthRequest(address, password))
-
-        val loginResponse = loginCall.executeAndCatchErrors()
-
-        token = "Bearer ${loginResponse.token}"
-        assignedEmail.update { address }
-        state.update { RemoteEmailDatabase.State.Success }
+        setEmailAddress(address)
     } catch (exception: IOException) {
         state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(exception)) }
     }
