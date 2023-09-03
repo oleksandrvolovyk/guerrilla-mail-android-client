@@ -146,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                 this,
                 getString(R.string.confirm_getting_new_address, newAddress)
             ) {
-                mainViewModel.setEmailAddress(newAddress.emailUsernamePart())
+                mainViewModel.setEmailAddress(newAddress)
                 binding.getNewAddressButton.visibility = View.GONE
             }
 

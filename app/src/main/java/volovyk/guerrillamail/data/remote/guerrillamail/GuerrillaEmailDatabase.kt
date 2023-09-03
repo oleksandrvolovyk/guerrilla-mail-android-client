@@ -61,7 +61,8 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
     override fun setEmailAddress(requestedEmailAddress: String) {
         state.update { RemoteEmailDatabase.State.Loading }
         try {
-            val assignedEmailAddress = makeSetEmailAddressRequest(requestedEmailAddress)
+            val assignedEmailAddress =
+                makeSetEmailAddressRequest(requestedEmailAddress.substringBefore("@"))
             assignedEmail.update { assignedEmailAddress }
             state.update { RemoteEmailDatabase.State.Success }
         } catch (e: IOException) {

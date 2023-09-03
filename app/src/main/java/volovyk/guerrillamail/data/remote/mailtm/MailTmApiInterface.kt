@@ -2,6 +2,7 @@ package volovyk.guerrillamail.data.remote.mailtm
 
 import retrofit2.Call
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -35,4 +36,10 @@ interface MailTmApiInterface {
         @Query("page") page: Int = 1,
         @Header("Authorization") token: String
     ): Call<Message>
+
+    @DELETE("messages/{id}")
+    fun deleteMessage(
+        @Path("id") id: String,
+        @Header("Authorization") token: String
+    ): Call<Unit>
 }
