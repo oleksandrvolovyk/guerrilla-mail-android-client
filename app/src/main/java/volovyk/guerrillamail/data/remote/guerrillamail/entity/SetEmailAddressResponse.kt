@@ -1,11 +1,11 @@
 package volovyk.guerrillamail.data.remote.guerrillamail.entity
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 class SetEmailAddressResponse(
-    @SerializedName("email_addr")
-    val emailAddress: String? = null,
+    @JsonProperty("email_addr")
+    val emailAddress: String,
 
-    @SerializedName("sid_token")
-    val sidToken: String? = null
+    @JsonProperty("sid_token")
+    val sidToken: String
 )

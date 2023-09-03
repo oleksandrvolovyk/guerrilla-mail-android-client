@@ -1,12 +1,11 @@
 package volovyk.guerrillamail.data.remote.guerrillamail.entity
 
-import com.google.gson.annotations.SerializedName
-import volovyk.guerrillamail.data.model.Email
+import com.fasterxml.jackson.annotation.JsonProperty
 
 class CheckForNewEmailsResponse(
-    @SerializedName("list")
-    val emails: List<Email>? = null,
+    @JsonProperty("list")
+    val emails: List<BriefEmail>,
 
-    @SerializedName("sid_token")
-    val sidToken: String? = null
+    @JsonProperty("sid_token")
+    val sidToken: String
 )

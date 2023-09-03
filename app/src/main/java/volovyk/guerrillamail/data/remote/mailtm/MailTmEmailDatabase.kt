@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
+import timber.log.Timber
 import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
@@ -39,9 +40,11 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         connection.disconnect()
         true
     } catch (e: IOException) {
+        Timber.e(e)
         state.update { RemoteEmailDatabase.State.Failure(e) }
         false
     } catch (e: SocketTimeoutException) {
+        Timber.e(e)
         state.update { RemoteEmailDatabase.State.Failure(e) }
         false
     }
@@ -82,6 +85,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         emails.update { fullEmails }
         state.update { RemoteEmailDatabase.State.Success }
     } catch (exception: IOException) {
+        Timber.e(exception)
         state.update { RemoteEmailDatabase.State.Failure(EmailFetchException(exception)) }
     }
 
@@ -110,6 +114,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
         setEmailAddress(address)
     } catch (exception: IOException) {
+        Timber.e(exception)
         state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(exception)) }
     }
 
@@ -141,6 +146,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         assignedEmail.update { requestedEmailAddress }
         state.update { RemoteEmailDatabase.State.Success }
     } catch (exception: IOException) {
+        Timber.e(exception)
         state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(exception)) }
     }
 
@@ -164,6 +170,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
                 throw IOException("Request was not successful")
             }
         } catch (e: RuntimeException) {
+            Timber.e(e)
             throw IOException(e)
         }
     }

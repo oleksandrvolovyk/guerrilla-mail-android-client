@@ -4,12 +4,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
+import timber.log.Timber
 import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.BriefEmail
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -55,6 +57,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
                 emails.update { emailsList }
                 state.update { RemoteEmailDatabase.State.Success }
             } catch (e: IOException) {
+                Timber.e(e)
                 state.update { RemoteEmailDatabase.State.Failure(EmailFetchException(e)) }
             }
         } else {
@@ -71,6 +74,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             assignedEmail.update { email }
             state.update { RemoteEmailDatabase.State.Success }
         } catch (e: IOException) {
+            Timber.e(e)
             state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
@@ -83,6 +87,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             assignedEmail.update { assignedEmailAddress }
             state.update { RemoteEmailDatabase.State.Success }
         } catch (e: IOException) {
+            Timber.e(e)
             state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
@@ -107,11 +112,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
         sidToken = setEmailAddressResponse.sidToken
         seq = 0
-        if (setEmailAddressResponse.emailAddress != null) {
-            return setEmailAddressResponse.emailAddress
-        } else {
-            throw IOException("API did not return an email address")
-        }
+        return setEmailAddressResponse.emailAddress
     }
 
     private fun getEmailAddress(): String {
@@ -120,11 +121,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         val getEmailAddressResponse = call.executeAndCatchErrors()
 
         sidToken = getEmailAddressResponse.sidToken
-        if (getEmailAddressResponse.emailAddress != null) {
-            return getEmailAddressResponse.emailAddress
-        } else {
-            throw IOException("API did not return an email address")
-        }
+        return getEmailAddressResponse.emailAddress
     }
 
     private fun checkForNewEmails(): List<Email> {
@@ -133,14 +130,11 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         val checkForNewEmailsResponse = call.executeAndCatchErrors()
 
         sidToken = checkForNewEmailsResponse.sidToken
-        if (!checkForNewEmailsResponse.emails.isNullOrEmpty()) {
-            return fetchAllEmails(checkForNewEmailsResponse.emails)
-        }
 
-        return emptyList()
+        return fetchAllEmails(checkForNewEmailsResponse.emails)
     }
 
-    private fun fetchAllEmails(emailsList: List<Email>): List<Email> {
+    private fun fetchAllEmails(emailsList: List<BriefEmail>): List<Email> {
         val fetchedEmailsList: MutableList<Email> = mutableListOf()
         for (email in emailsList) {
             val call = guerrillaMailApiInterface.fetchEmail(sidToken, email.id)
@@ -168,6 +162,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
                 throw IOException("Request was not successful or response body is null")
             }
         } catch (e: RuntimeException) {
+            Timber.e(e)
             throw IOException(e)
         }
     }

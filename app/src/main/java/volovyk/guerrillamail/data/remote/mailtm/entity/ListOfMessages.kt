@@ -1,8 +1,8 @@
 package volovyk.guerrillamail.data.remote.mailtm.entity
 
-import com.google.gson.annotations.SerializedName
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class ListOfMessages(
-    @SerializedName("hydra:member") val messages: List<Message>,
-    @SerializedName("hydra:totalItems") val totalMessages: Int
+    @JsonProperty("hydra:member") val messages: List<Message>,
+    @JsonProperty("hydra:totalItems") val totalMessages: Int
 )
