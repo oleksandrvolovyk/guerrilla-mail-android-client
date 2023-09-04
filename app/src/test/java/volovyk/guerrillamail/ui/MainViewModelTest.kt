@@ -1,5 +1,8 @@
 package volovyk.guerrillamail.ui
 
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -10,9 +13,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
-import org.mockito.kotlin.verify
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.EmailRepository
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
@@ -33,13 +33,13 @@ class MainViewModelTest {
 
     @Before
     fun setup() {
-        emailRepository = mock(EmailRepository::class.java)
+        emailRepository = mockk<EmailRepository>(relaxed = true)
 
         assignedEmailFlow = MutableStateFlow(null)
         stateFlow = MutableStateFlow(RemoteEmailDatabase.State.Loading)
 
-        `when`(emailRepository.observeAssignedEmail()).thenReturn(assignedEmailFlow)
-        `when`(emailRepository.observeState()).thenReturn(stateFlow)
+        every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
+        every { emailRepository.observeState() } returns stateFlow
 
         viewModel = MainViewModel(emailRepository)
     }
@@ -76,6 +76,6 @@ class MainViewModelTest {
 
         viewModel.setEmailAddress(newAddress)
 
-        verify(emailRepository).setEmailAddress(newAddress)
+        coVerify { emailRepository.setEmailAddress(newAddress) }
     }
 }

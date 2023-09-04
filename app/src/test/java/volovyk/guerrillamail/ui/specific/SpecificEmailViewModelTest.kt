@@ -1,6 +1,8 @@
 package volovyk.guerrillamail.ui.specific
 
 import androidx.lifecycle.SavedStateHandle
+import io.mockk.coEvery
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -8,8 +10,6 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.EmailRepository
 import volovyk.guerrillamail.data.model.Email
@@ -28,7 +28,7 @@ class SpecificEmailViewModelTest {
 
     @Before
     fun setup() {
-        emailRepository = mock(EmailRepository::class.java)
+        emailRepository = mockk<EmailRepository>()
         savedStateHandle = SavedStateHandle()
     }
 
@@ -39,7 +39,7 @@ class SpecificEmailViewModelTest {
         val email = Email(0, "", "", "", "", false)
 
         savedStateHandle["emailId"] = emailId
-        `when`(emailRepository.getEmailById(emailId)).thenReturn(email)
+        coEvery { emailRepository.getEmailById(emailId) } returns email
 
         // When
         viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository)

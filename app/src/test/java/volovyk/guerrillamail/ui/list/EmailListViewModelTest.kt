@@ -1,5 +1,8 @@
 package volovyk.guerrillamail.ui.list
 
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -9,9 +12,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mockito
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.`when`
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.EmailRepository
 import volovyk.guerrillamail.data.model.Email
@@ -31,11 +31,11 @@ class EmailListViewModelTest {
 
     @Before
     fun setup() {
-        emailRepository = Mockito.mock(EmailRepository::class.java)
+        emailRepository = mockk<EmailRepository>(relaxed = true)
 
         emailFlow = MutableStateFlow(emptyList())
 
-        `when`(emailRepository.observeEmails()).thenReturn(emailFlow)
+        every { emailRepository.observeEmails() } returns emailFlow
 
         viewModel = EmailListViewModel(emailRepository)
     }
@@ -72,7 +72,7 @@ class EmailListViewModelTest {
         viewModel.deleteEmail(emailToDelete)
 
         // Then
-        verify(emailRepository).deleteEmail(emailToDelete)
+        coVerify { emailRepository.deleteEmail(emailToDelete) }
     }
 
     @Test
@@ -81,6 +81,6 @@ class EmailListViewModelTest {
         viewModel.deleteAllEmails()
 
         // Then
-        verify(emailRepository).deleteAllEmails()
+        coVerify { emailRepository.deleteAllEmails() }
     }
 }

@@ -1,36 +1,30 @@
 package volovyk.guerrillamail.data.remote
 
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.Mockito.anyInt
-import org.mockito.Mockito.`when`
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.eq
 import retrofit2.Response
 import retrofit2.mock.Calls
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaEmailDatabase
 import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiInterface
+import volovyk.guerrillamail.data.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.remote.guerrillamail.entity.CheckForNewEmailsResponse
 import volovyk.guerrillamail.data.remote.guerrillamail.entity.GetEmailAddressResponse
 import volovyk.guerrillamail.data.remote.guerrillamail.entity.SetEmailAddressResponse
 
 class GuerrillaEmailDatabaseTest {
 
-    @Mock
     private lateinit var guerrillaMailApiInterface: GuerrillaMailApiInterface
-
     private lateinit var database: GuerrillaEmailDatabase
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
-
+        guerrillaMailApiInterface = mockk<GuerrillaMailApiInterface>()
         database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
     }
 
@@ -43,14 +37,14 @@ class GuerrillaEmailDatabaseTest {
         val response = Response.success(
             SetEmailAddressResponse(requestedEmailAddress, sidToken)
         )
-        `when`(
+        every {
             guerrillaMailApiInterface.setEmailAddress(
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull(),
-                anyOrNull()
+                any(),
+                any(),
+                any(),
+                any()
             )
-        ).thenReturn(Calls.response(response))
+        } returns Calls.response(response)
 
         database.setEmailAddress(requestedEmailAddress)
 
@@ -78,7 +72,7 @@ class GuerrillaEmailDatabaseTest {
             )
         )
 
-        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(Calls.response(response))
+        every { guerrillaMailApiInterface.emailAddress } returns Calls.response(response)
 
         database.getRandomEmailAddress()
 
@@ -105,16 +99,14 @@ class GuerrillaEmailDatabaseTest {
             GetEmailAddressResponse(emailAddress, sidToken)
         )
 
-        `when`(guerrillaMailApiInterface.emailAddress).thenReturn(
-            Calls.response(
-                getEmailAddressResponse
-            )
+        every { guerrillaMailApiInterface.emailAddress } returns Calls.response(
+            getEmailAddressResponse
         )
 
-        val remoteEmails = mutableListOf<Email>()
+        val remoteEmails = mutableListOf<BriefEmail>()
 
         repeat(3) { i ->
-            remoteEmails.add(Email(i, "from$i", "subject$i", "body$i", "date$i"))
+            remoteEmails.add(BriefEmail(i, "from$i", "subject$i", "date$i"))
         }
 
         val fullRemoteEmails = remoteEmails.map {
@@ -122,7 +114,7 @@ class GuerrillaEmailDatabaseTest {
                 it.id,
                 "Full ${it.from}",
                 "Full ${it.subject}",
-                "Full ${it.body}",
+                "Full body ${it.id}",
                 "Full ${it.date}"
             )
         }
@@ -131,16 +123,20 @@ class GuerrillaEmailDatabaseTest {
             CheckForNewEmailsResponse(remoteEmails, sidToken)
         )
 
-        `when`(
+        every {
             guerrillaMailApiInterface.checkForNewEmails(
-                anyOrNull(),
-                anyInt()
+                any(),
+                any()
             )
-        ).thenReturn(Calls.response(checkForNewEmailsResponse))
+        } returns Calls.response(checkForNewEmailsResponse)
 
         fullRemoteEmails.forEach { email ->
-            `when`(guerrillaMailApiInterface.fetchEmail(anyOrNull(), eq(email.id)))
-                .thenReturn(Calls.response(email))
+            every {
+                guerrillaMailApiInterface.fetchEmail(
+                    any(),
+                    eq(email.id)
+                )
+            } returns Calls.response(email)
         }
 
         database.getRandomEmailAddress()
