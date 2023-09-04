@@ -43,7 +43,7 @@ class EmailRepositoryImplTest {
 
     @Test
     fun `getEmailById should call LocalEmailDatabase`() = runTest {
-        val emailId = 123
+        val emailId = "123"
 
         emailRepository.getEmailById(emailId)
 
@@ -61,7 +61,7 @@ class EmailRepositoryImplTest {
 
     @Test
     fun `deleteEmail should call LocalEmailDatabase`() = runTest {
-        val email = Email(1, "test", "test", "", "")
+        val email = Email("1", "test", "test", "", "")
 
         emailRepository.deleteEmail(email)
 

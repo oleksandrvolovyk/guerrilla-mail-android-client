@@ -24,7 +24,7 @@
         tools:layout="@layout/fragment_specific_email">
         <argument
             android:name="emailId"
-            app:argType="integer" />
+            app:argType="string" />
         <argument
             android:name="emailSubject"
             app:argType="string" />

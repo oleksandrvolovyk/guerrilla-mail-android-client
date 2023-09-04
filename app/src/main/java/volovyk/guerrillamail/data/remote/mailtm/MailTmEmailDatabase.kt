@@ -17,7 +17,6 @@ import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
-import kotlin.random.Random
 
 class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
     RemoteEmailDatabase {
@@ -73,7 +72,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
         val fullEmails = fullMessages.map { message ->
             Email(
-                id = Random.nextInt(), // TODO: don't use Random to avoid overriding existing emails
+                id = message.id,
                 from = message.from.address,
                 subject = message.subject,
                 body = message.text ?: "",

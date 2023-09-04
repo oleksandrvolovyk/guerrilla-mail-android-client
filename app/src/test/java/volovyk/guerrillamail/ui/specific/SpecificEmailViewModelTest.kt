@@ -35,8 +35,8 @@ class SpecificEmailViewModelTest {
     @Test
     fun `init with emailId sets uiState email when emailId is provided`() = runTest {
         // Given
-        val emailId = 123
-        val email = Email(0, "", "", "", "", false)
+        val emailId = "123"
+        val email = Email("123", "", "", "", "", false)
 
         savedStateHandle["emailId"] = emailId
         coEvery { emailRepository.getEmailById(emailId) } returns email

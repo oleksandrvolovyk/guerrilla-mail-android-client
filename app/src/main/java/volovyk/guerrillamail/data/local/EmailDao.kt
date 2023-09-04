@@ -14,10 +14,10 @@ interface EmailDao {
     val all: Flow<List<Email>>
 
     @Query("SELECT * FROM email WHERE id = :emailId")
-    fun getById(emailId: Int): Email?
+    fun getById(emailId: String): Email?
 
     @Query("UPDATE email SET viewed = :viewed WHERE id = :emailId")
-    fun setEmailViewed(emailId: Int, viewed: Boolean)
+    fun setEmailViewed(emailId: String, viewed: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(emails: Collection<Email?>?)

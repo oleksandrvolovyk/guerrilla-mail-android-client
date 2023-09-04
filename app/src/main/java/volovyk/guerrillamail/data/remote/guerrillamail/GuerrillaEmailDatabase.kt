@@ -142,7 +142,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
             val fetchedEmail = call.executeAndCatchErrors()
 
             fetchedEmailsList.add(fetchedEmail.copy(body = formatEmailBody(fetchedEmail.body)))
-            seq = seq.coerceAtLeast(fetchedEmail.id)
+            seq = seq.coerceAtLeast(fetchedEmail.id.toInt())
         }
         return fetchedEmailsList
     }

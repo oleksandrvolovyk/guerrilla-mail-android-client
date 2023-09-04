@@ -69,7 +69,7 @@ class EmailRepositoryImpl @Inject constructor(
         private const val EMAIL_ASSIGNMENT_INTERVAL = 1000L // 1 second, interval between attempts
     }
 
-    override suspend fun getEmailById(emailId: Int): Email? {
+    override suspend fun getEmailById(emailId: String): Email? {
         return withContext(Dispatchers.IO) {
             localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
             localEmailDatabase.getEmailDao().getById(emailId)

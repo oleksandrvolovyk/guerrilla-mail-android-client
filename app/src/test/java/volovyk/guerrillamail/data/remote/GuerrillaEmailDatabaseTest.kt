@@ -106,7 +106,7 @@ class GuerrillaEmailDatabaseTest {
         val remoteEmails = mutableListOf<BriefEmail>()
 
         repeat(3) { i ->
-            remoteEmails.add(BriefEmail(i, "from$i", "subject$i", "date$i"))
+            remoteEmails.add(BriefEmail(i.toString(), "from$i", "subject$i", "date$i"))
         }
 
         val fullRemoteEmails = remoteEmails.map {
@@ -159,7 +159,7 @@ class GuerrillaEmailDatabaseTest {
         // Assert seq value is equal to the highest email id value
         assertEquals(
             fullRemoteEmails.map { it.id }.maxOf { it },
-            database.getSeq()
+            database.getSeq().toString()
         )
     }
 }

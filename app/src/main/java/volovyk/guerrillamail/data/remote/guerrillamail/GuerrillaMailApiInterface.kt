@@ -21,7 +21,7 @@ interface GuerrillaMailApiInterface {
     @GET("ajax.php?f=fetch_email")
     fun fetchEmail(
         @Query("sid_token") sidToken: String?,
-        @Query("email_id") id: Int
+        @Query("email_id") id: String
     ): Call<Email>
 
     @GET("ajax.php?f=set_email_user")

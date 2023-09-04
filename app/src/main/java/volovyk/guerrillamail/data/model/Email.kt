@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 @Entity
 data class Email(
-    @JsonProperty("mail_id") @PrimaryKey val id: Int,
+    @JsonProperty("mail_id") @PrimaryKey val id: String,
     @JsonProperty("mail_from") val from: String,
     @JsonProperty("mail_subject") val subject: String,
     @JsonProperty("mail_body") val body: String,

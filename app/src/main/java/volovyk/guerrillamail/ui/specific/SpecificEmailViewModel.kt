@@ -27,7 +27,7 @@ class SpecificEmailViewModel @Inject constructor(
     val uiState: StateFlow<SpecificEmailUiState> = _uiState.asStateFlow()
 
     init {
-        val emailId: Int? = savedStateHandle["emailId"]
+        val emailId: String? = savedStateHandle["emailId"]
 
         emailId?.let {
             viewModelScope.launch {
