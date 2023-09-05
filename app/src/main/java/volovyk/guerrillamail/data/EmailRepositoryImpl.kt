@@ -4,7 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,18 +24,18 @@ class EmailRepositoryImpl @Inject constructor(
     private val localEmailDatabase: LocalEmailDatabase
 ) : EmailRepository {
 
-    private var mainRemoteEmailDatabaseIsAvailable = true
+    private var mainRemoteEmailDatabaseIsAvailable = MutableStateFlow(true)
 
     init {
         externalScope.launch {
             withContext(Dispatchers.IO) {
-                mainRemoteEmailDatabaseIsAvailable = mainRemoteEmailDatabase.isAvailable()
+                mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
             }
         }
         externalScope.launch {
             withContext(Dispatchers.IO) {
                 while (isActive) {
-                    val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable) {
+                    val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable.value) {
                         mainRemoteEmailDatabase
                     } else {
                         backupRemoteEmailDatabase
@@ -78,7 +80,7 @@ class EmailRepositoryImpl @Inject constructor(
 
     override suspend fun setEmailAddress(newAddress: String) {
         withContext(Dispatchers.IO) {
-            if (mainRemoteEmailDatabaseIsAvailable) {
+            if (mainRemoteEmailDatabaseIsAvailable.value) {
                 mainRemoteEmailDatabase.setEmailAddress(newAddress)
             } else {
                 backupRemoteEmailDatabase.setEmailAddress(newAddress)
@@ -103,7 +105,7 @@ class EmailRepositoryImpl @Inject constructor(
             mainRemoteEmailDatabase.observeAssignedEmail(),
             backupRemoteEmailDatabase.observeAssignedEmail()
         ) { mainEmail, backupEmail ->
-            if (mainRemoteEmailDatabaseIsAvailable) {
+            if (mainRemoteEmailDatabaseIsAvailable.value) {
                 mainEmail
             } else {
                 backupEmail
@@ -116,12 +118,15 @@ class EmailRepositoryImpl @Inject constructor(
             mainRemoteEmailDatabase.observeState(),
             backupRemoteEmailDatabase.observeState()
         ) { mainState, backupState ->
-            if (mainRemoteEmailDatabaseIsAvailable) {
+            if (mainRemoteEmailDatabaseIsAvailable.value) {
                 mainState
             } else {
                 backupState
             }
         }
+
+    override fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean> =
+        mainRemoteEmailDatabaseIsAvailable
 
     // Must be called on a non-UI thread or Room will throw an exception.
     private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) {

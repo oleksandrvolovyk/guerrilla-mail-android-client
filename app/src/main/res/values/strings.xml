@@ -20,4 +20,5 @@
     <string name="email_address_assignment_failure">Failed to assign email address: %1$s</string>
     <string name="email_fetch_failure">Failed to fetch emails: %1$s</string>
     <string name="common_failure">Something went wrong! Check your Internet connection</string>
+    <string name="guerrilla_mail_offline">Could not connect to Guerrilla Mail, using Mail.tm now</string>
 </resources>

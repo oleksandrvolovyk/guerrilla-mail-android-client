@@ -15,7 +15,8 @@ import javax.inject.Inject
 
 data class UiState(
     val assignedEmail: String? = null,
-    val state: RemoteEmailDatabase.State = RemoteEmailDatabase.State.Loading
+    val state: RemoteEmailDatabase.State = RemoteEmailDatabase.State.Loading,
+    val mainRemoteEmailDatabaseIsAvailable: Boolean = true
 )
 
 @HiltViewModel
@@ -29,9 +30,10 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
     val uiState: StateFlow<UiState> =
         combine(
             emailRepository.observeAssignedEmail(),
-            emailRepository.observeState()
-        ) { assignedEmail, state ->
-            UiState(assignedEmail, state)
+            emailRepository.observeState(),
+            emailRepository.observeMainRemoteEmailDatabaseAvailability()
+        ) { assignedEmail, state, mainRemoteEmailDatabaseAvailability ->
+            UiState(assignedEmail, state, mainRemoteEmailDatabaseAvailability)
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),

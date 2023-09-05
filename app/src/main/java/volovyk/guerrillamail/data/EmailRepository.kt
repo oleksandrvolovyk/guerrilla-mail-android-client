@@ -14,4 +14,5 @@ interface EmailRepository {
     fun observeAssignedEmail(): Flow<String?>
     fun observeEmails(): Flow<List<Email>>
     fun observeState(): Flow<RemoteEmailDatabase.State>
+    fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean>
 }

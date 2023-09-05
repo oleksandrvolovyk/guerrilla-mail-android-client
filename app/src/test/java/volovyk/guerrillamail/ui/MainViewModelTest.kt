@@ -25,6 +25,7 @@ class MainViewModelTest {
 
     private lateinit var assignedEmailFlow: MutableStateFlow<String?>
     private lateinit var stateFlow: MutableStateFlow<RemoteEmailDatabase.State>
+    private lateinit var mainRemoteEmailDatabaseAvailability: MutableStateFlow<Boolean>
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -37,10 +38,11 @@ class MainViewModelTest {
 
         assignedEmailFlow = MutableStateFlow(null)
         stateFlow = MutableStateFlow(RemoteEmailDatabase.State.Loading)
+        mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
 
         every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
         every { emailRepository.observeState() } returns stateFlow
-
+        every { emailRepository.observeMainRemoteEmailDatabaseAvailability() } returns mainRemoteEmailDatabaseAvailability
         viewModel = MainViewModel(emailRepository)
     }
 

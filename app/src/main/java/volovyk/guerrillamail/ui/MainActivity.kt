@@ -3,8 +3,6 @@ package volovyk.guerrillamail.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -16,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupActionBarWithNavController
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -66,24 +65,14 @@ class MainActivity : AppCompatActivity() {
                     "${emailUsernameEditText.text}${emailDomainTextView.text}"
                 )
             }
-            emailUsernameEditText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) = Unit
-
-                override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) =
-                    Unit
-
-                override fun afterTextChanged(s: Editable) {
+            emailUsernameEditText.addTextChangedListener(
+                UiHelper.AfterTextChangedWatcher { editable ->
                     if (assignedEmail != null) {
                         getNewAddressButton.isVisible =
-                            assignedEmail!!.emailUsernamePart() != s.toString()
+                            assignedEmail!!.emailUsernamePart() != editable.toString()
                     }
                 }
-            })
+            )
         }
 
         lifecycleScope.launch {
@@ -117,17 +106,41 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         }
+
+        val guerrillaMailOfflineSnackbar = Snackbar.make(
+            binding.root,
+            getString(R.string.guerrilla_mail_offline),
+            Snackbar.LENGTH_INDEFINITE
+        )
+        lifecycleScope.launch {
+            mainViewModel.uiState
+                .map { it.mainRemoteEmailDatabaseIsAvailable }
+                .distinctUntilChanged()
+                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+                .collect { mainRemoteEmailDatabaseIsAvailable ->
+                    if (mainRemoteEmailDatabaseIsAvailable) {
+                        guerrillaMailOfflineSnackbar.dismiss()
+                    } else {
+                        guerrillaMailOfflineSnackbar.show()
+                    }
+                }
+        }
     }
 
     private fun showFailureMessage(error: Throwable) {
         when (error) {
-            is EmailAddressAssignmentException ->
+            is EmailAddressAssignmentException -> {
                 messageHandler.showMessage(
                     getString(
                         R.string.email_address_assignment_failure,
                         error.message
                     )
                 )
+                mainViewModel.uiState.value.assignedEmail?.let {
+                    binding.emailUsernameEditText.setText(it.emailUsernamePart())
+                    binding.emailDomainTextView.text = it.emailDomainPart()
+                }
+            }
 
             is EmailFetchException -> messageHandler.showMessage(
                 getString(
