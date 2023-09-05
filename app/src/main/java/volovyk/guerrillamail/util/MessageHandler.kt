@@ -9,7 +9,7 @@ interface MessageHandler {
 
 class MessageHandlerImpl(applicationContext: Context) : MessageHandler {
 
-    private val toast = Toast(applicationContext).apply { duration = Toast.LENGTH_SHORT }
+    private val toast = Toast.makeText(applicationContext, "", Toast.LENGTH_SHORT)
 
     override fun showMessage(text: String) {
         toast.setText(text)
