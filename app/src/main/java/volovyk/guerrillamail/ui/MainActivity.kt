@@ -111,11 +111,12 @@ class MainActivity : AppCompatActivity() {
             binding.root,
             getString(R.string.guerrilla_mail_offline),
             Snackbar.LENGTH_INDEFINITE
-        )
+        ).setAction(R.string.retry) {
+            mainViewModel.retryConnectingToMainDatabase()
+        }
         lifecycleScope.launch {
             mainViewModel.uiState
                 .map { it.mainRemoteEmailDatabaseIsAvailable }
-                .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { mainRemoteEmailDatabaseIsAvailable ->
                     if (mainRemoteEmailDatabaseIsAvailable) {

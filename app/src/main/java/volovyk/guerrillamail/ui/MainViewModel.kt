@@ -45,4 +45,10 @@ class MainViewModel @Inject constructor(private val emailRepository: EmailReposi
             emailRepository.setEmailAddress(newAddress)
         }
     }
+
+    fun retryConnectingToMainDatabase() {
+        viewModelScope.launch {
+            emailRepository.retryConnectingToMainDatabase()
+        }
+    }
 }

@@ -100,6 +100,12 @@ class EmailRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun retryConnectingToMainDatabase() {
+        withContext(Dispatchers.IO) {
+            mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
+        }
+    }
+
     override fun observeAssignedEmail(): Flow<String?> =
         combine(
             mainRemoteEmailDatabase.observeAssignedEmail(),

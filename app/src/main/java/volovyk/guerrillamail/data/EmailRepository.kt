@@ -10,6 +10,7 @@ interface EmailRepository {
     suspend fun setEmailAddress(newAddress: String)
     suspend fun deleteEmail(email: Email?)
     suspend fun deleteAllEmails()
+    suspend fun retryConnectingToMainDatabase()
 
     fun observeAssignedEmail(): Flow<String?>
     fun observeEmails(): Flow<List<Email>>
