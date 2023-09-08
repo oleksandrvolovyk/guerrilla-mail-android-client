@@ -31,4 +31,7 @@ interface GuerrillaMailApiInterface {
         @Query("site") site: String,
         @Query("email_user") newAddress: String
     ): Call<SetEmailAddressResponse>
+
+    @GET("ajax.php")
+    fun ping(): Call<Unit>
 }

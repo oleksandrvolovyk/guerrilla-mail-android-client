@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import timber.log.Timber
-import volovyk.guerrillamail.BuildConfig
 import volovyk.guerrillamail.data.model.Email
 import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
@@ -13,9 +12,6 @@ import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.remote.guerrillamail.entity.BriefEmail
 import java.io.IOException
-import java.net.HttpURLConnection
-import java.net.SocketTimeoutException
-import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -37,14 +33,9 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
     private var seq = 0
 
     override fun isAvailable(): Boolean = try {
-        val connection = URL(BuildConfig.GUERRILLAMAIL_API_BASE_URL).openConnection() as HttpURLConnection
-        connection.connect()
-        connection.disconnect()
+        guerrillaMailApiInterface.ping().executeAndCatchErrors()
         true
     } catch (e: IOException) {
-        state.update { RemoteEmailDatabase.State.Failure(e) }
-        false
-    } catch (e: SocketTimeoutException) {
         state.update { RemoteEmailDatabase.State.Failure(e) }
         false
     }
