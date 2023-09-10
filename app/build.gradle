@@ -25,7 +25,7 @@ android {
         versionCode 23
         versionName "3.3"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "volovyk.MyTestRunner"
 
         // should correspond to key/value pairs inside the file
         resValue("string", "ADMOB_APP_ID", keysProperties['ADMOB_APP_ID'])
@@ -52,6 +52,10 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        resources.excludes.add("META-INF/LICENSE.md")
+        resources.excludes.add("META-INF/LICENSE-notice.md")
+    }
 }
 
 dependencies {
@@ -66,6 +70,9 @@ dependencies {
     // Hilt dependencies
     implementation "com.google.dagger:hilt-android:2.47"
     kapt "com.google.dagger:hilt-compiler:2.47"
+    // Hilt dependencies for instrumented tests.
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.47'
+    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.47'
 
     // Room Database
     implementation "androidx.room:room-ktx:2.5.1"
