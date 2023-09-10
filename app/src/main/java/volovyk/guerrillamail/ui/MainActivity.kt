@@ -82,12 +82,14 @@ class MainActivity : AppCompatActivity() {
                 .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
                 .collect { email ->
                     if (email != null) {
+                        binding.emailLinearLayout.isVisible = true
                         binding.emailTextView.text = getString(R.string.your_temporary_email)
                         binding.emailUsernameEditText.setText(email.emailUsernamePart())
                         binding.emailDomainTextView.text = email.emailDomainPart()
                         assignedEmail = email
                         binding.getNewAddressButton.visibility = View.GONE
                     } else {
+                        binding.emailLinearLayout.isVisible = false
                         binding.emailTextView.text = getString(R.string.getting_temporary_email)
                         binding.emailUsernameEditText.setText("")
                     }
