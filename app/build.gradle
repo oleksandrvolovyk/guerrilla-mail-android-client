@@ -23,7 +23,7 @@ android {
         minSdk 24
         targetSdk 33
         versionCode 26
-        versionName "3.3.2"
+        versionName "3.3.4"
 
         testInstrumentationRunner "volovyk.MyTestRunner"
 
