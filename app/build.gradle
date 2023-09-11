@@ -22,7 +22,7 @@ android {
         applicationId "volovyk.guerrillamail"
         minSdk 24
         targetSdk 33
-        versionCode 24
+        versionCode 26
         versionName "3.3.2"
 
         testInstrumentationRunner "volovyk.MyTestRunner"
