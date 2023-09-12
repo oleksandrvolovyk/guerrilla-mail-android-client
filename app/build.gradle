@@ -22,8 +22,8 @@ android {
         applicationId "volovyk.guerrillamail"
         minSdk 24
         targetSdk 34
-        versionCode 26
-        versionName "3.3.4"
+        versionCode 27
+        versionName "3.3.5"
 
         testInstrumentationRunner "volovyk.MyTestRunner"
 
@@ -64,7 +64,7 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     testImplementation 'com.squareup.retrofit2:retrofit-mock:2.9.0'
     implementation 'com.squareup.retrofit2:converter-jackson:2.9.0'
-    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
 
     // Hilt dependencies
