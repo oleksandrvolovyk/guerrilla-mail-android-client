@@ -13,6 +13,7 @@ import volovyk.guerrillamail.data.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.remote.mailtm.entity.Message
+import volovyk.guerrillamail.data.remote.mailtm.entity.toEmail
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -70,15 +71,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
             deleteMessageCall.executeAndCatchErrors(checkForNullResponse = false)
         }
 
-        val fullEmails = fullMessages.map { message ->
-            Email(
-                id = message.id,
-                from = message.from.address,
-                subject = message.subject,
-                body = message.text ?: "",
-                date = message.createdAt.toString()
-            )
-        }
+        val fullEmails = fullMessages.map { it.toEmail() }
 
         // 3. Update emails flow
         emails.update { fullEmails }

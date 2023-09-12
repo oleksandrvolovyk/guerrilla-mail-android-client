@@ -1,5 +1,6 @@
 package volovyk.guerrillamail.data.remote.mailtm.entity
 
+import volovyk.guerrillamail.data.model.Email
 import java.util.Date
 
 data class Message(
@@ -14,3 +15,11 @@ data class Message(
         val name: String?
     )
 }
+
+fun Message.toEmail() = Email(
+    id = this.id,
+    from = this.from.address,
+    subject = this.subject,
+    body = this.text ?: "",
+    date = this.createdAt.toString()
+)
