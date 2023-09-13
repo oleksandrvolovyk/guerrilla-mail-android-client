@@ -43,6 +43,26 @@ jobs:
     - name: Run Unit tests
       run: ./gradlew :app:testDebugUnitTest
 
+    - name: Build debug APK
+      run: ./gradlew :app:assembleDebug
+
+    - name: Build androidTest APK
+      run: ./gradlew :app:assembleAndroidTest
+
+    - name: Run Android Tests on Firebase Test Lab (API 24)
+      uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+      with:
+        arg-spec: 'android-device.yml:nexus6-api-24'
+      env:
+        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+
+    - name: Run Android Tests on Firebase Test Lab (API 33)
+      uses: asadmansr/Firebase-Test-Lab-Action@v1.0
+      with:
+        arg-spec: 'android-device.yml:pixel6-api-33'
+      env:
+        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+
     - name: Build release APK
       if: success()
       run: ./gradlew :app:assembleRelease

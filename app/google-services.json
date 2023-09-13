@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "869655222811",
+    "project_id": "my-test-project-398615",
+    "storage_bucket": "my-test-project-398615.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:869655222811:android:bba89eb4524e3c771e36be",
+        "android_client_info": {
+          "package_name": "volovyk.guerrillamail"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH7h6054-Qw7-QKfO_gm8QQFkvIPwfdBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
