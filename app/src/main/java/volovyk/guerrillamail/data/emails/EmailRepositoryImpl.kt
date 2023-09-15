@@ -6,6 +6,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
@@ -58,23 +60,15 @@ class EmailRepositoryImpl @Inject constructor(
                 }
             }
         }
-        externalScope.launch {
-            withContext(Dispatchers.IO) {
-                mainRemoteEmailDatabase.observeEmails().collect { emails ->
-                    insertAllToLocalDatabase(emails)
-                }
-            }
-        }
-        externalScope.launch {
-            withContext(Dispatchers.IO) {
-                backupRemoteEmailDatabase.observeEmails().collect { emails ->
-                    insertAllToLocalDatabase(emails)
-                }
-            }
-        }
+        mainRemoteEmailDatabase.observeEmails().onEach { emails ->
+            insertAllToLocalDatabase(emails)
+        }.flowOn(Dispatchers.IO).launchIn(externalScope)
+        backupRemoteEmailDatabase.observeEmails().onEach {  emails ->
+            insertAllToLocalDatabase(emails)
+        }.flowOn(Dispatchers.IO).launchIn(externalScope)
     }
 
-    private companion object {
+    companion object {
         const val REFRESH_INTERVAL = 5000L // 5 seconds
         const val EMAIL_ASSIGNMENT_INTERVAL = 1000L // 1 second, interval between attempts
         const val LAST_EMAIL_ADDRESS_KEY = "last_email_address"
