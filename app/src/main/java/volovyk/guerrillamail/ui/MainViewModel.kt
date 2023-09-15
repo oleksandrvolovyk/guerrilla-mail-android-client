@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import volovyk.guerrillamail.data.EmailRepository
-import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import javax.inject.Inject
 
 data class UiState(

@@ -3,8 +3,9 @@ package volovyk.guerrillamail.data
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 
 class FakeEmailRepository : EmailRepository {
 

@@ -9,10 +9,12 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import volovyk.guerrillamail.data.local.EmailDao
-import volovyk.guerrillamail.data.local.LocalEmailDatabase
-import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.EmailRepositoryImpl
+import volovyk.guerrillamail.data.emails.local.EmailDao
+import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
+import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.preferences.PreferencesRepository
+import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 
 @ExperimentalCoroutinesApi
 class EmailRepositoryImplTest {
@@ -20,6 +22,7 @@ class EmailRepositoryImplTest {
     private lateinit var remoteEmailDatabase: RemoteEmailDatabase
     private lateinit var localEmailDatabase: LocalEmailDatabase
     private lateinit var emailDao: EmailDao
+    private lateinit var preferencesRepository: PreferencesRepository
 
     private lateinit var emailRepository: EmailRepositoryImpl
 
@@ -28,6 +31,7 @@ class EmailRepositoryImplTest {
         remoteEmailDatabase = mockk<RemoteEmailDatabase>(relaxed = true)
         localEmailDatabase = mockk<LocalEmailDatabase>(relaxed = true)
         emailDao = mockk<EmailDao>(relaxed = true)
+        preferencesRepository = mockk<PreferencesRepository>()
 
         every { emailDao.all } returns emptyFlow()
         every { remoteEmailDatabase.observeEmails() } returns emptyFlow()
@@ -37,7 +41,8 @@ class EmailRepositoryImplTest {
             TestScope(),
             remoteEmailDatabase,
             remoteEmailDatabase,
-            localEmailDatabase
+            localEmailDatabase,
+            preferencesRepository
         )
     }
 

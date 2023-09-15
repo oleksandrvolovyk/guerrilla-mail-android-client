@@ -12,15 +12,15 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.mock.Calls
-import volovyk.guerrillamail.data.remote.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.remote.exception.NoEmailAddressAssignedException
-import volovyk.guerrillamail.data.remote.mailtm.MailTmApiInterface
-import volovyk.guerrillamail.data.remote.mailtm.MailTmEmailDatabase
-import volovyk.guerrillamail.data.remote.mailtm.entity.Domain
-import volovyk.guerrillamail.data.remote.mailtm.entity.ListOfDomains
-import volovyk.guerrillamail.data.remote.mailtm.entity.ListOfMessages
-import volovyk.guerrillamail.data.remote.mailtm.entity.LoginResponse
-import volovyk.guerrillamail.data.remote.mailtm.entity.Message
+import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssignedException
+import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmApiInterface
+import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmEmailDatabase
+import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Domain
+import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfDomains
+import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfMessages
+import volovyk.guerrillamail.data.emails.remote.mailtm.entity.LoginResponse
+import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import java.util.Date
 
 class MailTmEmailDatabaseTest {

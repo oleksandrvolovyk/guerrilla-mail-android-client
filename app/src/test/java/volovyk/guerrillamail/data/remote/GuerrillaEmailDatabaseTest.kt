@@ -9,13 +9,13 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.mock.Calls
-import volovyk.guerrillamail.data.model.Email
-import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaEmailDatabase
-import volovyk.guerrillamail.data.remote.guerrillamail.GuerrillaMailApiInterface
-import volovyk.guerrillamail.data.remote.guerrillamail.entity.BriefEmail
-import volovyk.guerrillamail.data.remote.guerrillamail.entity.CheckForNewEmailsResponse
-import volovyk.guerrillamail.data.remote.guerrillamail.entity.GetEmailAddressResponse
-import volovyk.guerrillamail.data.remote.guerrillamail.entity.SetEmailAddressResponse
+import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaEmailDatabase
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailApiInterface
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.CheckForNewEmailsResponse
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.GetEmailAddressResponse
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.SetEmailAddressResponse
 
 class GuerrillaEmailDatabaseTest {
 

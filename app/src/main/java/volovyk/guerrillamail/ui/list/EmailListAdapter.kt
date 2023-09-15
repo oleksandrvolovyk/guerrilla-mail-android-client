@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import volovyk.guerrillamail.data.model.Email
+import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.databinding.FragmentEmailBinding
 
 class EmailListAdapter(

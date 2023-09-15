@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import volovyk.guerrillamail.data.EmailRepository
-import volovyk.guerrillamail.data.model.Email
+import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.model.Email
 import javax.inject.Inject
 
 data class SpecificEmailUiState(

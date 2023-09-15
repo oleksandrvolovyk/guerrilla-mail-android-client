@@ -11,8 +11,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
-import volovyk.guerrillamail.data.EmailRepository
-import volovyk.guerrillamail.data.model.Email
+import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.model.Email
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SpecificEmailViewModelTest {

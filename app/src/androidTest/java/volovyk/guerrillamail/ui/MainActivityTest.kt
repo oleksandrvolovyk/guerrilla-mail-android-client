@@ -21,9 +21,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.EmailRepository
+import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.FakeEmailRepository
-import volovyk.guerrillamail.data.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.util.FakeMessageHandler
 import volovyk.guerrillamail.util.MessageHandler
 import java.io.IOException

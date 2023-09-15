@@ -10,7 +10,7 @@ import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.ads.Ad
 import volovyk.guerrillamail.data.ads.AdManager
-import volovyk.guerrillamail.data.model.Email
+import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.databinding.FragmentEmailListBinding
 import volovyk.guerrillamail.ui.BaseFragment
 import volovyk.guerrillamail.ui.UiHelper
