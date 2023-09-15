@@ -2,7 +2,7 @@ package volovyk.guerrillamail.data.emails
 
 import kotlinx.coroutines.flow.Flow
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.util.State
 
 interface EmailRepository {
 
@@ -14,6 +14,6 @@ interface EmailRepository {
 
     fun observeAssignedEmail(): Flow<String?>
     fun observeEmails(): Flow<List<Email>>
-    fun observeState(): Flow<RemoteEmailDatabase.State>
+    fun observeState(): Flow<State>
     fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean>
 }

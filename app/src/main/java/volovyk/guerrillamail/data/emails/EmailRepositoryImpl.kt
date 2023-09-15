@@ -15,8 +15,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.data.preferences.PreferencesRepository
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.preferences.PreferencesRepository
+import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -127,7 +128,7 @@ class EmailRepositoryImpl @Inject constructor(
         }
 
     override fun observeEmails(): Flow<List<Email>> = localEmailDatabase.getEmailDao().all
-    override fun observeState(): Flow<RemoteEmailDatabase.State> =
+    override fun observeState(): Flow<State> =
         combine(
             mainRemoteEmailDatabase.observeState(),
             backupRemoteEmailDatabase.observeState()

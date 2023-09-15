@@ -15,7 +15,7 @@ import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.util.State
 
 @ExperimentalCoroutinesApi
 class MainViewModelTest {
@@ -24,7 +24,7 @@ class MainViewModelTest {
     private lateinit var emailRepository: EmailRepository
 
     private lateinit var assignedEmailFlow: MutableStateFlow<String?>
-    private lateinit var stateFlow: MutableStateFlow<RemoteEmailDatabase.State>
+    private lateinit var stateFlow: MutableStateFlow<State>
     private lateinit var mainRemoteEmailDatabaseAvailability: MutableStateFlow<Boolean>
 
     // Set the main coroutines dispatcher for unit testing.
@@ -37,7 +37,7 @@ class MainViewModelTest {
         emailRepository = mockk<EmailRepository>(relaxed = true)
 
         assignedEmailFlow = MutableStateFlow(null)
-        stateFlow = MutableStateFlow(RemoteEmailDatabase.State.Loading)
+        stateFlow = MutableStateFlow(State.Loading)
         mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
 
         every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
@@ -61,10 +61,10 @@ class MainViewModelTest {
         val emailAddress = "test@example.com"
 
         val expectedUiState =
-            UiState(assignedEmail = emailAddress, state = RemoteEmailDatabase.State.Success)
+            UiState(assignedEmail = emailAddress, state = State.Success)
 
         assignedEmailFlow.update { emailAddress }
-        stateFlow.update { RemoteEmailDatabase.State.Success }
+        stateFlow.update { State.Success }
 
         // Assert new UiState is emitted
         assertEquals(expectedUiState, viewModel.uiState.value)

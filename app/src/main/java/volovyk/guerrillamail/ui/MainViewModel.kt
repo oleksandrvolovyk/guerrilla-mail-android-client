@@ -10,12 +10,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.data.emails.EmailRepository
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 data class UiState(
     val assignedEmail: String? = null,
-    val state: RemoteEmailDatabase.State = RemoteEmailDatabase.State.Loading,
+    val state: State = State.Loading,
     val mainRemoteEmailDatabaseIsAvailable: Boolean = true
 )
 

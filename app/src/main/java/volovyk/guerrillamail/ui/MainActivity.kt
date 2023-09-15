@@ -22,12 +22,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.ads.AdManager
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import volovyk.guerrillamail.util.EmailValidator
 import volovyk.guerrillamail.util.MessageHandler
+import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -102,8 +102,8 @@ class MainActivity : AppCompatActivity() {
                 .distinctUntilChanged()
                 .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
                 .collect { state ->
-                    binding.refreshingSpinner.isVisible = state is RemoteEmailDatabase.State.Loading
-                    if (state is RemoteEmailDatabase.State.Failure) {
+                    binding.refreshingSpinner.isVisible = state is State.Loading
+                    if (state is State.Failure) {
                         showFailureMessage(state.error)
                     }
                 }

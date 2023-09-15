@@ -5,14 +5,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.util.State
 
 class FakeEmailRepository : EmailRepository {
 
     val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     val emails = MutableStateFlow(emptyList<Email>())
-    val state: MutableStateFlow<RemoteEmailDatabase.State> =
-        MutableStateFlow(RemoteEmailDatabase.State.Loading)
+    val state: MutableStateFlow<State> =
+        MutableStateFlow(State.Loading)
     val mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
 
     override suspend fun getEmailById(emailId: String): Email? {
@@ -43,7 +43,7 @@ class FakeEmailRepository : EmailRepository {
 
     override fun observeEmails(): Flow<List<Email>> = emails
 
-    override fun observeState(): Flow<RemoteEmailDatabase.State> = state
+    override fun observeState(): Flow<State> = state
 
     override fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean> =
         mainRemoteEmailDatabaseAvailability

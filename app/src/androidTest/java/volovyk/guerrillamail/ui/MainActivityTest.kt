@@ -21,11 +21,11 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.FakeEmailRepository
-import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.util.FakeMessageHandler
 import volovyk.guerrillamail.util.MessageHandler
+import volovyk.guerrillamail.util.State
 import java.io.IOException
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
@@ -102,7 +102,7 @@ class MainActivityTest {
         val preMessageHandlerCalls = fakeMessageHandler.callsCounter
 
         // Repository is in error state
-        fakeEmailRepository.state.update { RemoteEmailDatabase.State.Failure(IOException()) }
+        fakeEmailRepository.state.update { State.Failure(IOException()) }
 
         sleepUntil { fakeMessageHandler.callsCounter > preMessageHandlerCalls }
 
@@ -167,13 +167,13 @@ class MainActivityTest {
     @Test
     fun uiShowsLoadingIndicator() {
         // Repository is loading data
-        fakeEmailRepository.state.update { RemoteEmailDatabase.State.Loading }
+        fakeEmailRepository.state.update { State.Loading }
 
         // Check that refreshing spinner is shown
         onView(withId(R.id.refreshingSpinner)).check(matches(isDisplayed()))
 
         // Repository finished loading
-        fakeEmailRepository.state.update { RemoteEmailDatabase.State.Success }
+        fakeEmailRepository.state.update { State.Success }
 
         // Check that refreshing spinner is not shown
         onView(withId(R.id.refreshingSpinner)).check(matches(not(isDisplayed())))

@@ -14,6 +14,7 @@ import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssigned
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.toEmail
+import volovyk.guerrillamail.util.State
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -29,8 +30,8 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     private val emails = MutableStateFlow(emptyList<Email>())
-    private val state: MutableStateFlow<RemoteEmailDatabase.State> =
-        MutableStateFlow(RemoteEmailDatabase.State.Loading)
+    private val state: MutableStateFlow<State> =
+        MutableStateFlow(State.Loading)
 
     private var token: String? = null
 
@@ -41,16 +42,16 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         true
     } catch (e: IOException) {
         Timber.e(e)
-        state.update { RemoteEmailDatabase.State.Failure(e) }
+        state.update { State.Failure(e) }
         false
     } catch (e: SocketTimeoutException) {
         Timber.e(e)
-        state.update { RemoteEmailDatabase.State.Failure(e) }
+        state.update { State.Failure(e) }
         false
     }
 
     override fun updateEmails() = try {
-        state.update { RemoteEmailDatabase.State.Loading }
+        state.update { State.Loading }
         if (token == null) throw NoEmailAddressAssignedException()
 
         // 1. Get all messages
@@ -75,16 +76,16 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
         // 3. Update emails flow
         emails.update { fullEmails }
-        state.update { RemoteEmailDatabase.State.Success }
+        state.update { State.Success }
     } catch (exception: IOException) {
         Timber.e(exception)
-        state.update { RemoteEmailDatabase.State.Failure(EmailFetchException(exception)) }
+        state.update { State.Failure(EmailFetchException(exception)) }
     }
 
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
     override fun getRandomEmailAddress() = try {
-        state.update { RemoteEmailDatabase.State.Loading }
+        state.update { State.Loading }
         // 1. Get available domains
         val getDomainsCall = mailTmApiInterface.getDomains()
 
@@ -107,7 +108,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         setEmailAddress(address)
     } catch (exception: IOException) {
         Timber.e(exception)
-        state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(exception)) }
+        state.update { State.Failure(EmailAddressAssignmentException(exception)) }
     }
 
     private fun generateRandomLatinString(length: Int): String {
@@ -118,7 +119,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
     }
 
     override fun setEmailAddress(requestedEmailAddress: String) = try {
-        state.update { RemoteEmailDatabase.State.Loading }
+        state.update { State.Loading }
         val requestEmailAddress = requestedEmailAddress.lowercase()
 
         // 1. Create an account with random password
@@ -136,17 +137,17 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
         token = "Bearer ${loginResponse.token}"
         assignedEmail.update { requestedEmailAddress }
-        state.update { RemoteEmailDatabase.State.Success }
+        state.update { State.Success }
     } catch (exception: IOException) {
         Timber.e(exception)
-        state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(exception)) }
+        state.update { State.Failure(EmailAddressAssignmentException(exception)) }
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
 
     override fun observeEmails(): Flow<List<Email>> = emails
 
-    override fun observeState(): Flow<RemoteEmailDatabase.State> = state
+    override fun observeState(): Flow<State> = state
 
     private fun <T> Call<T>.executeAndCatchErrors(checkForNullResponse: Boolean): T? {
         try {

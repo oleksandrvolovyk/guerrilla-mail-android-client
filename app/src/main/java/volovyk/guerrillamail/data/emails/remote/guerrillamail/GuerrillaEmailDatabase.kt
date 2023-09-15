@@ -11,6 +11,7 @@ import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignment
 import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
+import volovyk.guerrillamail.util.State
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -26,8 +27,8 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     private val emails = MutableStateFlow(emptyList<Email>())
-    private val state: MutableStateFlow<RemoteEmailDatabase.State> =
-        MutableStateFlow(RemoteEmailDatabase.State.Loading)
+    private val state: MutableStateFlow<State> =
+        MutableStateFlow(State.Loading)
 
     private var sidToken: String? = null
     private var seq = 0
@@ -36,20 +37,20 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
         guerrillaMailApiInterface.ping().executeAndCatchErrors()
         true
     } catch (e: IOException) {
-        state.update { RemoteEmailDatabase.State.Failure(e) }
+        state.update { State.Failure(e) }
         false
     }
 
     override fun updateEmails() {
         if (assignedEmail.value != null) {
-            state.update { RemoteEmailDatabase.State.Loading }
+            state.update { State.Loading }
             try {
                 val emailsList = checkForNewEmails()
                 emails.update { emailsList }
-                state.update { RemoteEmailDatabase.State.Success }
+                state.update { State.Success }
             } catch (e: IOException) {
                 Timber.e(e)
-                state.update { RemoteEmailDatabase.State.Failure(EmailFetchException(e)) }
+                state.update { State.Failure(EmailFetchException(e)) }
             }
         } else {
             throw NoEmailAddressAssignedException()
@@ -59,33 +60,33 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
     override fun getRandomEmailAddress() {
-        state.update { RemoteEmailDatabase.State.Loading }
+        state.update { State.Loading }
         try {
             val email = getEmailAddress()
             assignedEmail.update { email }
-            state.update { RemoteEmailDatabase.State.Success }
+            state.update { State.Success }
         } catch (e: IOException) {
             Timber.e(e)
-            state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
+            state.update { State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
 
     override fun setEmailAddress(requestedEmailAddress: String) {
-        state.update { RemoteEmailDatabase.State.Loading }
+        state.update { State.Loading }
         try {
             val assignedEmailAddress =
                 makeSetEmailAddressRequest(requestedEmailAddress.substringBefore("@"))
             assignedEmail.update { assignedEmailAddress }
-            state.update { RemoteEmailDatabase.State.Success }
+            state.update { State.Success }
         } catch (e: IOException) {
             Timber.e(e)
-            state.update { RemoteEmailDatabase.State.Failure(EmailAddressAssignmentException(e)) }
+            state.update { State.Failure(EmailAddressAssignmentException(e)) }
         }
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
     override fun observeEmails(): Flow<List<Email>> = emails
-    override fun observeState(): Flow<RemoteEmailDatabase.State> = state
+    override fun observeState(): Flow<State> = state
 
     fun getSidToken() = sidToken
     fun getSeq() = seq
