@@ -7,13 +7,19 @@ import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.util.State
 
-class FakeEmailRepository : EmailRepository {
+class FakeEmailRepository(
+    initialAssignedEmail: String? = null,
+    initialEmails: List<Email> = emptyList(),
+    initialState: State = State.Loading,
+    initialMainRemoteEmailDatabaseAvailability: Boolean = true
+) : EmailRepository {
 
-    val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
-    val emails = MutableStateFlow(emptyList<Email>())
+    val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(initialAssignedEmail)
+    val emails = MutableStateFlow(initialEmails)
     val state: MutableStateFlow<State> =
-        MutableStateFlow(State.Loading)
-    val mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
+        MutableStateFlow(initialState)
+    val mainRemoteEmailDatabaseAvailability =
+        MutableStateFlow(initialMainRemoteEmailDatabaseAvailability)
 
     override suspend fun getEmailById(emailId: String): Email? {
         return emails.value.find { it.id == emailId }
