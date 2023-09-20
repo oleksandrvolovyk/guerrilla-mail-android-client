@@ -32,6 +32,7 @@ class AdManagerImpl(private val appContext: Context) : AdManager {
     }
 
     override fun loadAd(ad: Ad) {
+        Timber.d("Trying to load ad: $ad")
         if (!loadedAds.containsKey(ad)) { // If Ad is not already loaded
             Timber.d("Loading ad: $ad")
             if (ad == Ad.Interstitial) {
@@ -74,6 +75,7 @@ class AdManagerImpl(private val appContext: Context) : AdManager {
     }
 
     override fun tryToShowAd(activity: Activity, ad: Ad) {
+        Timber.d("Trying to show ad: $ad")
         loadedAds[ad]?.let {
             Timber.d("Showing ad: $ad")
             it.show(activity)
