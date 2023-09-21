@@ -8,13 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.ads.Ad
-import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.databinding.FragmentEmailListBinding
 import volovyk.guerrillamail.ui.BaseFragment
 import volovyk.guerrillamail.ui.UiHelper
-import javax.inject.Inject
 
 /**
  * A fragment representing a list of Emails.
@@ -24,20 +21,6 @@ class EmailListFragment :
     BaseFragment<FragmentEmailListBinding>(FragmentEmailListBinding::inflate) {
 
     private val viewModel: EmailListViewModel by viewModels()
-
-    @Inject
-    lateinit var adManager: AdManager
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        findNavController().addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.emailListFragment) {
-                // User has navigated back to the email list
-                activity?.let { adManager.tryToShowAd(it, Ad.Interstitial) }
-            }
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         Timber.d("onViewCreated")
@@ -53,8 +36,6 @@ class EmailListFragment :
             layoutManager = LinearLayoutManager(context)
             adapter = emailListAdapter
         }
-
-        context?.let { adManager.loadAd(Ad.Interstitial) }
 
         viewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
             emailListAdapter.submitList(emails)

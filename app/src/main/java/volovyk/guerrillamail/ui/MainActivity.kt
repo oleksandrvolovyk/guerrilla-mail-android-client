@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.ads.AdManager
 import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
@@ -35,9 +34,6 @@ class MainActivity : AppCompatActivity() {
     private var assignedEmail: String? = null
     private lateinit var binding: ActivityMainBinding
     private val mainViewModel: MainViewModel by viewModels()
-
-    @Inject
-    lateinit var adManager: AdManager
 
     @Inject
     lateinit var emailValidator: EmailValidator
