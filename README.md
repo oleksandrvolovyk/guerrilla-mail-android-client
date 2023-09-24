@@ -14,8 +14,10 @@ This is an Android client for [Guerrilla Mail](https://www.guerrillamail.com), a
 - [Guerrilla Mail API](https://www.guerrillamail.com/GuerrillaMailAPI.html)
 - [Retrofit](https://square.github.io/retrofit/)
 - [OkHttp](https://square.github.io/okhttp/)
-- [Gson](https://github.com/google/gson)
+- [Jackson](https://github.com/FasterXML/jackson)
+- [Room](https://developer.android.com/jetpack/androidx/releases/room)
 - [Hilt](https://dagger.dev/hilt/)
+- [Timber](https://github.com/JakeWharton/timber)
 
 ## Build Instructions
 
