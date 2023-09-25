@@ -52,7 +52,7 @@ class EmailListViewModelTest {
         // Assert default UiState
         assertEquals(defaultUiState, viewModel.uiState.value)
 
-        val email = Email("0", "", "", "", "", false)
+        val email = Email("0", "", "", "", "", "", false)
         val expectedUiState = EmailListUiState(listOf(email))
 
         emailFlow.emit(listOf(email))
@@ -66,7 +66,7 @@ class EmailListViewModelTest {
     @Test
     fun `deleteEmail calls emailRepository`() = runTest {
         // Given
-        val emailToDelete = Email("0", "", "", "", "", false)
+        val emailToDelete = Email("0", "", "", "", "", "", false)
 
         // When
         viewModel.deleteEmail(emailToDelete)

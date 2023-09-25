@@ -97,7 +97,7 @@ class EmailRepositoryImplTest {
             preferencesRepository
         )
 
-        val email = Email("1", "test", "test", "", "")
+        val email = Email("1", "test", "test", "", "", "", false)
 
         emailRepository.deleteEmail(email)
 

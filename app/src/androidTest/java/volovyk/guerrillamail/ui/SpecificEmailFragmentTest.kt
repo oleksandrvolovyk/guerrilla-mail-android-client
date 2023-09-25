@@ -1,6 +1,5 @@
 package volovyk.guerrillamail.ui
 
-import android.text.Html
 import androidx.lifecycle.SavedStateHandle
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -18,6 +17,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.FakeEmailRepository
+import volovyk.guerrillamail.data.FakePreferencesRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.specific.SpecificEmailFragment
 import volovyk.guerrillamail.ui.specific.SpecificEmailViewModel
@@ -35,15 +35,22 @@ class SpecificEmailFragmentTest {
         from = "from",
         subject = "subject",
         body = "body",
+        htmlBody = "html body",
         date = "date",
         viewed = true
     )
 
     private val fakeEmailRepository = FakeEmailRepository(initialEmails = listOf(email))
+    private val fakePreferencesRepository =
+        FakePreferencesRepository(mapOf(SpecificEmailViewModel.HTML_RENDER_KEY to "false"))
 
     @BindValue
     val fakeSpecificEmailViewModel =
-        SpecificEmailViewModel(SavedStateHandle(mapOf("emailId" to email.id)), fakeEmailRepository)
+        SpecificEmailViewModel(
+            SavedStateHandle(mapOf("emailId" to email.id)),
+            fakeEmailRepository,
+            fakePreferencesRepository
+        )
 
     @Before
     fun init() {
@@ -51,7 +58,7 @@ class SpecificEmailFragmentTest {
     }
 
     @Test
-    fun testingTest() {
+    fun fragmentShowsEmail() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         launchFragmentInHiltContainer<SpecificEmailFragment> {}
@@ -62,10 +69,6 @@ class SpecificEmailFragmentTest {
             .check(matches(withText(appContext.getString(R.string.subject, email.subject))))
         onView(withId(R.id.dateTextView))
             .check(matches(withText(appContext.getString(R.string.date, email.date))))
-        onView(withId(R.id.bodyTextView)).check(
-            matches(
-                withText(Html.fromHtml(email.body, Html.FROM_HTML_MODE_COMPACT).toString())
-            )
-        )
+        onView(withId(R.id.bodyTextView)).check(matches(withText(email.body)))
     }
 }

@@ -1,7 +1,9 @@
 package volovyk.guerrillamail.data.remote
 
+import android.util.Base64
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import io.mockk.verify
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -113,6 +115,10 @@ class MailTmEmailDatabaseTest {
     fun `updateEmails makes correct API calls, updates emails`() = runTest {
         val emailAddress = "test@example.com"
 
+        // Mock static method for base64 encoding
+        mockkStatic(Base64::class)
+        every { Base64.encodeToString(any(), any()) } returns "encoded"
+
         // Mock the response for createAccount()
         every {
             mailTmApiInterface.createAccount(match { it.address == emailAddress })
@@ -124,10 +130,15 @@ class MailTmEmailDatabaseTest {
         } returns Calls.response(Response.success(LoginResponse("token")))
 
         val messagesList = List(3) { i ->
-            Message("id$i", Message.From("address$i", null), null, "subject$i", Date())
+            Message("id$i", Message.From("address$i", null), null, null, "subject$i", Date())
         }
         val fullMessagesList =
-            messagesList.mapIndexed { i, message -> message.copy(text = "body$i") }
+            messagesList.mapIndexed { i, message ->
+                message.copy(
+                    text = "body$i",
+                    html = listOf("html$i")
+                )
+            }
 
         val getMessagesResponse = Response.success(
             ListOfMessages(

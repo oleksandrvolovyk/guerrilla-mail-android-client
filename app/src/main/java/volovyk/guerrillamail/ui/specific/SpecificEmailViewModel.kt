@@ -54,6 +54,6 @@ class SpecificEmailViewModel @Inject constructor(
     }
 
     companion object {
-        private const val HTML_RENDER_KEY = "html_render"
+        const val HTML_RENDER_KEY = "html_render"
     }
 }

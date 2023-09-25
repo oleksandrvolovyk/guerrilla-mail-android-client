@@ -13,12 +13,14 @@ import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.preferences.PreferencesRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SpecificEmailViewModelTest {
 
     private lateinit var viewModel: SpecificEmailViewModel
     private lateinit var emailRepository: EmailRepository
+    private lateinit var preferencesRepository: PreferencesRepository
     private lateinit var savedStateHandle: SavedStateHandle
 
     // Set the main coroutines dispatcher for unit testing.
@@ -29,6 +31,7 @@ class SpecificEmailViewModelTest {
     @Before
     fun setup() {
         emailRepository = mockk<EmailRepository>()
+        preferencesRepository = mockk<PreferencesRepository>()
         savedStateHandle = SavedStateHandle()
     }
 
@@ -36,13 +39,14 @@ class SpecificEmailViewModelTest {
     fun `init with emailId sets uiState email when emailId is provided`() = runTest {
         // Given
         val emailId = "123"
-        val email = Email("123", "", "", "", "", false)
+        val email = Email("123", "", "", "", "", "", false)
 
         savedStateHandle["emailId"] = emailId
         coEvery { emailRepository.getEmailById(emailId) } returns email
+        coEvery { preferencesRepository.getValue(SpecificEmailViewModel.HTML_RENDER_KEY) } returns "true"
 
         // When
-        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository)
+        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository, preferencesRepository)
 
         // Then
         val uiState = viewModel.uiState.value
@@ -55,7 +59,7 @@ class SpecificEmailViewModelTest {
         savedStateHandle.remove<Int>("emailId")
 
         // When
-        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository)
+        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository, preferencesRepository)
 
         // Then
         val uiState = viewModel.uiState.value

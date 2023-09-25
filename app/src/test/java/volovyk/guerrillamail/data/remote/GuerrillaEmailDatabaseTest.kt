@@ -1,7 +1,11 @@
 package volovyk.guerrillamail.data.remote
 
+import android.text.Html
+import android.text.SpannedString
+import android.util.Base64
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -9,13 +13,14 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.mock.Calls
-import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailApiInterface
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.CheckForNewEmailsResponse
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.EmailGuerrillaMail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.GetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.SetEmailAddressResponse
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 
 class GuerrillaEmailDatabaseTest {
 
@@ -94,6 +99,16 @@ class GuerrillaEmailDatabaseTest {
         val emailAddress = "test@guerrillamailblock.com"
         val sidToken = "new sidToken"
 
+        // Mock static method for base64 encoding
+        mockkStatic(Base64::class)
+        every { Base64.encodeToString(any(), any()) } returns "encoded"
+
+        // Mock methods used for html to text conversion
+        val spannedStringMock = mockk<SpannedString>()
+        every { spannedStringMock.toString() } returns "spanned string"
+        mockkStatic(Html::class)
+        every { Html.fromHtml(any(), any()) } returns spannedStringMock
+
         // Mock the response from the API call
         val getEmailAddressResponse = Response.success(
             GetEmailAddressResponse(emailAddress, sidToken)
@@ -110,7 +125,7 @@ class GuerrillaEmailDatabaseTest {
         }
 
         val fullRemoteEmails = remoteEmails.map {
-            Email(
+            EmailGuerrillaMail(
                 it.id,
                 "Full ${it.from}",
                 "Full ${it.subject}",
@@ -134,7 +149,7 @@ class GuerrillaEmailDatabaseTest {
             every {
                 guerrillaMailApiInterface.fetchEmail(
                     any(),
-                    eq(email.id)
+                    eq(email.mailId)
                 )
             } returns Calls.response(email)
         }
@@ -146,7 +161,7 @@ class GuerrillaEmailDatabaseTest {
 
         // Assert emittedEmails are equal to full remote emails
         assertEquals(
-            fullRemoteEmails,
+            fullRemoteEmails.map { it.toEmail() },
             emittedEmails
         )
 
@@ -158,7 +173,7 @@ class GuerrillaEmailDatabaseTest {
 
         // Assert seq value is equal to the highest email id value
         assertEquals(
-            fullRemoteEmails.map { it.id }.maxOf { it },
+            fullRemoteEmails.map { it.mailId }.maxOf { it },
             database.getSeq().toString()
         )
     }
