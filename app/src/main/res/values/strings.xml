@@ -22,4 +22,5 @@
     <string name="common_failure">Something went wrong! Check your Internet connection</string>
     <string name="guerrilla_mail_offline">Could not connect to Guerrilla Mail, using Mail.tm now</string>
     <string name="retry">Retry</string>
+    <string name="toggle_html_rendering">Text/HTML</string>
 </resources>

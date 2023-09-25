@@ -3,8 +3,8 @@ package volovyk.guerrillamail.data.emails.remote.guerrillamail
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
-import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.CheckForNewEmailsResponse
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.EmailGuerrillaMail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.GetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.SetEmailAddressResponse
 
@@ -22,7 +22,7 @@ interface GuerrillaMailApiInterface {
     fun fetchEmail(
         @Query("sid_token") sidToken: String?,
         @Query("email_id") id: String
-    ): Call<Email>
+    ): Call<EmailGuerrillaMail>
 
     @GET("ajax.php?f=set_email_user")
     fun setEmailAddress(

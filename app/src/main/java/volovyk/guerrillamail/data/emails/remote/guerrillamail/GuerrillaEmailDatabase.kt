@@ -11,6 +11,7 @@ import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignment
 import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
 import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 import volovyk.guerrillamail.util.State
 import java.io.IOException
 import javax.inject.Inject
@@ -133,14 +134,10 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
             val fetchedEmail = call.executeAndCatchErrors()
 
-            fetchedEmailsList.add(fetchedEmail.copy(body = formatEmailBody(fetchedEmail.body)))
-            seq = seq.coerceAtLeast(fetchedEmail.id.toInt())
+            fetchedEmailsList.add(fetchedEmail.toEmail())
+            seq = seq.coerceAtLeast(fetchedEmail.mailId.toInt())
         }
         return fetchedEmailsList
-    }
-
-    private fun formatEmailBody(body: String): String {
-        return body.replace("\\r\\n".toRegex(), "<br>")
     }
 
     private fun <T> Call<T>.executeAndCatchErrors(): T {

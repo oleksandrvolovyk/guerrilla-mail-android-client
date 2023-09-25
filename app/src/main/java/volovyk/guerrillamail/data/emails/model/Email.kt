@@ -2,14 +2,14 @@ package volovyk.guerrillamail.data.emails.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.fasterxml.jackson.annotation.JsonProperty
 
 @Entity
 data class Email(
-    @JsonProperty("mail_id") @PrimaryKey val id: String,
-    @JsonProperty("mail_from") val from: String,
-    @JsonProperty("mail_subject") val subject: String,
-    @JsonProperty("mail_body") val body: String,
-    @JsonProperty("mail_date") val date: String,
-    val viewed: Boolean = false
+    @PrimaryKey val id: String,
+    val from: String,
+    val subject: String,
+    val body: String,
+    val htmlBody: String,
+    val date: String,
+    val viewed: Boolean
 )

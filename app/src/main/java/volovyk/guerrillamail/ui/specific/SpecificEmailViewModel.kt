@@ -11,16 +11,19 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.preferences.PreferencesRepository
 import javax.inject.Inject
 
 data class SpecificEmailUiState(
-    val email: Email? = null
+    val email: Email? = null,
+    val renderHtml: Boolean = true
 )
 
 @HiltViewModel
 class SpecificEmailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
-    private val emailRepository: EmailRepository
+    private val emailRepository: EmailRepository,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SpecificEmailUiState())
@@ -33,10 +36,24 @@ class SpecificEmailViewModel @Inject constructor(
             viewModelScope.launch {
                 _uiState.update {
                     it.copy(
-                        email = emailRepository.getEmailById(emailId)
+                        email = emailRepository.getEmailById(emailId),
+                        renderHtml = preferencesRepository.getValue(HTML_RENDER_KEY).toBoolean()
                     )
                 }
             }
         }
+    }
+
+    fun setHtmlRender(render: Boolean) {
+        viewModelScope.launch {
+            preferencesRepository.setValue(HTML_RENDER_KEY, render.toString())
+            _uiState.update {
+                it.copy(renderHtml = render)
+            }
+        }
+    }
+
+    companion object {
+        private const val HTML_RENDER_KEY = "html_render"
     }
 }
