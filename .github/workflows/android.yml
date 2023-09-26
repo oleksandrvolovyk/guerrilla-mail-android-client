@@ -95,12 +95,13 @@ jobs:
 
     - name: Create CHANGELOG
       id: changelog
-      uses: requarks/changelog-action@v1
+      uses: oleksandrvolovik/changelog-action@v1
       with:
         token: ${{ secrets.GH_TOKEN }}
         tag: ${{ github.ref_name }}
         writeToFile: false
-        
+        googlePlayMode: false
+
     - name: Create release
       if: success()
       id: create_release
