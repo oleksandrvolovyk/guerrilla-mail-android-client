@@ -10,7 +10,7 @@ class EmailGuerrillaMail(
     @JsonProperty("mail_from") val from: String,
     @JsonProperty("mail_subject") val subject: String,
     @JsonProperty("mail_body") val body: String,
-    @JsonProperty("mail_date") val date: String,
+    @JsonProperty("mail_date") val date: String
 )
 
 fun EmailGuerrillaMail.toEmail() = Email(

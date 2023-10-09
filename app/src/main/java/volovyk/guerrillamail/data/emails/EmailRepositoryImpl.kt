@@ -64,7 +64,7 @@ class EmailRepositoryImpl @Inject constructor(
         mainRemoteEmailDatabase.observeEmails().onEach { emails ->
             insertAllToLocalDatabase(emails)
         }.flowOn(Dispatchers.IO).launchIn(externalScope)
-        backupRemoteEmailDatabase.observeEmails().onEach {  emails ->
+        backupRemoteEmailDatabase.observeEmails().onEach { emails ->
             insertAllToLocalDatabase(emails)
         }.flowOn(Dispatchers.IO).launchIn(externalScope)
     }
