@@ -3,6 +3,7 @@ package volovyk.guerrillamail.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
+import android.text.Editable
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -62,10 +63,12 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             emailUsernameEditText.addTextChangedListener(
-                UiHelper.AfterTextChangedWatcher { editable ->
-                    if (assignedEmail != null) {
-                        getNewAddressButton.isVisible =
-                            assignedEmail!!.emailUsernamePart() != editable.toString()
+                object : UiHelper.SimpleTextWatcher() {
+                    override fun afterTextChanged(s: Editable) {
+                        if (assignedEmail != null) {
+                            getNewAddressButton.isVisible =
+                                assignedEmail!!.emailUsernamePart() != s.toString()
+                        }
                     }
                 }
             )
