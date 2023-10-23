@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
@@ -30,6 +31,7 @@ class SpecificEmailViewModel @Inject constructor(
     val uiState: StateFlow<SpecificEmailUiState> = _uiState.asStateFlow()
 
     init {
+        Timber.d("init ${hashCode()}")
         val emailId: String? = savedStateHandle["emailId"]
 
         emailId?.let {

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import javax.inject.Inject
@@ -19,6 +20,10 @@ data class EmailListUiState(
 @HiltViewModel
 class EmailListViewModel @Inject constructor(private val emailRepository: EmailRepository) :
     ViewModel() {
+
+    init {
+        Timber.d("init ${hashCode()}")
+    }
 
     val uiState: StateFlow<EmailListUiState> = emailRepository.observeEmails()
         .map { EmailListUiState(it) }

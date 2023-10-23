@@ -15,15 +15,17 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 import volovyk.guerrillamail.util.State
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInterface: GuerrillaMailApiInterface) :
     RemoteEmailDatabase {
 
     companion object {
         private const val SITE = "guerrillamail.com"
         private const val LANG = "en"
+    }
+
+    init {
+        Timber.d("init ${hashCode()}")
     }
 
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)

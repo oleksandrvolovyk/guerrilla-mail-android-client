@@ -28,6 +28,10 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         private const val PASSWORD_LENGTH = 12
     }
 
+    init {
+        Timber.d("init ${hashCode()}")
+    }
+
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     private val emails = MutableStateFlow(emptyList<Email>())
     private val state: MutableStateFlow<State> =

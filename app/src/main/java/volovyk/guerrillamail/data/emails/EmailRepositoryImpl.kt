@@ -13,15 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
 import volovyk.guerrillamail.util.State
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class EmailRepositoryImpl @Inject constructor(
     externalScope: CoroutineScope,
     private val mainRemoteEmailDatabase: RemoteEmailDatabase,
@@ -33,6 +32,7 @@ class EmailRepositoryImpl @Inject constructor(
     private var mainRemoteEmailDatabaseIsAvailable = MutableStateFlow(true)
 
     init {
+        Timber.d("init ${hashCode()}")
         externalScope.launch {
             withContext(Dispatchers.IO) {
                 mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
