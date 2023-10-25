@@ -11,13 +11,15 @@ This is an Android client for [Guerrilla Mail](https://www.guerrillamail.com), a
 
 ## Dependencies
 
-- [Guerrilla Mail API](https://www.guerrillamail.com/GuerrillaMailAPI.html)
-- [Retrofit](https://square.github.io/retrofit/)
-- [OkHttp](https://square.github.io/okhttp/)
-- [Jackson](https://github.com/FasterXML/jackson)
-- [Room](https://developer.android.com/jetpack/androidx/releases/room)
-- [Hilt](https://dagger.dev/hilt/)
-- [Timber](https://github.com/JakeWharton/timber)
+- [Guerrilla Mail API](https://www.guerrillamail.com/GuerrillaMailAPI.html): The API used for communication with Guerrilla Mail service.
+- [Retrofit](https://square.github.io/retrofit/): An HTTP client used for communication with the Guerrilla Mail API.
+- [Jackson](https://github.com/FasterXML/jackson): A library for JSON serialization and deserialization used in the project.
+- [Room](https://developer.android.com/jetpack/androidx/releases/room): Local storage for received emails.
+- [Hilt](https://dagger.dev/hilt/): Dependency injection framework used for managing dependencies in the project.
+- [Timber](https://github.com/JakeWharton/timber): Logging library.
+- [DataStore Preferences](https://developer.android.com/topic/libraries/architecture/datastore): Used for storing and managing user preferences.
+- [Firebase Analytics](https://firebase.google.com/docs/analytics): Analytics.
+- [Firebase Crashlytics](https://firebase.google.com/docs/crashlytics): Crash analytics.
 
 ## Build Instructions
 
