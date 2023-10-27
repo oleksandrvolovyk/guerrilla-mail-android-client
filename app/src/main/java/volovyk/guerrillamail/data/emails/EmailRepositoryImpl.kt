@@ -33,31 +33,27 @@ class EmailRepositoryImpl @Inject constructor(
 
     init {
         Timber.d("init ${hashCode()}")
-        externalScope.launch {
-            withContext(Dispatchers.IO) {
-                mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
-            }
+        externalScope.launch(Dispatchers.IO) {
+            mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
         }
-        externalScope.launch {
-            withContext(Dispatchers.IO) {
-                while (isActive) {
-                    val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable.value) {
-                        mainRemoteEmailDatabase
+        externalScope.launch(Dispatchers.IO) {
+            while (isActive) {
+                val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable.value) {
+                    mainRemoteEmailDatabase
+                } else {
+                    backupRemoteEmailDatabase
+                }
+                if (remoteEmailDatabase.hasEmailAddressAssigned()) {
+                    remoteEmailDatabase.updateEmails()
+                    delay(REFRESH_INTERVAL)
+                } else {
+                    val lastEmailAddress = preferencesRepository.getValue(LAST_EMAIL_ADDRESS_KEY)
+                    if (lastEmailAddress != null && remoteEmailDatabase == mainRemoteEmailDatabase) {
+                        remoteEmailDatabase.setEmailAddress(lastEmailAddress)
                     } else {
-                        backupRemoteEmailDatabase
+                        remoteEmailDatabase.getRandomEmailAddress()
                     }
-                    if (remoteEmailDatabase.hasEmailAddressAssigned()) {
-                        remoteEmailDatabase.updateEmails()
-                        delay(REFRESH_INTERVAL)
-                    } else {
-                        val lastEmailAddress = preferencesRepository.getValue(LAST_EMAIL_ADDRESS_KEY)
-                        if (lastEmailAddress != null && remoteEmailDatabase == mainRemoteEmailDatabase) {
-                            remoteEmailDatabase.setEmailAddress(lastEmailAddress)
-                        } else {
-                            remoteEmailDatabase.getRandomEmailAddress()
-                        }
-                        delay(EMAIL_ASSIGNMENT_INTERVAL)
-                    }
+                    delay(EMAIL_ASSIGNMENT_INTERVAL)
                 }
             }
         }
@@ -75,39 +71,29 @@ class EmailRepositoryImpl @Inject constructor(
         const val LAST_EMAIL_ADDRESS_KEY = "last_email_address"
     }
 
-    override suspend fun getEmailById(emailId: String): Email? {
-        return withContext(Dispatchers.IO) {
-            localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
-            localEmailDatabase.getEmailDao().getById(emailId)
+    override suspend fun getEmailById(emailId: String): Email? = withContext(Dispatchers.IO) {
+        localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
+        localEmailDatabase.getEmailDao().getById(emailId)
+    }
+
+    override suspend fun setEmailAddress(newAddress: String) = withContext(Dispatchers.IO) {
+        if (mainRemoteEmailDatabaseIsAvailable.value) {
+            mainRemoteEmailDatabase.setEmailAddress(newAddress)
+        } else {
+            backupRemoteEmailDatabase.setEmailAddress(newAddress)
         }
     }
 
-    override suspend fun setEmailAddress(newAddress: String) {
-        withContext(Dispatchers.IO) {
-            if (mainRemoteEmailDatabaseIsAvailable.value) {
-                mainRemoteEmailDatabase.setEmailAddress(newAddress)
-            } else {
-                backupRemoteEmailDatabase.setEmailAddress(newAddress)
-            }
-        }
+    override suspend fun deleteEmail(email: Email?) = withContext(Dispatchers.IO) {
+        localEmailDatabase.getEmailDao().delete(email)
     }
 
-    override suspend fun deleteEmail(email: Email?) {
-        withContext(Dispatchers.IO) {
-            localEmailDatabase.getEmailDao().delete(email)
-        }
+    override suspend fun deleteAllEmails() = withContext(Dispatchers.IO) {
+        localEmailDatabase.getEmailDao().deleteAll()
     }
 
-    override suspend fun deleteAllEmails() {
-        withContext(Dispatchers.IO) {
-            localEmailDatabase.getEmailDao().deleteAll()
-        }
-    }
-
-    override suspend fun retryConnectingToMainDatabase() {
-        withContext(Dispatchers.IO) {
-            mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
-        }
+    override suspend fun retryConnectingToMainDatabase() = withContext(Dispatchers.IO) {
+        mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
     }
 
     override fun observeAssignedEmail(): Flow<String?> =
@@ -144,9 +130,8 @@ class EmailRepositoryImpl @Inject constructor(
         mainRemoteEmailDatabaseIsAvailable
 
     // Must be called on a non-UI thread or Room will throw an exception.
-    private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) {
+    private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) =
         withContext(Dispatchers.IO) {
             localEmailDatabase.getEmailDao().insertAll(emails)
         }
-    }
 }
