@@ -29,11 +29,9 @@ class FakeEmailRepository(
         assignedEmail.update { newAddress }
     }
 
-    override suspend fun deleteEmail(email: Email?) {
-        email?.let {
-            emails.update { emails ->
-                emails.minus(email)
-            }
+    override suspend fun deleteEmail(email: Email) {
+        emails.update { emails ->
+            emails.minus(email)
         }
     }
 

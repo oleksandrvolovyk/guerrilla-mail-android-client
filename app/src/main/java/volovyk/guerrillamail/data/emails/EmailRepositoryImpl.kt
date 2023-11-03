@@ -84,7 +84,7 @@ class EmailRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteEmail(email: Email?) = withContext(Dispatchers.IO) {
+    override suspend fun deleteEmail(email: Email) = withContext(Dispatchers.IO) {
         localEmailDatabase.getEmailDao().delete(email)
     }
 
@@ -130,7 +130,7 @@ class EmailRepositoryImpl @Inject constructor(
         mainRemoteEmailDatabaseIsAvailable
 
     // Must be called on a non-UI thread or Room will throw an exception.
-    private suspend fun insertAllToLocalDatabase(emails: Collection<Email?>?) =
+    private suspend fun insertAllToLocalDatabase(emails: Collection<Email>) =
         withContext(Dispatchers.IO) {
             localEmailDatabase.getEmailDao().insertAll(emails)
         }

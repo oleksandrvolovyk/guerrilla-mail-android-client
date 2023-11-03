@@ -20,10 +20,10 @@ interface EmailDao {
     fun setEmailViewed(emailId: String, viewed: Boolean)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(emails: Collection<Email?>?)
+    fun insertAll(emails: Collection<Email>)
 
     @Delete
-    fun delete(email: Email?)
+    fun delete(email: Email)
 
     @Query("DELETE FROM email")
     fun deleteAll()
