@@ -24,18 +24,11 @@ This is an Android client for [Guerrilla Mail](https://www.guerrillamail.com), a
 ## Build Instructions
 
 1. Clone the repository
-2. Setup AdMob:
-   1. Create an AdMob account 
-   2. Set up a new app
-   3. Create an interstitial ad unit
-   4. Add your ids to keys.properties:
-    ```
-    ADMOB_APP_ID="ca-app-pub-xxx"
-    ADMOB_TEST_AD_ID="ca-app-pub-3940256099942544/1033173712"
-    ADMOB_MY_AD_ID="ca-app-pub-yyy"
-    ```  
-3. Open the project in Android Studio
-4. Build and run the app
+```
+git clone https://github.com/oleksandrvolovyk/guerrilla-mail-android-client
+```
+2. Open the project in Android Studio
+3. Build and run the app
 
 ## Usage Instructions
 
