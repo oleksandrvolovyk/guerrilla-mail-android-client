@@ -1,7 +1,7 @@
 package volovyk.guerrillamail.data.emails
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,6 +14,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import volovyk.guerrillamail.data.IoDispatcher
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
@@ -23,6 +24,7 @@ import javax.inject.Inject
 
 class EmailRepositoryImpl @Inject constructor(
     externalScope: CoroutineScope,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val mainRemoteEmailDatabase: RemoteEmailDatabase,
     private val backupRemoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase,
@@ -33,10 +35,10 @@ class EmailRepositoryImpl @Inject constructor(
 
     init {
         Timber.d("init ${hashCode()}")
-        externalScope.launch(Dispatchers.IO) {
+        externalScope.launch(ioDispatcher) {
             mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
         }
-        externalScope.launch(Dispatchers.IO) {
+        externalScope.launch(ioDispatcher) {
             while (isActive) {
                 val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable.value) {
                     mainRemoteEmailDatabase
@@ -59,10 +61,10 @@ class EmailRepositoryImpl @Inject constructor(
         }
         mainRemoteEmailDatabase.observeEmails().onEach { emails ->
             insertAllToLocalDatabase(emails)
-        }.flowOn(Dispatchers.IO).launchIn(externalScope)
+        }.flowOn(ioDispatcher).launchIn(externalScope)
         backupRemoteEmailDatabase.observeEmails().onEach { emails ->
             insertAllToLocalDatabase(emails)
-        }.flowOn(Dispatchers.IO).launchIn(externalScope)
+        }.flowOn(ioDispatcher).launchIn(externalScope)
     }
 
     companion object {
@@ -71,12 +73,12 @@ class EmailRepositoryImpl @Inject constructor(
         const val LAST_EMAIL_ADDRESS_KEY = "last_email_address"
     }
 
-    override suspend fun getEmailById(emailId: String): Email? = withContext(Dispatchers.IO) {
+    override suspend fun getEmailById(emailId: String): Email? = withContext(ioDispatcher) {
         localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
         localEmailDatabase.getEmailDao().getById(emailId)
     }
 
-    override suspend fun setEmailAddress(newAddress: String) = withContext(Dispatchers.IO) {
+    override suspend fun setEmailAddress(newAddress: String) = withContext(ioDispatcher) {
         if (mainRemoteEmailDatabaseIsAvailable.value) {
             mainRemoteEmailDatabase.setEmailAddress(newAddress)
         } else {
@@ -84,15 +86,15 @@ class EmailRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteEmail(email: Email) = withContext(Dispatchers.IO) {
+    override suspend fun deleteEmail(email: Email) = withContext(ioDispatcher) {
         localEmailDatabase.getEmailDao().delete(email)
     }
 
-    override suspend fun deleteAllEmails() = withContext(Dispatchers.IO) {
+    override suspend fun deleteAllEmails() = withContext(ioDispatcher) {
         localEmailDatabase.getEmailDao().deleteAll()
     }
 
-    override suspend fun retryConnectingToMainDatabase() = withContext(Dispatchers.IO) {
+    override suspend fun retryConnectingToMainDatabase() = withContext(ioDispatcher) {
         mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
     }
 
@@ -131,7 +133,7 @@ class EmailRepositoryImpl @Inject constructor(
 
     // Must be called on a non-UI thread or Room will throw an exception.
     private suspend fun insertAllToLocalDatabase(emails: Collection<Email>) =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             localEmailDatabase.getEmailDao().insertAll(emails)
         }
 }

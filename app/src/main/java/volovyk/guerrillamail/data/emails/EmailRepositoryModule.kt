@@ -4,7 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import volovyk.guerrillamail.data.IoDispatcher
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.BackupRemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.MainRemoteEmailDatabase
@@ -19,6 +21,7 @@ object EmailRepositoryModule {
     @Singleton
     fun provideEmailRepository(
         externalScope: CoroutineScope,
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
         @MainRemoteEmailDatabase mainRemoteEmailDatabase: RemoteEmailDatabase,
         @BackupRemoteEmailDatabase backupRemoteEmailDatabase: RemoteEmailDatabase,
         localEmailDatabase: LocalEmailDatabase,
@@ -26,6 +29,7 @@ object EmailRepositoryModule {
     ): EmailRepository {
         return EmailRepositoryImpl(
             externalScope,
+            ioDispatcher,
             mainRemoteEmailDatabase,
             backupRemoteEmailDatabase,
             localEmailDatabase,

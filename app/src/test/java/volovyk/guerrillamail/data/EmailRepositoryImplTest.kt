@@ -7,6 +7,7 @@ import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
@@ -28,7 +29,8 @@ class EmailRepositoryImplTest {
     private lateinit var emailDao: EmailDao
     private lateinit var preferencesRepository: PreferencesRepository
 
-    private val testScope = TestScope()
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
     private lateinit var emailRepository: EmailRepositoryImpl
 
     @Before
@@ -53,6 +55,7 @@ class EmailRepositoryImplTest {
     fun `getEmailById should call LocalEmailDatabase`() = testScope.runTest {
         emailRepository = EmailRepositoryImpl(
             testScope,
+            testDispatcher,
             mainRemoteEmailDatabase,
             backupRemoteEmailDatabase,
             localEmailDatabase,
@@ -72,6 +75,7 @@ class EmailRepositoryImplTest {
     fun `setEmailAddress should call RemoteEmailDatabase`() = testScope.runTest {
         emailRepository = EmailRepositoryImpl(
             testScope,
+            testDispatcher,
             mainRemoteEmailDatabase,
             backupRemoteEmailDatabase,
             localEmailDatabase,
@@ -91,6 +95,7 @@ class EmailRepositoryImplTest {
     fun `deleteEmail should call LocalEmailDatabase`() = testScope.runTest {
         emailRepository = EmailRepositoryImpl(
             testScope,
+            testDispatcher,
             mainRemoteEmailDatabase,
             backupRemoteEmailDatabase,
             localEmailDatabase,
@@ -116,6 +121,7 @@ class EmailRepositoryImplTest {
 
         emailRepository = EmailRepositoryImpl(
             testScope,
+            testDispatcher,
             mainRemoteEmailDatabase,
             backupRemoteEmailDatabase,
             localEmailDatabase,
@@ -138,6 +144,7 @@ class EmailRepositoryImplTest {
 
             emailRepository = EmailRepositoryImpl(
                 testScope,
+                testDispatcher,
                 mainRemoteEmailDatabase,
                 backupRemoteEmailDatabase,
                 localEmailDatabase,

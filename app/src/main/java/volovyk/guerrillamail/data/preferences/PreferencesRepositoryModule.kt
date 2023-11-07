@@ -4,6 +4,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineDispatcher
+import volovyk.guerrillamail.data.IoDispatcher
 import volovyk.guerrillamail.data.preferences.local.PreferencesDatasource
 import javax.inject.Singleton
 
@@ -12,7 +14,10 @@ import javax.inject.Singleton
 object PreferencesRepositoryModule {
     @Provides
     @Singleton
-    fun providePreferencesRepository(preferencesDatasource: PreferencesDatasource): PreferencesRepository {
-        return PreferencesRepositoryImpl(preferencesDatasource)
+    fun providePreferencesRepository(
+        @IoDispatcher ioDispatcher: CoroutineDispatcher,
+        preferencesDatasource: PreferencesDatasource
+    ): PreferencesRepository {
+        return PreferencesRepositoryImpl(ioDispatcher, preferencesDatasource)
     }
 }
