@@ -6,103 +6,35 @@
     android:layout_height="match_parent"
     tools:context=".ui.MainActivity">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardView"
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/refreshingSpinner"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:indeterminate="true"
+        app:layout_constraintEnd_toEndOf="@id/assignedEmailFragmentContainerView"
+        app:layout_constraintTop_toTopOf="@id/assignedEmailFragmentContainerView" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/assignedEmailFragmentContainerView"
+        android:name="volovyk.guerrillamail.ui.assigned.AssignedEmailFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal"
-            android:orientation="vertical">
-
-            <com.google.android.material.progressindicator.CircularProgressIndicator
-                android:id="@+id/refreshingSpinner"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:indeterminate="true"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/emailTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:foreground="?android:attr/selectableItemBackground"
-                android:labelFor="@+id/emailUsernameEditText"
-                android:text="@string/getting_temporary_email"
-                android:textAlignment="center"
-                android:textColor="?android:attr/textColorPrimary"
-                android:textSize="16sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/emailLinearLayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emailTextView"
-                tools:visibility="visible">
-
-                <EditText
-                    android:id="@+id/emailUsernameEditText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:ems="10"
-                    android:importantForAutofill="no"
-                    android:inputType="textEmailAddress" />
-
-                <TextView
-                    android:id="@+id/emailDomainTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    tools:text="\@guerillamailblock.com" />
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/getNewAddressButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/get_new_address"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/emailLinearLayout"
-                tools:visibility="visible" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout="@layout/fragment_assigned_email" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/my_nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:defaultNavHost="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView"
+        app:layout_constraintTop_toBottomOf="@id/assignedEmailFragmentContainerView"
         app:navGraph="@navigation/navigation" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

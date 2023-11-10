@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui
+package volovyk.guerrillamail.ui.assigned
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,34 +13,34 @@ import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
-data class UiState(
-    val state: State = State.Loading,
-    val mainRemoteEmailDatabaseIsAvailable: Boolean = true
+data class AssignedEmailUiState(
+    val assignedEmail: String? = null,
+    val state: State = State.Loading
 )
 
 @HiltViewModel
-class MainViewModel @Inject constructor(private val emailRepository: EmailRepository) :
+class AssignedEmailViewModel @Inject constructor(private val emailRepository: EmailRepository) :
     ViewModel() {
 
     init {
         Timber.d("init ${hashCode()}")
     }
 
-    val uiState: StateFlow<UiState> =
+    val uiState: StateFlow<AssignedEmailUiState> =
         combine(
-            emailRepository.observeState(),
-            emailRepository.observeMainRemoteEmailDatabaseAvailability()
-        ) { state, mainRemoteEmailDatabaseAvailability ->
-            UiState(state, mainRemoteEmailDatabaseAvailability)
+            emailRepository.observeAssignedEmail(),
+            emailRepository.observeState()
+        ) { assignedEmail, state ->
+            AssignedEmailUiState(assignedEmail, state)
         }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            UiState()
+            AssignedEmailUiState()
         )
 
-    fun retryConnectingToMainDatabase() {
+    fun setEmailAddress(newAddress: String) {
         viewModelScope.launch {
-            emailRepository.retryConnectingToMainDatabase()
+            emailRepository.setEmailAddress(newAddress)
         }
     }
 }
