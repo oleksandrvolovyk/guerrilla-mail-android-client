@@ -5,7 +5,12 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -20,7 +25,6 @@ class AssignedEmailViewModelTest {
 
     private lateinit var assignedEmailFlow: MutableStateFlow<String?>
     private lateinit var stateFlow: MutableStateFlow<State>
-    private lateinit var mainRemoteEmailDatabaseAvailability: MutableStateFlow<Boolean>
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -33,12 +37,39 @@ class AssignedEmailViewModelTest {
 
         assignedEmailFlow = MutableStateFlow(null)
         stateFlow = MutableStateFlow(State.Loading)
-        mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
 
         every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
         every { emailRepository.observeState() } returns stateFlow
-        every { emailRepository.observeMainRemoteEmailDatabaseAvailability() } returns mainRemoteEmailDatabaseAvailability
         viewModel = AssignedEmailViewModel(emailRepository)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `viewModel emits correct uiState`() = runTest {
+        // Create an empty collector for the StateFlow
+        val uiStateCollectionJob = backgroundScope.launch(StandardTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        val defaultUiState = AssignedEmailUiState()
+
+        // Assert default UiState
+        Assert.assertEquals(defaultUiState, viewModel.uiState.value)
+
+        val newEmailAddress = "test@example.com"
+
+        assignedEmailFlow.update { newEmailAddress }
+        stateFlow.update { State.Success }
+
+        advanceUntilIdle()
+
+        val expectedUiState =
+            AssignedEmailUiState(assignedEmail = newEmailAddress, state = State.Success)
+
+        // Assert new UiState is emitted
+        Assert.assertEquals(expectedUiState, viewModel.uiState.value)
+
+        uiStateCollectionJob.cancel()
     }
 
     @Test

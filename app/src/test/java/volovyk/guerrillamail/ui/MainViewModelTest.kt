@@ -1,12 +1,14 @@
 package volovyk.guerrillamail.ui
 
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -45,7 +47,7 @@ class MainViewModelTest {
     @Test
     fun `viewModel emits correct uiState`() = runTest {
         // Create an empty collector for the StateFlow
-        val uiStateCollectionJob = backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+        val uiStateCollectionJob = backgroundScope.launch(StandardTestDispatcher(testScheduler)) {
             viewModel.uiState.collect {}
         }
 
@@ -57,11 +59,20 @@ class MainViewModelTest {
         stateFlow.update { State.Success }
         mainRemoteEmailDatabaseAvailability.update { false }
 
+        advanceUntilIdle()
+
         val expectedUiState = UiState(state = State.Success, mainRemoteEmailDatabaseIsAvailable = false)
 
         // Assert new UiState is emitted
         assertEquals(expectedUiState, viewModel.uiState.value)
 
         uiStateCollectionJob.cancel()
+    }
+
+    @Test
+    fun `retryConnectingToMainDatabase calls emailRepository`() = runTest {
+        viewModel.retryConnectingToMainDatabase()
+
+        coVerify { emailRepository.retryConnectingToMainDatabase() }
     }
 }
