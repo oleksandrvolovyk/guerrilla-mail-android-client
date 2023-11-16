@@ -55,13 +55,12 @@ class SpecificEmailFragmentTest {
     @Before
     fun init() {
         hiltRule.inject()
+        launchFragmentInHiltContainer<SpecificEmailFragment>()
     }
 
     @Test
     fun fragmentShowsEmail() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-
-        launchFragmentInHiltContainer<SpecificEmailFragment> {}
 
         onView(withId(R.id.fromTextView))
             .check(matches(withText(appContext.getString(R.string.from, email.from))))
