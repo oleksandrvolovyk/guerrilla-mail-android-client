@@ -3,16 +3,26 @@ package volovyk.guerrillamail.ui.assigned
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.os.Bundle
-import android.text.Editable
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.databinding.FragmentAssignedEmailBinding
-import volovyk.guerrillamail.ui.BaseFragment
 import volovyk.guerrillamail.ui.UiHelper
 import volovyk.guerrillamail.util.EmailValidator
 import volovyk.guerrillamail.util.MessageHandler
@@ -20,8 +30,7 @@ import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class AssignedEmailFragment :
-    BaseFragment<FragmentAssignedEmailBinding>(FragmentAssignedEmailBinding::inflate) {
+class AssignedEmailFragment : Fragment() {
 
     private val viewModel: AssignedEmailViewModel by viewModels()
 
@@ -31,58 +40,76 @@ class AssignedEmailFragment :
     @Inject
     lateinit var messageHandler: MessageHandler
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                GuerrillaMailTheme {
+                    val uiState by viewModel.uiState.collectAsState()
+                    var emailUsername by remember { mutableStateOf<String?>("") }
+                    var isGetNewAddressButtonVisible by remember { mutableStateOf(false) }
 
-        binding.apply {
-            emailTextView.setOnClickListener { copyEmailToClipboard() }
-            emailDomainTextView.setOnClickListener { copyEmailToClipboard() }
-            getNewAddressButton.setOnClickListener {
-                getNewAddress("${emailUsernameEditText.text}${emailDomainTextView.text}")
-            }
-            emailUsernameEditText.addTextChangedListener(
-                object : UiHelper.SimpleTextWatcher() {
-                    override fun afterTextChanged(s: Editable) {
-                        viewModel.uiState.value.assignedEmail?.let {
-                            getNewAddressButton.isVisible = it.emailUsernamePart() != s.toString()
+                    LaunchedEffect(uiState.assignedEmail) {
+                        emailUsername = uiState.assignedEmail?.emailUsernamePart()
+                    }
+
+                    LaunchedEffect(emailUsername) {
+                        uiState.assignedEmail?.emailUsernamePart().let {
+                            isGetNewAddressButtonVisible = emailUsername != it
                         }
                     }
-                }
-            )
-        }
 
-        viewModel.uiState.observeWithViewLifecycle({ it.assignedEmail }) { email ->
-            if (email != null) {
-                binding.emailLinearLayout.isVisible = true
-                binding.emailTextView.text = getString(R.string.your_temporary_email)
-                binding.emailUsernameEditText.setText(email.emailUsernamePart())
-                binding.emailDomainTextView.text = email.emailDomainPart()
-                binding.getNewAddressButton.visibility = View.GONE
-            } else {
-                binding.emailLinearLayout.isVisible = false
-                binding.emailTextView.text = getString(R.string.getting_temporary_email)
-                binding.emailUsernameEditText.setText("")
-            }
-        }
+                    LaunchedEffect(uiState.state) {
+                        if (uiState.state is State.Failure &&
+                            (uiState.state as State.Failure).error is EmailAddressAssignmentException
+                        ) {
+                            emailUsername = uiState.assignedEmail?.emailUsernamePart()
+                        }
+                    }
 
-        viewModel.uiState.observeWithViewLifecycle({ it.state }) { state ->
-            if (state is State.Failure && state.error is EmailAddressAssignmentException) {
-                viewModel.uiState.value.assignedEmail?.let {
-                    binding.emailUsernameEditText.setText(it.emailUsernamePart())
-                    binding.emailDomainTextView.text = it.emailDomainPart()
+                    AssignedEmailCard(
+                        emailUsername = emailUsername,
+                        emailDomain = uiState.assignedEmail?.emailDomainPart(),
+                        isGetNewAddressButtonVisible = isGetNewAddressButtonVisible,
+                        onEmailAddressClick = {
+                            uiState.assignedEmail?.let {
+                                copyEmailToClipboard(it)
+                                messageHandler.showMessage(context.getString(R.string.email_in_clipboard))
+                            }
+                        },
+                        onGetNewAddressButtonClick = {
+                            uiState.assignedEmail?.let {
+                                getNewAddress("$emailUsername@${it.emailDomainPart()}")
+                                isGetNewAddressButtonVisible = false
+                            }
+                        },
+                        onEmailUsernameValueChange = { newEmailUsername ->
+                            emailUsername = newEmailUsername
+                        }
+                    )
                 }
             }
         }
     }
 
+    private fun copyEmailToClipboard(email: String) {
+        val clipboard =
+            requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText(getString(R.string.app_name), email)
+        clipboard.setPrimaryClip(clip)
+    }
+
     private fun getNewAddress(newAddress: String) {
-        if (emailValidator.isValidEmailAddress(newAddress)) {
+        return if (emailValidator.isValidEmailAddress(newAddress)) {
             val confirmationDialog = UiHelper.createConfirmationDialog(
                 requireContext(),
                 getString(R.string.confirm_getting_new_address, newAddress)
             ) {
                 viewModel.setEmailAddress(newAddress)
-                binding.getNewAddressButton.visibility = View.GONE
             }
 
             confirmationDialog.show()
@@ -96,16 +123,36 @@ class AssignedEmailFragment :
     }
 
     private fun String.emailDomainPart(): String {
-        return "@" + this.substringAfter("@")
+        return this.substringAfter("@")
     }
+}
 
-    private fun copyEmailToClipboard() {
-        viewModel.uiState.value.assignedEmail?.let { email ->
-            val clipboard =
-                requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText(getString(R.string.app_name), email)
-            clipboard.setPrimaryClip(clip)
-            messageHandler.showMessage(getString(R.string.email_in_clipboard))
-        }
-    }
+@Composable
+@Preview(showBackground = true)
+fun AssignedEmailCardPreview1() {
+    AssignedEmailCard(
+        emailUsername = "test",
+        emailDomain = "guerrillamail.com",
+        isGetNewAddressButtonVisible = false
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun AssignedEmailCardPreview2() {
+    AssignedEmailCard(
+        emailUsername = "test2",
+        emailDomain = "guerrillamail.com",
+        isGetNewAddressButtonVisible = true
+    )
+}
+
+@Composable
+@Preview(showBackground = true)
+fun AssignedEmailCardPreview3() {
+    AssignedEmailCard(
+        emailUsername = null,
+        emailDomain = null,
+        isGetNewAddressButtonVisible = false
+    )
 }
