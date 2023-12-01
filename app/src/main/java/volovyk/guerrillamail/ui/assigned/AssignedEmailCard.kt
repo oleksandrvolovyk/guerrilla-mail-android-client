@@ -2,10 +2,10 @@ package volovyk.guerrillamail.ui.assigned
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +25,7 @@ fun AssignedEmailCard(
     onEmailUsernameValueChange: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
@@ -49,7 +49,7 @@ fun AssignedEmailCard(
             EditableEmailRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(8.dp),
                 emailUsername = emailUsername,
                 onEmailUsernameValueChange = onEmailUsernameValueChange,
                 emailDomain = emailDomain
@@ -61,7 +61,6 @@ fun AssignedEmailCard(
                 onClick = onGetNewAddressButtonClick,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
             ) {
                 Text("Get New Address")
             }
