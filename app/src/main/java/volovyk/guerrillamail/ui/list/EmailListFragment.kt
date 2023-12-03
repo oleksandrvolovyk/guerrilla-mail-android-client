@@ -1,44 +1,49 @@
 package volovyk.guerrillamail.ui.list
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.databinding.FragmentEmailListBinding
-import volovyk.guerrillamail.ui.BaseFragment
 import volovyk.guerrillamail.ui.UiHelper
 
 /**
  * A fragment representing a list of Emails.
  */
 @AndroidEntryPoint
-class EmailListFragment :
-    BaseFragment<FragmentEmailListBinding>(FragmentEmailListBinding::inflate) {
+class EmailListFragment : Fragment() {
 
     private val viewModel: EmailListViewModel by viewModels()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Timber.d("onViewCreated")
-        super.onViewCreated(view, savedInstanceState)
-
-        val emailListAdapter = EmailListAdapter(
-            onItemClick = ::navigateToSpecificEmail,
-            onItemDeleteButtonClick = ::deleteEmail,
-            onItemDeleteButtonLongClick = { deleteAllEmails() }
-        )
-
-        binding.list.apply {
-            layoutManager = LinearLayoutManager(context)
-            adapter = emailListAdapter
-        }
-
-        viewModel.uiState.observeWithViewLifecycle({ it.emails }) { emails ->
-            emailListAdapter.submitList(emails)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                GuerrillaMailTheme {
+                    val uiState by viewModel.uiState.collectAsState()
+                    EmailList(
+                        emails = uiState.emails,
+                        onItemClick = ::navigateToSpecificEmail,
+                        onItemDeleteButtonClick = ::deleteEmail,
+                        onItemDeleteButtonLongClick = { deleteAllEmails() }
+                    )
+                }
+            }
         }
     }
 
