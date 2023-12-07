@@ -17,8 +17,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
+import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.emails.exception.EmailFetchException
 import volovyk.guerrillamail.databinding.ActivityMainBinding
 import volovyk.guerrillamail.util.MessageHandler
 import volovyk.guerrillamail.util.State

@@ -1,3 +1,3 @@
-package volovyk.guerrillamail.data.emails.remote.exception
+package volovyk.guerrillamail.data.emails.exception
 
 class EmailAddressAssignmentException(throwable: Throwable) : RuntimeException(throwable)

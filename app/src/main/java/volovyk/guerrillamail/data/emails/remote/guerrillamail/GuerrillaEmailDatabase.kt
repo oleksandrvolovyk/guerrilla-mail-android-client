@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import timber.log.Timber
+import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.emails.exception.EmailFetchException
+import volovyk.guerrillamail.data.emails.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
-import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.remote.exception.EmailFetchException
-import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 import volovyk.guerrillamail.util.State

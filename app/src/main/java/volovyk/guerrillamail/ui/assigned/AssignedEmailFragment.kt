@@ -22,7 +22,7 @@ import androidx.fragment.app.viewModels
 import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.ui.UiHelper
 import volovyk.guerrillamail.util.EmailValidator
 import volovyk.guerrillamail.util.MessageHandler

@@ -14,8 +14,8 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.mock.Calls
-import volovyk.guerrillamail.data.emails.remote.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.remote.exception.NoEmailAddressAssignedException
+import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
+import volovyk.guerrillamail.data.emails.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Domain
