@@ -54,7 +54,10 @@ class AssignedEmailViewModel @Inject constructor(private val emailRepository: Em
     fun setEmailAddress(newAddress: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isGetNewAddressButtonVisible = false) }
-            emailRepository.setEmailAddress(newAddress)
+            if (!emailRepository.setEmailAddress(newAddress)) {
+                // If the operation is unsuccessful, revert emailUsername to previous assigned email
+                _uiState.update { it.copy(emailUsername = assignedEmailFlow.value?.emailUsernamePart()) }
+            }
         }
     }
 

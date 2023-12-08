@@ -11,7 +11,7 @@ interface RemoteEmailDatabase {
     fun updateEmails()
     fun hasEmailAddressAssigned(): Boolean
     fun getRandomEmailAddress()
-    fun setEmailAddress(requestedEmailAddress: String)
+    fun setEmailAddress(requestedEmailAddress: String): Boolean
 
     fun observeAssignedEmail(): Flow<String?>
     fun observeEmails(): Flow<List<Email>>

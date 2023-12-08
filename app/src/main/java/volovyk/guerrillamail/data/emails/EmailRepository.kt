@@ -7,7 +7,7 @@ import volovyk.guerrillamail.util.State
 interface EmailRepository {
 
     suspend fun getEmailById(emailId: String): Email?
-    suspend fun setEmailAddress(newAddress: String)
+    suspend fun setEmailAddress(newAddress: String): Boolean
     suspend fun deleteEmail(email: Email)
     suspend fun deleteAllEmails()
     suspend fun retryConnectingToMainDatabase()

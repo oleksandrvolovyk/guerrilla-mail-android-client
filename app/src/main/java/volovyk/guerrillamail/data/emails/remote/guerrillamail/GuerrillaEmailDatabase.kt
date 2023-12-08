@@ -62,29 +62,27 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
-    override fun getRandomEmailAddress() {
+    override fun getRandomEmailAddress() = try {
         state.update { State.Loading }
-        try {
-            val email = getEmailAddress()
-            assignedEmail.update { email }
-            state.update { State.Success }
-        } catch (e: IOException) {
-            Timber.e(e)
-            state.update { State.Failure(EmailAddressAssignmentException(e)) }
-        }
+        val email = getEmailAddress()
+        assignedEmail.update { email }
+        state.update { State.Success }
+    } catch (e: IOException) {
+        Timber.e(e)
+        state.update { State.Failure(EmailAddressAssignmentException(e)) }
     }
 
-    override fun setEmailAddress(requestedEmailAddress: String) {
+    override fun setEmailAddress(requestedEmailAddress: String): Boolean = try {
         state.update { State.Loading }
-        try {
-            val assignedEmailAddress =
-                makeSetEmailAddressRequest(requestedEmailAddress.substringBefore("@"))
-            assignedEmail.update { assignedEmailAddress }
-            state.update { State.Success }
-        } catch (e: IOException) {
-            Timber.e(e)
-            state.update { State.Failure(EmailAddressAssignmentException(e)) }
-        }
+        val assignedEmailAddress =
+            makeSetEmailAddressRequest(requestedEmailAddress.substringBefore("@"))
+        assignedEmail.update { assignedEmailAddress }
+        state.update { State.Success }
+        true
+    } catch (e: IOException) {
+        Timber.e(e)
+        state.update { State.Failure(EmailAddressAssignmentException(e)) }
+        false
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail

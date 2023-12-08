@@ -88,31 +88,33 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
 
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
-    override fun getRandomEmailAddress() = try {
-        state.update { State.Loading }
-        // 1. Get available domains
-        val getDomainsCall = mailTmApiInterface.getDomains()
+    override fun getRandomEmailAddress() {
+        try {
+            state.update { State.Loading }
+            // 1. Get available domains
+            val getDomainsCall = mailTmApiInterface.getDomains()
 
-        val listOfDomains = getDomainsCall.executeAndCatchErrors()
+            val listOfDomains = getDomainsCall.executeAndCatchErrors()
 
-        if (listOfDomains.totalDomains == 0) {
-            throw EmailAddressAssignmentException(
-                RuntimeException(
-                    "No domains available"
+            if (listOfDomains.totalDomains == 0) {
+                throw EmailAddressAssignmentException(
+                    RuntimeException(
+                        "No domains available"
+                    )
                 )
-            )
+            }
+
+            // 2. Create an account with first available domain
+            val domain = listOfDomains.domains[0].domain
+
+            val username = generateRandomLatinString(USERNAME_LENGTH)
+            val address = "$username@$domain"
+
+            setEmailAddress(address)
+        } catch (exception: IOException) {
+            Timber.e(exception)
+            state.update { State.Failure(EmailAddressAssignmentException(exception)) }
         }
-
-        // 2. Create an account with first available domain
-        val domain = listOfDomains.domains[0].domain
-
-        val username = generateRandomLatinString(USERNAME_LENGTH)
-        val address = "$username@$domain"
-
-        setEmailAddress(address)
-    } catch (exception: IOException) {
-        Timber.e(exception)
-        state.update { State.Failure(EmailAddressAssignmentException(exception)) }
     }
 
     private fun generateRandomLatinString(length: Int): String {
@@ -122,7 +124,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
             .joinToString("")
     }
 
-    override fun setEmailAddress(requestedEmailAddress: String) = try {
+    override fun setEmailAddress(requestedEmailAddress: String): Boolean = try {
         state.update { State.Loading }
         val requestEmailAddress = requestedEmailAddress.lowercase()
 
@@ -142,9 +144,11 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
         token = "Bearer ${loginResponse.token}"
         assignedEmail.update { requestedEmailAddress }
         state.update { State.Success }
+        true
     } catch (exception: IOException) {
         Timber.e(exception)
         state.update { State.Failure(EmailAddressAssignmentException(exception)) }
+        false
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail

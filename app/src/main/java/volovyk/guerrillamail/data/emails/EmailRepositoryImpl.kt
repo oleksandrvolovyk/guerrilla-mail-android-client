@@ -78,7 +78,7 @@ class EmailRepositoryImpl @Inject constructor(
         localEmailDatabase.getEmailDao().getById(emailId)
     }
 
-    override suspend fun setEmailAddress(newAddress: String) = withContext(ioDispatcher) {
+    override suspend fun setEmailAddress(newAddress: String): Boolean = withContext(ioDispatcher) {
         if (mainRemoteEmailDatabaseIsAvailable.value) {
             mainRemoteEmailDatabase.setEmailAddress(newAddress)
         } else {
