@@ -8,12 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.tooling.preview.Preview
@@ -22,11 +18,9 @@ import androidx.fragment.app.viewModels
 import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
 import volovyk.guerrillamail.ui.UiHelper
 import volovyk.guerrillamail.util.EmailValidator
 import volovyk.guerrillamail.util.MessageHandler
-import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,46 +44,23 @@ class AssignedEmailFragment : Fragment() {
             setContent {
                 GuerrillaMailTheme {
                     val uiState by viewModel.uiState.collectAsState()
-                    var emailUsername by remember { mutableStateOf<String?>("") }
-                    var isGetNewAddressButtonVisible by remember { mutableStateOf(false) }
-
-                    LaunchedEffect(uiState.assignedEmail) {
-                        emailUsername = uiState.assignedEmail?.emailUsernamePart()
-                    }
-
-                    LaunchedEffect(emailUsername) {
-                        uiState.assignedEmail?.emailUsernamePart().let {
-                            isGetNewAddressButtonVisible = emailUsername != it
-                        }
-                    }
-
-                    LaunchedEffect(uiState.state) {
-                        if (uiState.state is State.Failure &&
-                            (uiState.state as State.Failure).error is EmailAddressAssignmentException
-                        ) {
-                            emailUsername = uiState.assignedEmail?.emailUsernamePart()
-                        }
-                    }
 
                     AssignedEmailCard(
-                        emailUsername = emailUsername,
-                        emailDomain = uiState.assignedEmail?.emailDomainPart(),
-                        isGetNewAddressButtonVisible = isGetNewAddressButtonVisible,
+                        emailUsername = uiState.emailUsername,
+                        emailDomain = uiState.emailDomain,
+                        isGetNewAddressButtonVisible = uiState.isGetNewAddressButtonVisible,
                         onEmailAddressClick = {
-                            uiState.assignedEmail?.let {
-                                copyEmailToClipboard(it)
+                            uiState.emailUsername?.let {
+                                copyEmailToClipboard(uiState.emailUsername + "@" + uiState.emailDomain)
                                 messageHandler.showMessage(context.getString(R.string.email_in_clipboard))
                             }
                         },
                         onGetNewAddressButtonClick = {
-                            uiState.assignedEmail?.let {
-                                getNewAddress("$emailUsername@${it.emailDomainPart()}")
-                                isGetNewAddressButtonVisible = false
+                            uiState.emailUsername?.let {
+                                getNewAddress("${uiState.emailUsername}@${uiState.emailDomain}")
                             }
                         },
-                        onEmailUsernameValueChange = { newEmailUsername ->
-                            emailUsername = newEmailUsername
-                        }
+                        onEmailUsernameValueChange = { viewModel.userChangedEmailUsername(it) }
                     )
                 }
             }
@@ -116,14 +87,6 @@ class AssignedEmailFragment : Fragment() {
         } else {
             messageHandler.showMessage(getString(R.string.email_invalid))
         }
-    }
-
-    private fun String.emailUsernamePart(): String {
-        return this.substringBefore("@")
-    }
-
-    private fun String.emailDomainPart(): String {
-        return this.substringAfter("@")
     }
 }
 
