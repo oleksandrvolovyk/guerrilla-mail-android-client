@@ -1,6 +1,7 @@
 package volovyk.guerrillamail.ui.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -58,12 +60,21 @@ fun EmailListItem(
     onItemDeleteButtonClick: (Email) -> Unit,
     onItemDeleteButtonLongClick: (Email) -> Unit
 ) {
+    val cardContainerColor = if (email.viewed) {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35F)
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(bottom = 8.dp)
-            .clickable { onItemClick(email) }
+            .clickable { onItemClick(email) },
+        colors = CardDefaults.cardColors(
+            containerColor = cardContainerColor,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     ) {
         Column(
             modifier = Modifier
@@ -98,7 +109,8 @@ fun EmailListItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete"
+                        contentDescription = "Delete",
+                        modifier = Modifier.background(color = cardContainerColor)
                     )
                 }
             }
@@ -110,7 +122,7 @@ fun EmailListItem(
 @Composable
 fun EmailListPreview() {
     EmailList(
-        emails = List(3) {
+        emails = List(2) {
             Email(
                 id = "it",
                 from = "test$it@example.com",
@@ -119,6 +131,16 @@ fun EmailListPreview() {
                 "Html body $it",
                 "0$it.0$it.2$it",
                 false
+            )
+        } + List(2) {
+            Email(
+                id = "it",
+                from = "test$it@example.com",
+                subject = "Subject $it",
+                "Body $it",
+                "Html body $it",
+                "0$it.0$it.2$it",
+                true
             )
         } + Email(
             id = "id",
