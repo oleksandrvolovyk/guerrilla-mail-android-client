@@ -1,5 +1,6 @@
 package volovyk.guerrillamail.ui.specific
 
+import android.graphics.Color
 import android.webkit.WebView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ fun WebViewWrapper(modifier: Modifier = Modifier, onUpdate: (WebView) -> Unit) {
                 isHorizontalScrollBarEnabled = true
                 settings.builtInZoomControls = true
                 settings.displayZoomControls = false
+                setBackgroundColor(Color.TRANSPARENT)
             }
         },
         update = onUpdate
