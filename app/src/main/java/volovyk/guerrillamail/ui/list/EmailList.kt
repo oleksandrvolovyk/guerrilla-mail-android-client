@@ -1,7 +1,6 @@
 package volovyk.guerrillamail.ui.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,15 +18,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 
 @Composable
@@ -60,6 +60,7 @@ fun EmailListItem(
     onItemDeleteButtonClick: (Email) -> Unit,
     onItemDeleteButtonLongClick: (Email) -> Unit
 ) {
+    val context = LocalContext.current
     val cardContainerColor = if (email.viewed) {
         MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35F)
     } else {
@@ -85,7 +86,8 @@ fun EmailListItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
@@ -99,20 +101,17 @@ fun EmailListItem(
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                     )
                 }
-                Surface(
+                IconButton(
                     modifier = Modifier
                         .size(48.dp)
                         .combinedClickable(
                             onClick = { onItemDeleteButtonClick(email) },
                             onLongClick = { onItemDeleteButtonLongClick(email) }
                         ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete",
-                        modifier = Modifier.background(color = cardContainerColor)
-                    )
-                }
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = context.getString(R.string.delete),
+                    iconBackgroundColor = cardContainerColor
+                )
             }
         }
     }
