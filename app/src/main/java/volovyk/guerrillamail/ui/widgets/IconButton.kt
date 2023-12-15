@@ -1,12 +1,15 @@
-package volovyk.guerrillamail.ui.list
+package volovyk.guerrillamail.ui.widgets
 
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun IconButton(
@@ -24,4 +27,14 @@ fun IconButton(
             modifier = Modifier.background(color = iconBackgroundColor)
         )
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun IconButtonPreview() {
+    IconButton(
+        imageVector = Icons.Default.Add,
+        contentDescription = "Description",
+        iconBackgroundColor = Color.Green
+    )
 }

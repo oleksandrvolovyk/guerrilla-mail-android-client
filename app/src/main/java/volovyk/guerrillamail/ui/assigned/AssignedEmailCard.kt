@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.ui.widgets.EditableEmailRow
 
 @Composable
 fun AssignedEmailCard(

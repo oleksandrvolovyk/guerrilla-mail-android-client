@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui.assigned
+package volovyk.guerrillamail.ui.widgets
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding

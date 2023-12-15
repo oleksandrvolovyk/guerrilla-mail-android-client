@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui.specific
+package volovyk.guerrillamail.ui.widgets
 
 import android.graphics.Color
 import android.webkit.WebView

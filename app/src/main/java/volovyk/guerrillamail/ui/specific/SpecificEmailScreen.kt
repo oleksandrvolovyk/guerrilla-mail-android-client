@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.ui.widgets.WebViewWrapper
 
 @Composable
 fun SpecificEmailScreen(
