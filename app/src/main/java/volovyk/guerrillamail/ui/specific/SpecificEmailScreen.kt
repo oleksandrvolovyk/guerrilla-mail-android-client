@@ -35,6 +35,7 @@ fun SpecificEmailScreen(
             .fillMaxSize()
             .padding(start = 8.dp, end = 8.dp)
             .background(color = MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
     ) {
         Card(
             modifier = Modifier
@@ -94,7 +95,6 @@ fun SpecificEmailScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
-                    .verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = uiState.email?.body ?: "",
