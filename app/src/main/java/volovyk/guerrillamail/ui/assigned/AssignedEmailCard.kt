@@ -63,7 +63,7 @@ fun AssignedEmailCard(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text("Get New Address")
+                Text(context.getString(R.string.get_new_address))
             }
         }
     }
