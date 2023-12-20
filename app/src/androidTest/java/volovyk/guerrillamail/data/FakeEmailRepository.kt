@@ -21,12 +21,19 @@ class FakeEmailRepository(
     val mainRemoteEmailDatabaseAvailability =
         MutableStateFlow(initialMainRemoteEmailDatabaseAvailability)
 
+    var isSetEmailAddressSuccessful = true
+
     override suspend fun getEmailById(emailId: String): Email? {
         return emails.value.find { it.id == emailId }
     }
 
-    override suspend fun setEmailAddress(newAddress: String) {
-        assignedEmail.update { newAddress }
+    override suspend fun setEmailAddress(newAddress: String): Boolean {
+        return if (isSetEmailAddressSuccessful) {
+            assignedEmail.update { newAddress }
+            true
+        } else {
+            false
+        }
     }
 
     override suspend fun deleteEmail(email: Email) {
