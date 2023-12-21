@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -71,6 +72,7 @@ fun SpecificEmailScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Switch(
+                modifier = Modifier.testTag(context.getString(R.string.test_tag_html_render_swtich)),
                 checked = uiState.renderHtml,
                 onCheckedChange = onHtmlRenderSwitchCheckedChange
             )
@@ -85,7 +87,8 @@ fun SpecificEmailScreen(
         if (uiState.renderHtml) {
             WebViewWrapper(
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .testTag(context.getString(R.string.test_tag_email_body_web_view)),
                 onUpdate = {
                     it.loadData(uiState.email?.htmlBody ?: "", "text/html", "base64")
                 }

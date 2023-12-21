@@ -23,4 +23,7 @@
     <string name="guerrilla_mail_offline">Could not connect to Guerrilla Mail, using Mail.tm now</string>
     <string name="retry">Retry</string>
     <string name="toggle_html_rendering">Text/HTML</string>
+
+    <string name="test_tag_email_body_web_view">Email Body WebView</string>
+    <string name="test_tag_html_render_swtich">HTML Render Switch</string>
 </resources>
