@@ -148,7 +148,7 @@ class SpecificEmailScreenTest {
 
         // Perform click on the "HTML render switch"
         composeTestRule
-            .onNode(hasTestTag(context.getString(R.string.test_tag_html_render_swtich)))
+            .onNode(hasTestTag(context.getString(R.string.test_tag_html_render_switch)))
             .performClick()
 
         // Assert that the lambda is called and the state is updated
@@ -169,7 +169,7 @@ class SpecificEmailScreenTest {
 
         // Perform click on the "HTML render switch"
         composeTestRule
-            .onNode(hasTestTag(context.getString(R.string.test_tag_html_render_swtich)))
+            .onNode(hasTestTag(context.getString(R.string.test_tag_html_render_switch)))
             .performClick()
 
         // Assert that the lambda is called and the state is updated

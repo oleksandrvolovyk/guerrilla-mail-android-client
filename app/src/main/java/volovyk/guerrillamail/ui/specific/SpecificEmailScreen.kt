@@ -72,7 +72,7 @@ fun SpecificEmailScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Switch(
-                modifier = Modifier.testTag(context.getString(R.string.test_tag_html_render_swtich)),
+                modifier = Modifier.testTag(context.getString(R.string.test_tag_html_render_switch)),
                 checked = uiState.renderHtml,
                 onCheckedChange = onHtmlRenderSwitchCheckedChange
             )
