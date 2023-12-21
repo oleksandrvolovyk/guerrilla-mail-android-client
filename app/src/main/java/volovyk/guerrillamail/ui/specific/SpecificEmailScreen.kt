@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -88,6 +89,7 @@ fun SpecificEmailScreen(
             WebViewWrapper(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color.White)
                     .testTag(context.getString(R.string.test_tag_email_body_web_view)),
                 onUpdate = {
                     it.loadData(uiState.email?.htmlBody ?: "", "text/html", "base64")
