@@ -16,7 +16,7 @@ import volovyk.guerrillamail.ui.assigned.AssignedEmailCard
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class AssignedEmailFragmentTest {
+class AssignedEmailCardTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
