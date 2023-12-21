@@ -141,7 +141,7 @@ jobs:
       env:
         RELEASE_NOTES: ${{ steps.release_notes.outputs.changes }}
       run: |
-        echo "$RELEASE_NOTES" > whatsnew-en-US
+        echo "${RELEASE_NOTES}" | cut -c 1-450 > whatsnew-en-US
 
     - name: Upload release AAB to Google Play
       if: success()
