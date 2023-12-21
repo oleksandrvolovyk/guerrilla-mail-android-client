@@ -7,8 +7,7 @@
     <fragment
         android:id="@+id/emailListFragment"
         android:name="volovyk.guerrillamail.ui.list.EmailListFragment"
-        android:label="@string/title_list_of_emails"
-        tools:layout="@layout/fragment_email_list">
+        android:label="@string/title_list_of_emails">
         <action
             android:id="@+id/action_open_email"
             app:destination="@id/specificEmailFragment"
@@ -20,8 +19,7 @@
     <fragment
         android:id="@+id/specificEmailFragment"
         android:name="volovyk.guerrillamail.ui.specific.SpecificEmailFragment"
-        android:label="{emailSubject}"
-        tools:layout="@layout/fragment_specific_email">
+        android:label="{emailSubject}">
         <argument
             android:name="emailId"
             app:argType="string" />
