@@ -18,8 +18,9 @@ import androidx.fragment.app.viewModels
 import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.ui.SideEffect
+import volovyk.guerrillamail.ui.SingleEventEffect
 import volovyk.guerrillamail.ui.UiHelper
-import volovyk.guerrillamail.util.EmailValidator
 import volovyk.guerrillamail.util.MessageHandler
 import javax.inject.Inject
 
@@ -27,9 +28,6 @@ import javax.inject.Inject
 class AssignedEmailFragment : Fragment() {
 
     private val viewModel: AssignedEmailViewModel by viewModels()
-
-    @Inject
-    lateinit var emailValidator: EmailValidator
 
     @Inject
     lateinit var messageHandler: MessageHandler
@@ -45,19 +43,20 @@ class AssignedEmailFragment : Fragment() {
                 GuerrillaMailTheme {
                     val uiState by viewModel.uiState.collectAsState()
 
+                    SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) {
+                        handleSideEffect(it)
+                    }
+
                     AssignedEmailCard(
                         emailUsername = uiState.emailUsername,
                         emailDomain = uiState.emailDomain,
                         isGetNewAddressButtonVisible = uiState.isGetNewAddressButtonVisible,
                         onEmailAddressClick = {
-                            uiState.emailUsername?.let {
-                                copyEmailToClipboard(uiState.emailUsername + "@" + uiState.emailDomain)
-                                messageHandler.showMessage(context.getString(R.string.email_in_clipboard))
-                            }
+                            viewModel.copyEmailAddressToClipboard()
                         },
                         onGetNewAddressButtonClick = {
                             uiState.emailUsername?.let {
-                                getNewAddress("${uiState.emailUsername}@${uiState.emailDomain}")
+                                viewModel.setEmailAddress("${uiState.emailUsername}@${uiState.emailDomain}")
                             }
                         },
                         onEmailUsernameValueChange = { viewModel.userChangedEmailUsername(it) }
@@ -67,25 +66,30 @@ class AssignedEmailFragment : Fragment() {
         }
     }
 
-    private fun copyEmailToClipboard(email: String) {
-        val clipboard =
-            requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText(getString(R.string.app_name), email)
-        clipboard.setPrimaryClip(clip)
-    }
-
-    private fun getNewAddress(newAddress: String) {
-        return if (emailValidator.isValidEmailAddress(newAddress)) {
-            val confirmationDialog = UiHelper.createConfirmationDialog(
-                requireContext(),
-                getString(R.string.confirm_getting_new_address, newAddress)
-            ) {
-                viewModel.setEmailAddress(newAddress)
+    private fun handleSideEffect(
+        it: SideEffect
+    ) {
+        when (it) {
+            is SideEffect.CopyTextToClipboard -> {
+                val clipboard =
+                    requireContext().getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip =
+                    ClipData.newPlainText(getString(R.string.app_name), it.text)
+                clipboard.setPrimaryClip(clip)
             }
 
-            confirmationDialog.show()
-        } else {
-            messageHandler.showMessage(getString(R.string.email_invalid))
+            is SideEffect.ShowToast -> {
+                messageHandler.showMessage(getString(it.stringId))
+            }
+
+            is SideEffect.ConfirmAction -> {
+                UiHelper.createConfirmationDialog(
+                    requireContext(),
+                    getString(it.messageStringId, it.stringFormatArg)
+                ) {
+                    it.action()
+                }.show()
+            }
         }
     }
 }

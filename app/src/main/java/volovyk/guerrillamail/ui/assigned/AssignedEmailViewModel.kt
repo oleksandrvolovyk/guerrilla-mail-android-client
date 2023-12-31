@@ -3,17 +3,23 @@ package volovyk.guerrillamail.ui.assigned
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.ui.SideEffect
+import volovyk.guerrillamail.util.EmailValidator
 import javax.inject.Inject
 
 data class AssignedEmailUiState(
@@ -23,8 +29,10 @@ data class AssignedEmailUiState(
 )
 
 @HiltViewModel
-class AssignedEmailViewModel @Inject constructor(private val emailRepository: EmailRepository) :
-    ViewModel() {
+class AssignedEmailViewModel @Inject constructor(
+    private val emailRepository: EmailRepository,
+    private val emailValidator: EmailValidator
+) : ViewModel() {
 
     init {
         Timber.d("init ${hashCode()}")
@@ -32,6 +40,10 @@ class AssignedEmailViewModel @Inject constructor(private val emailRepository: Em
 
     private val _uiState = MutableStateFlow(AssignedEmailUiState())
     val uiState: StateFlow<AssignedEmailUiState> = _uiState.asStateFlow()
+
+    private val _sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)
+    val sideEffectFlow: Flow<SideEffect>
+        get() = _sideEffectChannel.receiveAsFlow()
 
     private val assignedEmailFlow = emailRepository.observeAssignedEmail().stateIn(
         viewModelScope,
@@ -52,13 +64,24 @@ class AssignedEmailViewModel @Inject constructor(private val emailRepository: Em
     }
 
     fun setEmailAddress(newAddress: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isGetNewAddressButtonVisible = false) }
-            if (!emailRepository.setEmailAddress(newAddress)) {
-                // If the operation is unsuccessful, revert emailUsername to previous assigned email
-                _uiState.update { it.copy(emailUsername = assignedEmailFlow.value?.emailUsernamePart()) }
-            }
+        if (!emailValidator.isValidEmailAddress(newAddress)) {
+            _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.email_invalid))
+            return
         }
+
+        _sideEffectChannel.trySend(
+            SideEffect.ConfirmAction(
+                R.string.confirm_getting_new_address,
+                newAddress
+            ) {
+                viewModelScope.launch {
+                    _uiState.update { it.copy(isGetNewAddressButtonVisible = false) }
+                    if (!emailRepository.setEmailAddress(newAddress)) {
+                        // If the operation is unsuccessful, revert emailUsername to previous assigned email
+                        _uiState.update { it.copy(emailUsername = assignedEmailFlow.value?.emailUsernamePart()) }
+                    }
+                }
+            })
     }
 
     fun userChangedEmailUsername(newEmailUsername: String) {
@@ -67,6 +90,13 @@ class AssignedEmailViewModel @Inject constructor(private val emailRepository: Em
                 emailUsername = newEmailUsername,
                 isGetNewAddressButtonVisible = newEmailUsername != assignedEmailFlow.value?.emailUsernamePart()
             )
+        }
+    }
+
+    fun copyEmailAddressToClipboard() {
+        assignedEmailFlow.value?.let { assignedEmail ->
+            _sideEffectChannel.trySend(SideEffect.CopyTextToClipboard(text = assignedEmail))
+            _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.email_in_clipboard))
         }
     }
 
