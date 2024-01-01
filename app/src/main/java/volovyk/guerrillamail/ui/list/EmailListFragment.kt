@@ -14,8 +14,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.ui.SideEffect
+import volovyk.guerrillamail.ui.SingleEventEffect
 import volovyk.guerrillamail.ui.UiHelper
 
 /**
@@ -36,11 +37,16 @@ class EmailListFragment : Fragment() {
             setContent {
                 GuerrillaMailTheme {
                     val uiState by viewModel.uiState.collectAsState()
+
+                    SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) {
+                        handleSideEffect(it)
+                    }
+
                     EmailList(
                         emails = uiState.emails,
                         onItemClick = ::navigateToSpecificEmail,
-                        onItemDeleteButtonClick = ::deleteEmail,
-                        onItemDeleteButtonLongClick = { deleteAllEmails() }
+                        onItemDeleteButtonClick = { viewModel.deleteEmail(it) },
+                        onItemDeleteButtonLongClick = { viewModel.deleteAllEmails() }
                     )
                 }
             }
@@ -53,27 +59,16 @@ class EmailListFragment : Fragment() {
         findNavController().navigate(action)
     }
 
-    private fun deleteEmail(email: Email) {
-        context?.let {
-            val confirmationDialog = UiHelper.createConfirmationDialog(
-                it,
-                it.getString(R.string.confirm_deleting_email)
-            ) {
-                viewModel.deleteEmail(email)
+    private fun handleSideEffect(sideEffect: SideEffect) {
+        when (sideEffect) {
+            is SideEffect.ConfirmAction -> {
+                UiHelper.createConfirmationDialog(
+                    requireContext(),
+                    getString(sideEffect.messageStringId, sideEffect.stringFormatArg)
+                ) {
+                    sideEffect.action()
+                }.show()
             }
-            confirmationDialog.show()
-        }
-    }
-
-    private fun deleteAllEmails() {
-        context?.let {
-            val confirmationDialog = UiHelper.createConfirmationDialog(
-                it,
-                it.getString(R.string.confirm_deleting_all_emails)
-            ) {
-                viewModel.deleteAllEmails()
-            }
-            confirmationDialog.show()
         }
     }
 }
