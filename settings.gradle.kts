@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Guerrilla Mail"
-include ':app'
+include(":app")
