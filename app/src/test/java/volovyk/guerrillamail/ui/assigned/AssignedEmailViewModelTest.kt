@@ -6,6 +6,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -14,6 +15,8 @@ import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.ui.SideEffect
+import volovyk.guerrillamail.util.EmailValidatorImpl
 import volovyk.guerrillamail.util.State
 
 class AssignedEmailViewModelTest {
@@ -37,7 +40,7 @@ class AssignedEmailViewModelTest {
         stateFlow = MutableStateFlow(State.Loading)
 
         every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
-        viewModel = AssignedEmailViewModel(emailRepository)
+        viewModel = AssignedEmailViewModel(emailRepository, EmailValidatorImpl())
     }
 
     @Test
@@ -116,6 +119,10 @@ class AssignedEmailViewModelTest {
         assertEquals(true, viewModel.uiState.value.isGetNewAddressButtonVisible)
         viewModel.setEmailAddress(newAddress)
 
+        // Simulate action confirmation
+        val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
+        confirmActionSideEffect.action()
+
         assertEquals(false, viewModel.uiState.value.isGetNewAddressButtonVisible)
         coVerify { emailRepository.setEmailAddress(newAddress) }
     }
@@ -152,6 +159,10 @@ class AssignedEmailViewModelTest {
             coEvery { emailRepository.setEmailAddress(any()) } returns false
 
             viewModel.setEmailAddress(newAddress)
+
+            // Simulate action confirmation
+            val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
+            confirmActionSideEffect.action()
 
             // Assert email username is reverted to last assigned address
             assertEquals(

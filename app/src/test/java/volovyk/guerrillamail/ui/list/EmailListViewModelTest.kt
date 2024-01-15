@@ -5,6 +5,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -16,6 +17,7 @@ import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.ui.SideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EmailListViewModelTest {
@@ -74,6 +76,10 @@ class EmailListViewModelTest {
         // When
         viewModel.deleteEmail(emailToDelete)
 
+        // Simulate action confirmation
+        val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
+        confirmActionSideEffect.action()
+
         // Then
         coVerify { emailRepository.deleteEmail(emailToDelete) }
     }
@@ -82,6 +88,10 @@ class EmailListViewModelTest {
     fun `deleteAllEmails calls emailRepository`() = runTest {
         // When
         viewModel.deleteAllEmails()
+
+        // Simulate action confirmation
+        val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
+        confirmActionSideEffect.action()
 
         // Then
         coVerify { emailRepository.deleteAllEmails() }
