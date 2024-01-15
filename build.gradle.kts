@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.5")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6")
         classpath("org.jlleitschuh.gradle:ktlint-gradle:11.5.1")
         classpath("io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.23.1")
     }
