@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui.specific
+package volovyk.guerrillamail.ui.details
 
 import androidx.lifecycle.SavedStateHandle
 import io.mockk.coEvery
@@ -16,9 +16,9 @@ import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SpecificEmailViewModelTest {
+class EmailDetailsViewModelTest {
 
-    private lateinit var viewModel: SpecificEmailViewModel
+    private lateinit var viewModel: EmailDetailsViewModel
     private lateinit var emailRepository: EmailRepository
     private lateinit var preferencesRepository: PreferencesRepository
     private lateinit var savedStateHandle: SavedStateHandle
@@ -43,10 +43,10 @@ class SpecificEmailViewModelTest {
 
         savedStateHandle["emailId"] = emailId
         coEvery { emailRepository.getEmailById(emailId) } returns email
-        coEvery { preferencesRepository.getValue(SpecificEmailViewModel.HTML_RENDER_KEY) } returns "true"
+        coEvery { preferencesRepository.getValue(EmailDetailsViewModel.HTML_RENDER_KEY) } returns "true"
 
         // When
-        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository, preferencesRepository)
+        viewModel = EmailDetailsViewModel(emailRepository, preferencesRepository)
 
         // Then
         val uiState = viewModel.uiState.value
@@ -59,7 +59,7 @@ class SpecificEmailViewModelTest {
         savedStateHandle.remove<Int>("emailId")
 
         // When
-        viewModel = SpecificEmailViewModel(savedStateHandle, emailRepository, preferencesRepository)
+        viewModel = EmailDetailsViewModel(emailRepository, preferencesRepository)
 
         // Then
         val uiState = viewModel.uiState.value

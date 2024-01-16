@@ -16,12 +16,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.ui.specific.SpecificEmailScreen
-import volovyk.guerrillamail.ui.specific.SpecificEmailUiState
+import volovyk.guerrillamail.ui.details.EmailDetailsScreen
+import volovyk.guerrillamail.ui.details.EmailDetailsUiState
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class SpecificEmailScreenTest {
+class EmailDetailsScreenTest {
 
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -34,12 +34,12 @@ class SpecificEmailScreenTest {
     }
 
     private fun setSpecificEmailScreenState(
-        state: SpecificEmailUiState,
+        state: EmailDetailsUiState,
         onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {}
     ) {
         composeTestRule.setContent {
             GuerrillaMailTheme {
-                SpecificEmailScreen(state, onHtmlRenderSwitchCheckedChange)
+                EmailDetailsScreen(state, onHtmlRenderSwitchCheckedChange)
             }
         }
     }
@@ -57,7 +57,7 @@ class SpecificEmailScreenTest {
         )
 
         setSpecificEmailScreenState(
-            SpecificEmailUiState(
+            EmailDetailsUiState(
                 email = email,
                 renderHtml = false
             )
@@ -102,7 +102,7 @@ class SpecificEmailScreenTest {
         )
 
         setSpecificEmailScreenState(
-            SpecificEmailUiState(
+            EmailDetailsUiState(
                 email = email,
                 renderHtml = true
             )
@@ -139,7 +139,7 @@ class SpecificEmailScreenTest {
         var isHtmlRenderSwitchChecked = false
 
         setSpecificEmailScreenState(
-            SpecificEmailUiState(
+            EmailDetailsUiState(
                 email = null,
                 renderHtml = isHtmlRenderSwitchChecked
             ),
@@ -160,7 +160,7 @@ class SpecificEmailScreenTest {
         var isHtmlRenderSwitchChecked = true
 
         setSpecificEmailScreenState(
-            SpecificEmailUiState(
+            EmailDetailsUiState(
                 email = null,
                 renderHtml = isHtmlRenderSwitchChecked
             ),

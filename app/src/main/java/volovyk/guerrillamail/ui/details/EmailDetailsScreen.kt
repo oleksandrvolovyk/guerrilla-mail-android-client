@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui.specific
+package volovyk.guerrillamail.ui.details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -27,8 +27,8 @@ import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.widgets.WebViewWrapper
 
 @Composable
-fun SpecificEmailScreen(
-    uiState: SpecificEmailUiState,
+fun EmailDetailsScreen(
+    uiState: EmailDetailsUiState,
     onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -116,9 +116,9 @@ fun SpecificEmailScreen(
 
 @Composable
 @Preview(showBackground = true)
-fun SpecificEmailScreenPreview() {
-    SpecificEmailScreen(
-        uiState = SpecificEmailUiState(
+fun EmailDetailsScreenPreview() {
+    EmailDetailsScreen(
+        uiState = EmailDetailsUiState(
             email = Email(
                 id = "1",
                 from = "from@example.com",

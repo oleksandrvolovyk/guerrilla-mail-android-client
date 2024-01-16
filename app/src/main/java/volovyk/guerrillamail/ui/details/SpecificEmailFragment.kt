@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.ui.specific
+package volovyk.guerrillamail.ui.details
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +19,7 @@ import volovyk.guerrillamail.data.emails.model.Email
 @AndroidEntryPoint
 class SpecificEmailFragment : Fragment() {
 
-    private val viewModel: SpecificEmailViewModel by viewModels()
+    private val viewModel: EmailDetailsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +31,7 @@ class SpecificEmailFragment : Fragment() {
             setContent {
                 GuerrillaMailTheme {
                     val uiState by viewModel.uiState.collectAsState()
-                    SpecificEmailScreen(
+                    EmailDetailsScreen(
                         uiState = uiState,
                         onHtmlRenderSwitchCheckedChange = { viewModel.setHtmlRender(it) }
                     )
@@ -45,8 +45,8 @@ class SpecificEmailFragment : Fragment() {
 @Preview(showBackground = true)
 fun SpecificEmailFragmentPreviewTextBody() {
     GuerrillaMailTheme {
-        SpecificEmailScreen(
-            uiState = SpecificEmailUiState(
+        EmailDetailsScreen(
+            uiState = EmailDetailsUiState(
                 email = Email(
                     id = "1",
                     from = "from@example.com",

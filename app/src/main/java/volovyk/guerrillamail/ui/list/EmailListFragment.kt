@@ -42,7 +42,7 @@ class EmailListFragment : Fragment() {
                         handleSideEffect(it)
                     }
 
-                    EmailList(
+                    EmailListScreen(
                         emails = uiState.emails,
                         onItemClick = ::navigateToSpecificEmail,
                         onItemDeleteButtonClick = { viewModel.deleteEmail(it) },

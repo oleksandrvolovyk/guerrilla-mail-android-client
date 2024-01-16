@@ -18,7 +18,7 @@
     </fragment>
     <fragment
         android:id="@+id/specificEmailFragment"
-        android:name="volovyk.guerrillamail.ui.specific.SpecificEmailFragment"
+        android:name="volovyk.guerrillamail.ui.details.SpecificEmailFragment"
         android:label="{emailSubject}">
         <argument
             android:name="emailId"

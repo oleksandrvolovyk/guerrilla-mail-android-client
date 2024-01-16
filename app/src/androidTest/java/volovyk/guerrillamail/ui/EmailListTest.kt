@@ -18,7 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.ui.list.EmailList
+import volovyk.guerrillamail.ui.list.EmailListScreen
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -42,7 +42,7 @@ class EmailListTest {
     ) {
         composeTestRule.setContent {
             GuerrillaMailTheme {
-                EmailList(emails, onItemClick, onItemDeleteButtonClick, onItemDeleteButtonLongClick)
+                EmailListScreen(emails, onItemClick, onItemDeleteButtonClick, onItemDeleteButtonLongClick)
             }
         }
     }
