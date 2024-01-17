@@ -1,19 +1,21 @@
 package volovyk.guerrillamail.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import volovyk.guerrillamail.R
+import volovyk.guerrillamail.ui.UiHelper.showToast
 import volovyk.guerrillamail.ui.assigned.AssignedEmail
 import volovyk.guerrillamail.ui.details.EmailDetails
 import volovyk.guerrillamail.ui.list.EmailList
@@ -21,13 +23,22 @@ import volovyk.guerrillamail.ui.list.EmailList
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val mainViewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Timber.d("onCreate")
         super.onCreate(savedInstanceState)
         setContent {
             GuerrillaMailTheme {
+                val uiState by viewModel.uiState.collectAsState()
+
+                SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) {
+                    handleSideEffect(this, it)
+                }
+
+                // TODO: Show loading indicator
+                // TODO: Show "Guerrilla Mail is not available" snackbar
+
                 MainActivityContent()
             }
         }
@@ -41,7 +52,6 @@ class MainActivity : AppCompatActivity() {
 //
 //        setupActionBarWithNavController(navController)
 
-        // TODO: Redo with side-effects
 //        lifecycleScope.launch {
 //            mainViewModel.uiState
 //                .map { it.state }
@@ -77,33 +87,19 @@ class MainActivity : AppCompatActivity() {
 //        }
     }
 
-//    private fun showFailureMessage(error: Throwable) {
-//        when (error) {
-//            is EmailAddressAssignmentException -> {
-//                messageHandler.showMessage(
-//                    getString(
-//                        R.string.email_address_assignment_failure,
-//                        error.message
-//                    )
-//                )
-//            }
+//    override fun onSupportNavigateUp(): Boolean {
+//        Timber.d("onSupportNavigateUp")
+//        val navController = findNavController(R.id.my_nav_host_fragment)
 //
-//            is EmailFetchException -> messageHandler.showMessage(
-//                getString(
-//                    R.string.email_fetch_failure,
-//                    error.message
-//                )
-//            )
-//
-//            else -> messageHandler.showMessage(getString(R.string.common_failure))
-//        }
+//        return navController.navigateUp() || super.onSupportNavigateUp()
 //    }
+}
 
-    override fun onSupportNavigateUp(): Boolean {
-        Timber.d("onSupportNavigateUp")
-        val navController = findNavController(R.id.my_nav_host_fragment)
-
-        return navController.navigateUp() || super.onSupportNavigateUp()
+private fun handleSideEffect(context: Context, sideEffect: SideEffect) {
+    when (sideEffect) {
+        is SideEffect.ShowToast -> {
+            context.showToast(context.getString(sideEffect.stringId, sideEffect.stringFormatArg))
+        }
     }
 }
 
