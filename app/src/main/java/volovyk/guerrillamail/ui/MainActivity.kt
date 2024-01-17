@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -41,7 +43,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GuerrillaMailTheme {
                 val uiState by viewModel.uiState.collectAsState()
-
                 val snackbarHostState = remember { SnackbarHostState() }
 
                 LaunchedEffect(uiState.isMainRemoteEmailDatabaseAvailable) {
@@ -66,47 +67,16 @@ class MainActivity : AppCompatActivity() {
                     handleSideEffect(this, it)
                 }
 
-                // TODO: Show loading indicator
-
                 Scaffold(
                     snackbarHost = {
                         SnackbarHost(hostState = snackbarHostState)
                     }
                 ) { contentPadding ->
-                    MainActivityContent(Modifier.padding(contentPadding))
+                    MainActivityContent(uiState, Modifier.padding(contentPadding))
                 }
             }
         }
-
-//        val binding = ActivityMainBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        val navHostFragment =
-//            supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment) as NavHostFragment
-//        val navController = navHostFragment.navController
-//
-//        setupActionBarWithNavController(navController)
-
-//        lifecycleScope.launch {
-//            mainViewModel.uiState
-//                .map { it.state }
-//                .distinctUntilChanged()
-//                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-//                .collect { state ->
-//                    binding.refreshingSpinner.isVisible = state is State.Loading
-//                    if (state is State.Failure) {
-//                        showFailureMessage(state.error)
-//                    }
-//                }
-//        }
     }
-
-//    override fun onSupportNavigateUp(): Boolean {
-//        Timber.d("onSupportNavigateUp")
-//        val navController = findNavController(R.id.my_nav_host_fragment)
-//
-//        return navController.navigateUp() || super.onSupportNavigateUp()
-//    }
 }
 
 private fun handleSideEffect(context: Context, sideEffect: SideEffect) {
@@ -118,11 +88,18 @@ private fun handleSideEffect(context: Context, sideEffect: SideEffect) {
 }
 
 @Composable
-fun MainActivityContent(modifier: Modifier = Modifier) {
+fun MainActivityContent(uiState: UiState, modifier: Modifier = Modifier) {
     val navController = rememberNavController()
 
     Column(modifier = modifier) {
+        if (uiState.isLoading) {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         AssignedEmail()
+
         NavHost(navController = navController, startDestination = "emails") {
             composable("emails") {
                 EmailList(
