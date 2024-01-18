@@ -61,7 +61,7 @@ class MainViewModelTest {
 
         advanceUntilIdle()
 
-        val expectedUiState = UiState(state = State.Success, mainRemoteEmailDatabaseIsAvailable = false)
+        val expectedUiState = UiState(isLoading = false, isMainRemoteEmailDatabaseAvailable = false)
 
         // Assert new UiState is emitted
         assertEquals(expectedUiState, viewModel.uiState.value)

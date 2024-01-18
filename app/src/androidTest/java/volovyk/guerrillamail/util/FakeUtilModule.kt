@@ -17,10 +17,4 @@ object FakeUtilModule {
     fun provideEmailValidator(): EmailValidator {
         return EmailValidatorImpl()
     }
-
-    @Provides
-    @Singleton
-    fun provideMessageHandler(): MessageHandler {
-        return FakeMessageHandler()
-    }
 }
