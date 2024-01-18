@@ -20,6 +20,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -43,37 +46,15 @@ class MainActivity : AppCompatActivity() {
         setContent {
             GuerrillaMailTheme {
                 val uiState by viewModel.uiState.collectAsState()
-                val snackbarHostState = remember { SnackbarHostState() }
-
-                LaunchedEffect(uiState.isMainRemoteEmailDatabaseAvailable) {
-                    if (uiState.isMainRemoteEmailDatabaseAvailable) {
-                        snackbarHostState.currentSnackbarData?.dismiss()
-                    } else {
-                        val result = snackbarHostState.showSnackbar(
-                            message = getString(R.string.guerrilla_mail_offline),
-                            actionLabel = getString(R.string.retry),
-                            duration = SnackbarDuration.Indefinite
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                viewModel.retryConnectingToMainDatabase()
-                            }
-                            SnackbarResult.Dismissed -> Unit
-                        }
-                    }
-                }
 
                 SingleEventEffect(sideEffectFlow = viewModel.sideEffectFlow) {
                     handleSideEffect(this, it)
                 }
 
-                Scaffold(
-                    snackbarHost = {
-                        SnackbarHost(hostState = snackbarHostState)
-                    }
-                ) { contentPadding ->
-                    MainActivityContent(uiState, Modifier.padding(contentPadding))
-                }
+                MainActivityContent(
+                    uiState = uiState,
+                    onRetryConnectingToMainDatabase = { viewModel.retryConnectingToMainDatabase() }
+                )
             }
         }
     }
@@ -88,29 +69,53 @@ private fun handleSideEffect(context: Context, sideEffect: SideEffect) {
 }
 
 @Composable
-fun MainActivityContent(uiState: UiState, modifier: Modifier = Modifier) {
+fun MainActivityContent(uiState: UiState, onRetryConnectingToMainDatabase: () -> Unit = {}) {
+    val context = LocalContext.current
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Column(modifier = modifier) {
-        if (uiState.isLoading) {
-            LinearProgressIndicator(
-                modifier = Modifier.fillMaxWidth()
+    LaunchedEffect(uiState.isMainRemoteEmailDatabaseAvailable) {
+        if (uiState.isMainRemoteEmailDatabaseAvailable) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+        } else {
+            val result = snackbarHostState.showSnackbar(
+                message = context.getString(R.string.guerrilla_mail_offline),
+                actionLabel = context.getString(R.string.retry),
+                duration = SnackbarDuration.Indefinite
             )
+            when (result) {
+                SnackbarResult.ActionPerformed -> onRetryConnectingToMainDatabase()
+                SnackbarResult.Dismissed -> Unit
+            }
         }
+    }
 
-        AssignedEmail()
-
-        NavHost(navController = navController, startDestination = "emails") {
-            composable("emails") {
-                EmailList(
-                    onNavigateToEmail = { emailId ->
-                        navController.navigate("emails/${emailId}")
-                    }
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { contentPadding ->
+        Column(modifier = Modifier.padding(contentPadding)) {
+            if (uiState.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(stringResource(R.string.test_tag_loading_indicator))
                 )
             }
-            composable("emails/{emailId}") { navBackStackEntry ->
-                navBackStackEntry.arguments?.getString("emailId")
-                    ?.let { EmailDetails(emailId = it) }
+
+            AssignedEmail()
+
+            NavHost(navController = navController, startDestination = "emails") {
+                composable("emails") {
+                    EmailList(
+                        onNavigateToEmail = { emailId ->
+                            navController.navigate("emails/${emailId}")
+                        }
+                    )
+                }
+                composable("emails/{emailId}") { navBackStackEntry ->
+                    navBackStackEntry.arguments?.getString("emailId")
+                        ?.let { EmailDetails(emailId = it) }
+                }
             }
         }
     }
