@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -112,7 +114,21 @@ fun MainActivityContent(uiState: UiState, onRetryConnectingToMainDatabase: () ->
                         }
                     )
                 }
-                composable("emails/{emailId}") { navBackStackEntry ->
+                composable(
+                    route = "emails/{emailId}",
+                    enterTransition = {
+                        slideIntoContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Left,
+                            animationSpec = tween(300)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            AnimatedContentTransitionScope.SlideDirection.Right,
+                            animationSpec = tween(300)
+                        )
+                    }
+                ) { navBackStackEntry ->
                     navBackStackEntry.arguments?.getString("emailId")
                         ?.let { EmailDetails(emailId = it) }
                 }
