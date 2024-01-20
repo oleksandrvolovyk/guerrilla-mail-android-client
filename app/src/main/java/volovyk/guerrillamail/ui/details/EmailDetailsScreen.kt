@@ -1,6 +1,7 @@
 package volovyk.guerrillamail.ui.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,7 +30,8 @@ import volovyk.guerrillamail.ui.widgets.WebViewWrapper
 @Composable
 fun EmailDetailsScreen(
     uiState: EmailDetailsUiState,
-    onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {}
+    onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {},
+    onFromFieldClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     Column(
@@ -49,6 +51,7 @@ fun EmailDetailsScreen(
                     .padding(16.dp)
             ) {
                 Text(
+                    modifier = Modifier.clickable(onClick = onFromFieldClick),
                     text = context.getString(R.string.from, uiState.email?.from),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface

@@ -3,14 +3,19 @@ package volovyk.guerrillamail.ui.details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
+import volovyk.guerrillamail.ui.SideEffect
 import javax.inject.Inject
 
 data class EmailDetailsUiState(
@@ -27,6 +32,10 @@ class EmailDetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(EmailDetailsUiState())
     val uiState: StateFlow<EmailDetailsUiState> = _uiState.asStateFlow()
 
+    private val _sideEffectChannel = Channel<SideEffect>(capacity = Channel.BUFFERED)
+    val sideEffectFlow: Flow<SideEffect>
+        get() = _sideEffectChannel.receiveAsFlow()
+
     fun loadEmail(emailId: String) = viewModelScope.launch {
         _uiState.update {
             it.copy(
@@ -40,6 +49,13 @@ class EmailDetailsViewModel @Inject constructor(
         preferencesRepository.setValue(HTML_RENDER_KEY, render.toString())
         _uiState.update {
             it.copy(renderHtml = render)
+        }
+    }
+
+    fun copySenderAddressToClipboard() {
+        uiState.value.email?.let { email ->
+            _sideEffectChannel.trySend(SideEffect.CopyTextToClipboard(text = email.from))
+            _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.senders_email_in_clipboard))
         }
     }
 

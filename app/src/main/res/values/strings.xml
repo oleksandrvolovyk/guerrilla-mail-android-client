@@ -7,6 +7,7 @@
     <string name="getting_temporary_email">Your temporary email will appear here:</string>
     <string name="your_temporary_email">Your temporary email:</string>
     <string name="email_in_clipboard">Email copied to clipboard!</string>
+    <string name="senders_email_in_clipboard">The sender\'s address has been copied to the clipboard!</string>
     <string name="delete">Delete</string>
     <string name="delete_button">Delete Button</string>
     <string name="get_new_address">Get new address</string>
