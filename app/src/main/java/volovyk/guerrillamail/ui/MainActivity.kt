@@ -1,6 +1,5 @@
 package volovyk.guerrillamail.ui
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -32,7 +31,6 @@ import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.ui.UiHelper.showToast
 import volovyk.guerrillamail.ui.assigned.AssignedEmail
 import volovyk.guerrillamail.ui.details.EmailDetails
 import volovyk.guerrillamail.ui.list.EmailList
@@ -58,14 +56,6 @@ class MainActivity : AppCompatActivity() {
                     onRetryConnectingToMainDatabase = { viewModel.retryConnectingToMainDatabase() }
                 )
             }
-        }
-    }
-}
-
-private fun handleSideEffect(context: Context, sideEffect: SideEffect) {
-    when (sideEffect) {
-        is SideEffect.ShowToast -> {
-            context.showToast(context.getString(sideEffect.stringId, sideEffect.stringFormatArg))
         }
     }
 }
