@@ -89,7 +89,6 @@ dependencies {
     testImplementation("com.squareup.retrofit2:retrofit-mock:$retrofitVersion")
     implementation("com.squareup.retrofit2:converter-jackson:$retrofitVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.5")
-    implementation("com.squareup.okhttp3:logging-interceptor:3.12.6")
 
     // Hilt dependencies
     val hiltVersion = "2.47"
