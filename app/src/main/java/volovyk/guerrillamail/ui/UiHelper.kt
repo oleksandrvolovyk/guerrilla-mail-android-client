@@ -1,9 +1,9 @@
 package volovyk.guerrillamail.ui
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import volovyk.guerrillamail.R
 
 object UiHelper {

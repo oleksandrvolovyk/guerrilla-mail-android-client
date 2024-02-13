@@ -3,7 +3,7 @@ package volovyk.guerrillamail.ui
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.ui.UiHelper.createConfirmationDialog
 import volovyk.guerrillamail.ui.UiHelper.showToast
@@ -21,7 +21,7 @@ sealed interface SideEffect {
 fun handleSideEffect(context: Context, sideEffect: SideEffect) = when (sideEffect) {
     is SideEffect.CopyTextToClipboard -> {
         val clipboard =
-            context.getSystemService(AppCompatActivity.CLIPBOARD_SERVICE) as ClipboardManager
+            context.getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
         val clip =
             ClipData.newPlainText(context.getString(R.string.app_name), sideEffect.text)
         clipboard.setPrimaryClip(clip)

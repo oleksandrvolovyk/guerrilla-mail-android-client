@@ -1,9 +1,9 @@
 package volovyk.guerrillamail.ui
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
@@ -27,16 +27,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.compose.GuerrillaMailTheme
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.ui.assigned.AssignedEmail
 import volovyk.guerrillamail.ui.details.EmailDetails
 import volovyk.guerrillamail.ui.list.EmailList
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 

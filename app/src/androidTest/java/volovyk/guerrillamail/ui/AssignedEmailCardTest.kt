@@ -6,7 +6,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.compose.GuerrillaMailTheme
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
