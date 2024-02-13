@@ -1,5 +1,8 @@
 package volovyk.guerrillamail.ui.assigned
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -46,18 +49,26 @@ fun AssignedEmailCard(
             color = MaterialTheme.colorScheme.onPrimary
         )
 
-        if (emailUsername != null && emailDomain != null) {
+        AnimatedVisibility(
+            visible = (emailUsername != null && emailDomain != null),
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
             EditableEmailRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp),
-                emailUsername = emailUsername,
+                emailUsername = emailUsername ?: "",
                 onEmailUsernameValueChange = onEmailUsernameValueChange,
-                emailDomain = emailDomain
+                emailDomain = emailDomain ?: ""
             )
         }
 
-        if (isGetNewAddressButtonVisible) {
+        AnimatedVisibility(
+            visible = isGetNewAddressButtonVisible,
+            enter = expandVertically(),
+            exit = shrinkVertically()
+        ) {
             Button(
                 onClick = onGetNewAddressButtonClick,
                 modifier = Modifier
