@@ -1,5 +1,6 @@
 package volovyk.guerrillamail.ui.assigned
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
@@ -15,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.guerrillamail.R
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import volovyk.guerrillamail.ui.widgets.EditableEmailRow
 
 @Composable
@@ -24,15 +27,14 @@ fun AssignedEmailCard(
     emailUsername: String?,
     emailDomain: String?,
     isGetNewAddressButtonVisible: Boolean,
+    modifier: Modifier = Modifier,
     onEmailAddressClick: () -> Unit = {},
     onGetNewAddressButtonClick: () -> Unit = {},
     onEmailUsernameValueChange: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
+        modifier = modifier
     ) {
         Text(
             text = if (emailUsername == null) {
@@ -78,4 +80,40 @@ fun AssignedEmailCard(
             }
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true)
+fun NoEmailAssigned_AssignedEmailCardPreview() {
+    GuerrillaMailTheme {
+        AssignedEmailCard(
+            emailUsername = null,
+            emailDomain = null,
+            isGetNewAddressButtonVisible = false
+        )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun NoEmailAssigned_AssignedEmailCardPreview_DarkTheme() {
+    NoEmailAssigned_AssignedEmailCardPreview()
+}
+
+@Composable
+@Preview(showBackground = true)
+fun EmailAssigned_AssignedEmailCardPreview() {
+    GuerrillaMailTheme {
+        AssignedEmailCard(
+            emailUsername = "test",
+            emailDomain = "guerrillamail.com",
+            isGetNewAddressButtonVisible = false
+        )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun EmailAssigned_AssignedEmailCardPreview_DarkTheme() {
+    EmailAssigned_AssignedEmailCardPreview()
 }

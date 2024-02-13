@@ -3,6 +3,7 @@ package volovyk.guerrillamail.ui.assigned
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import volovyk.guerrillamail.ui.SingleEventEffect
@@ -10,6 +11,7 @@ import volovyk.guerrillamail.ui.handleSideEffect
 
 @Composable
 fun AssignedEmail(
+    modifier: Modifier = Modifier,
     viewModel: AssignedEmailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -20,6 +22,7 @@ fun AssignedEmail(
     }
 
     AssignedEmailCard(
+        modifier = modifier,
         emailUsername = uiState.emailUsername,
         emailDomain = uiState.emailDomain,
         isGetNewAddressButtonVisible = uiState.isGetNewAddressButtonVisible,

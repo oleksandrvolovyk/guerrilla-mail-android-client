@@ -1,5 +1,6 @@
 package volovyk.guerrillamail.ui.list
 
+import android.content.res.Configuration
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -7,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,21 +29,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import volovyk.guerrillamail.ui.widgets.IconButton
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EmailListScreen(
     emails: List<Email>,
+    modifier: Modifier = Modifier,
     onItemClick: (Email) -> Unit = {},
     onItemDeleteButtonClick: (Email) -> Unit = {},
     onItemDeleteButtonLongClick: (Email) -> Unit = {}
 ) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 8.dp, end = 8.dp)
+        modifier = modifier,
+        contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(emails, key = {  it.id }) { email ->
+        items(emails, key = { it.id }) { email ->
             EmailListItem(
                 modifier = Modifier.animateItemPlacement(),
                 email,
@@ -74,7 +77,6 @@ fun EmailListItem(
         modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(bottom = 8.dp)
             .clickable { onItemClick(email) },
         colors = CardDefaults.cardColors(
             containerColor = cardContainerColor,
@@ -124,35 +126,43 @@ fun EmailListItem(
 @Preview(showBackground = true)
 @Composable
 fun EmailListPreview() {
-    EmailListScreen(
-        emails = List(2) {
-            Email(
-                id = "it",
-                from = "test$it@example.com",
-                subject = "Subject $it",
-                "Body $it",
-                "Html body $it",
-                "0$it.0$it.2$it",
+    GuerrillaMailTheme {
+        EmailListScreen(
+            emails = List(2) {
+                Email(
+                    id = it.toString(),
+                    from = "test$it@example.com",
+                    subject = "Subject $it",
+                    "Body $it",
+                    "Html body $it",
+                    "0$it.0$it.2$it",
+                    false
+                )
+            } + List(2) {
+                Email(
+                    id = (it + 2).toString(),
+                    from = "test$it@example.com",
+                    subject = "Subject $it",
+                    "Body $it",
+                    "Html body $it",
+                    "0$it.0$it.2$it",
+                    true
+                )
+            } + Email(
+                id = "id",
+                from = "test@example.com",
+                subject = "Fusce at dolor nec magna maximus porttitor. Donec accumsan convallis nisl non vulputate.",
+                "",
+                "",
+                "",
                 false
             )
-        } + List(2) {
-            Email(
-                id = "it",
-                from = "test$it@example.com",
-                subject = "Subject $it",
-                "Body $it",
-                "Html body $it",
-                "0$it.0$it.2$it",
-                true
-            )
-        } + Email(
-            id = "id",
-            from = "test@example.com",
-            subject = "Fusce at dolor nec magna maximus porttitor. Donec accumsan convallis nisl non vulputate.",
-            "",
-            "",
-            "",
-            false
         )
-    )
+    }
+}
+
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun EmailListPreviewDarkTheme() {
+    EmailListPreview()
 }

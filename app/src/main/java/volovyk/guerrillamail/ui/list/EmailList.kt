@@ -3,6 +3,7 @@ package volovyk.guerrillamail.ui.list
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import volovyk.guerrillamail.ui.SingleEventEffect
@@ -10,6 +11,7 @@ import volovyk.guerrillamail.ui.handleSideEffect
 
 @Composable
 fun EmailList(
+    modifier: Modifier = Modifier,
     onNavigateToEmail: (emailId: String) -> Unit,
     viewModel: EmailListViewModel = hiltViewModel()
 ) {
@@ -21,6 +23,7 @@ fun EmailList(
     }
 
     EmailListScreen(
+        modifier = modifier,
         emails = uiState.emails,
         onItemClick = { email -> onNavigateToEmail(email.id) },
         onItemDeleteButtonClick = { viewModel.deleteEmail(it) },

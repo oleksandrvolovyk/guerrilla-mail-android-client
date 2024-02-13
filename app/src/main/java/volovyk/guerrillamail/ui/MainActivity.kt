@@ -7,6 +7,7 @@ import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.LinearProgressIndicator
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -94,11 +96,16 @@ fun MainActivityContent(uiState: UiState, onRetryConnectingToMainDatabase: () ->
                 )
             }
 
-            AssignedEmail()
+            AssignedEmail(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+            )
 
             NavHost(navController = navController, startDestination = "emails") {
                 composable("emails") {
                     EmailList(
+                        modifier = Modifier.fillMaxSize(),
                         onNavigateToEmail = { emailId ->
                             navController.navigate("emails/${emailId}")
                         }
@@ -119,8 +126,14 @@ fun MainActivityContent(uiState: UiState, onRetryConnectingToMainDatabase: () ->
                         )
                     }
                 ) { navBackStackEntry ->
-                    navBackStackEntry.arguments?.getString("emailId")
-                        ?.let { EmailDetails(emailId = it) }
+                    navBackStackEntry.arguments?.getString("emailId")?.let {
+                        EmailDetails(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(start = 8.dp, end = 8.dp),
+                            emailId = it
+                        )
+                    }
                 }
             }
         }

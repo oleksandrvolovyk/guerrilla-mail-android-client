@@ -1,10 +1,10 @@
 package volovyk.guerrillamail.ui.details
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -26,20 +26,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import volovyk.guerrillamail.ui.widgets.WebViewWrapper
 
 @Composable
 fun EmailDetailsScreen(
     uiState: EmailDetailsUiState,
+    modifier: Modifier = Modifier,
     onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {},
     onFromFieldClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 8.dp, end = 8.dp)
-            .background(color = MaterialTheme.colorScheme.background)
+        modifier = modifier
             .verticalScroll(rememberScrollState())
     ) {
         Card(
@@ -85,7 +84,8 @@ fun EmailDetailsScreen(
             Text(
                 modifier = Modifier.padding(start = 8.dp),
                 text = context.getString(R.string.toggle_html_rendering),
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
 
@@ -123,18 +123,26 @@ fun EmailDetailsScreen(
 @Composable
 @Preview(showBackground = true)
 fun EmailDetailsScreenPreview() {
-    EmailDetailsScreen(
-        uiState = EmailDetailsUiState(
-            email = Email(
-                id = "1",
-                from = "from@example.com",
-                subject = "Test subject",
-                body = "Test body",
-                htmlBody = "Test html body",
-                date = "Today",
-                viewed = false
-            ),
-            renderHtml = false
+    GuerrillaMailTheme {
+        EmailDetailsScreen(
+            uiState = EmailDetailsUiState(
+                email = Email(
+                    id = "1",
+                    from = "from@example.com",
+                    subject = "Test subject",
+                    body = "Test body",
+                    htmlBody = "Test html body",
+                    date = "Today",
+                    viewed = false
+                ),
+                renderHtml = false
+            )
         )
-    )
+    }
+}
+
+@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+fun EmailDetailsScreenPreviewDarkTheme() {
+    EmailDetailsScreenPreview()
 }
