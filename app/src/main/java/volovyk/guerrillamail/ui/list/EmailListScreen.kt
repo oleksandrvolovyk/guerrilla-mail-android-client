@@ -31,6 +31,7 @@ import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.widgets.IconButton
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EmailListScreen(
     emails: List<Email>,
@@ -42,8 +43,9 @@ fun EmailListScreen(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 8.dp, end = 8.dp)
     ) {
-        items(emails) { email ->
+        items(emails, key = {  it.id }) { email ->
             EmailListItem(
+                modifier = Modifier.animateItemPlacement(),
                 email,
                 onItemClick,
                 onItemDeleteButtonClick,
@@ -56,6 +58,7 @@ fun EmailListScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EmailListItem(
+    modifier: Modifier = Modifier,
     email: Email,
     onItemClick: (Email) -> Unit,
     onItemDeleteButtonClick: (Email) -> Unit,
@@ -68,7 +71,7 @@ fun EmailListItem(
         MaterialTheme.colorScheme.surfaceVariant
     }
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(bottom = 8.dp)
