@@ -8,7 +8,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -18,6 +17,7 @@ import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.details.EmailDetailsScreen
 import volovyk.guerrillamail.ui.details.EmailDetailsUiState
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -39,7 +39,10 @@ class EmailDetailsScreenTest {
     ) {
         composeTestRule.setContent {
             GuerrillaMailTheme {
-                EmailDetailsScreen(state, onHtmlRenderSwitchCheckedChange)
+                EmailDetailsScreen(
+                    uiState = state,
+                    onHtmlRenderSwitchCheckedChange = onHtmlRenderSwitchCheckedChange
+                )
             }
         }
     }

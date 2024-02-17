@@ -10,7 +10,6 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -19,6 +18,7 @@ import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.list.EmailListScreen
+import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -42,7 +42,12 @@ class EmailListTest {
     ) {
         composeTestRule.setContent {
             GuerrillaMailTheme {
-                EmailListScreen(emails, onItemClick, onItemDeleteButtonClick, onItemDeleteButtonLongClick)
+                EmailListScreen(
+                    emails = emails,
+                    onItemClick = onItemClick,
+                    onItemDeleteButtonClick = onItemDeleteButtonClick,
+                    onItemDeleteButtonLongClick = onItemDeleteButtonLongClick
+                )
             }
         }
     }
