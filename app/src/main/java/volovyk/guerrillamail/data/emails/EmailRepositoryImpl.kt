@@ -86,12 +86,8 @@ class EmailRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun deleteEmail(email: Email) = withContext(ioDispatcher) {
-        localEmailDatabase.getEmailDao().delete(email)
-    }
-
-    override suspend fun deleteAllEmails() = withContext(ioDispatcher) {
-        localEmailDatabase.getEmailDao().deleteAll()
+    override suspend fun deleteEmails(emailIds: List<String>) = withContext(ioDispatcher) {
+        localEmailDatabase.getEmailDao().delete(emailIds)
     }
 
     override suspend fun retryConnectingToMainDatabase() = withContext(ioDispatcher) {

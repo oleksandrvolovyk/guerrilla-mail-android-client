@@ -8,8 +8,7 @@ interface EmailRepository {
 
     suspend fun getEmailById(emailId: String): Email?
     suspend fun setEmailAddress(newAddress: String): Boolean
-    suspend fun deleteEmail(email: Email)
-    suspend fun deleteAllEmails()
+    suspend fun deleteEmails(emailIds: List<String>)
     suspend fun retryConnectingToMainDatabase()
 
     fun observeAssignedEmail(): Flow<String?>

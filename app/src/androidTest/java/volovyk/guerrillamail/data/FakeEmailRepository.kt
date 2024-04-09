@@ -36,14 +36,8 @@ class FakeEmailRepository(
         }
     }
 
-    override suspend fun deleteEmail(email: Email) {
-        emails.update { emails ->
-            emails.minus(email)
-        }
-    }
-
-    override suspend fun deleteAllEmails() {
-        emails.update { emptyList() }
+    override suspend fun deleteEmails(emailIds: List<String>) {
+        emails.update { emails -> emails.filter { it.id !in emailIds } }
     }
 
     override suspend fun retryConnectingToMainDatabase() {

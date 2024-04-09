@@ -16,7 +16,6 @@ import org.junit.Test
 import volovyk.guerrillamail.data.emails.EmailRepositoryImpl
 import volovyk.guerrillamail.data.emails.local.EmailDao
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
-import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
 
@@ -92,7 +91,7 @@ class EmailRepositoryImplTest {
     }
 
     @Test
-    fun `deleteEmail should call LocalEmailDatabase`() = testScope.runTest {
+    fun `deleteEmails should call LocalEmailDatabase`() = testScope.runTest {
         emailRepository = EmailRepositoryImpl(
             testScope,
             testDispatcher,
@@ -102,11 +101,11 @@ class EmailRepositoryImplTest {
             preferencesRepository
         )
 
-        val email = Email("1", "test", "test", "", "", "", false)
+        val emailIds = listOf("1", "2", "3")
 
-        emailRepository.deleteEmail(email)
+        emailRepository.deleteEmails(emailIds)
 
-        verify { emailDao.delete(email) }
+        verify { emailDao.delete(emailIds) }
 
         testScope.coroutineContext.cancelChildren()
     }

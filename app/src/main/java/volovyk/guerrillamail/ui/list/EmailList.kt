@@ -24,9 +24,11 @@ fun EmailList(
 
     EmailListScreen(
         modifier = modifier,
-        emails = uiState.emails,
+        uiState = uiState,
         onItemClick = { email -> onNavigateToEmail(email.id) },
-        onItemDeleteButtonClick = { viewModel.deleteEmail(it) },
-        onItemDeleteButtonLongClick = { viewModel.deleteAllEmails() }
+        onItemLongClick = { viewModel.toggleEmailSelection(it) },
+        onClearSelectionButtonClick = { viewModel.clearSelectedEmails() },
+        onSelectAllButtonClick = { viewModel.toggleSelectAllEmails() },
+        onDeleteButtonClick = { viewModel.deleteSelectedEmails() }
     )
 }

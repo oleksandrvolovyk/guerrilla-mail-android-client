@@ -1,7 +1,6 @@
 package volovyk.guerrillamail.data.emails.local
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -22,9 +21,6 @@ interface EmailDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(emails: Collection<Email>)
 
-    @Delete
-    fun delete(email: Email)
-
-    @Query("DELETE FROM email")
-    fun deleteAll()
+    @Query("DELETE FROM email WHERE id in (:emailIds)")
+    fun delete(emailIds: List<String>)
 }

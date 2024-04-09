@@ -3,7 +3,6 @@ package volovyk.guerrillamail.ui
 import android.content.Context
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
@@ -15,9 +14,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.list.EmailListScreen
+import volovyk.guerrillamail.ui.list.EmailListUiState
+import volovyk.guerrillamail.ui.list.SelectableItem
 import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 
 @RunWith(AndroidJUnit4::class)
@@ -35,18 +35,22 @@ class EmailListTest {
     }
 
     private fun setEmailListState(
-        emails: List<Email>,
+        uiState: EmailListUiState,
         onItemClick: (Email) -> Unit = {},
-        onItemDeleteButtonClick: (Email) -> Unit = {},
-        onItemDeleteButtonLongClick: (Email) -> Unit = {}
+        onItemLongClick: (Email) -> Unit = {},
+        onClearSelectionButtonClick: () -> Unit = {},
+        onSelectAllButtonClick: () -> Unit = {},
+        onDeleteButtonClick: () -> Unit = {}
     ) {
         composeTestRule.setContent {
             GuerrillaMailTheme {
                 EmailListScreen(
-                    emails = emails,
+                    uiState = uiState,
                     onItemClick = onItemClick,
-                    onItemDeleteButtonClick = onItemDeleteButtonClick,
-                    onItemDeleteButtonLongClick = onItemDeleteButtonLongClick
+                    onItemLongClick = onItemLongClick,
+                    onClearSelectionButtonClick = onClearSelectionButtonClick,
+                    onSelectAllButtonClick = onSelectAllButtonClick,
+                    onDeleteButtonClick = onDeleteButtonClick
                 )
             }
         }
@@ -55,53 +59,61 @@ class EmailListTest {
     @Test
     fun emailList_ShowsEmails() {
         // Generate a list of 3 sample Email objects
-        val emails = List(3) { index ->
-            Email(
-                id = "$index",
-                from = "from$index@example.com",
-                subject = "Subject $index",
-                body = "Body $index",
-                htmlBody = "HtmlBody $index",
-                date = "Date $index",
-                viewed = false
-            )
-        }
+        val uiState = EmailListUiState(
+            List(3) { index ->
+                SelectableItem(
+                    item = Email(
+                        id = "$index",
+                        from = "from$index@example.com",
+                        subject = "Subject $index",
+                        body = "Body $index",
+                        htmlBody = "HtmlBody $index",
+                        date = "Date $index",
+                        viewed = false
+                    )
+                )
+            }
+        )
 
-        setEmailListState(emails = emails)
+        setEmailListState(uiState = uiState)
 
-        emails.forEach { email ->
+        uiState.emails.forEach { email ->
             composeTestRule
-                .onNodeWithText(email.from)
+                .onNodeWithText(email.item.from)
                 .assertExists()
 
             composeTestRule
-                .onNodeWithText(email.subject)
+                .onNodeWithText(email.item.subject)
                 .assertExists()
         }
     }
 
     @Test
     fun clickingEmailListItem_InvokesLambda() {
-        val emails = listOf(
-            Email(
-                id = "0",
-                from = "from@example.com",
-                subject = "Subject",
-                body = "Body",
-                htmlBody = "HtmlBody",
-                date = "Date",
-                viewed = false
+        val uiState = EmailListUiState(
+            listOf(
+                SelectableItem(
+                    item = Email(
+                        id = "0",
+                        from = "from@example.com",
+                        subject = "Subject",
+                        body = "Body",
+                        htmlBody = "HtmlBody",
+                        date = "Date",
+                        viewed = false
+                    )
+                )
             )
         )
 
         var lambdaWasInvoked = false
-        setEmailListState(emails = emails, onItemClick = { email ->
-            if (email == emails[0]) {
+        setEmailListState(uiState = uiState, onItemClick = { email ->
+            if (email == uiState.emails[0].item) {
                 lambdaWasInvoked = true
             } else {
                 throw IllegalStateException(
                     "Wrong Email object passed to lambda!\n" +
-                            "Expected: ${emails[0]}\n" +
+                            "Expected: ${uiState.emails[0].item}\n" +
                             "Received: $email"
                 )
             }
@@ -109,7 +121,7 @@ class EmailListTest {
 
         // Perform click on the EmailListItem
         composeTestRule
-            .onNodeWithText(emails[0].subject)
+            .onNodeWithText(uiState.emails[0].item.subject)
             .performClick()
 
         // Assert lambda was invoked
@@ -117,63 +129,31 @@ class EmailListTest {
     }
 
     @Test
-    fun clickingEmailListItemDeleteButton_InvokesLambda() {
-        val emails = listOf(
-            Email(
-                id = "0",
-                from = "from@example.com",
-                subject = "Subject",
-                body = "Body",
-                htmlBody = "HtmlBody",
-                date = "Date",
-                viewed = false
-            )
-        )
-
-        var lambdaWasInvoked = false
-        setEmailListState(emails = emails, onItemDeleteButtonClick = { email ->
-            if (email == emails[0]) {
-                lambdaWasInvoked = true
-            } else {
-                throw IllegalStateException(
-                    "Wrong Email object passed to lambda!\n" +
-                            "Expected: ${emails[0]}\n" +
-                            "Received: $email"
+    fun longClickingEmailListItem_InvokesLambda() {
+        val uiState = EmailListUiState(
+            listOf(
+                SelectableItem(
+                    item = Email(
+                        id = "0",
+                        from = "from@example.com",
+                        subject = "Subject",
+                        body = "Body",
+                        htmlBody = "HtmlBody",
+                        date = "Date",
+                        viewed = false
+                    )
                 )
-            }
-        })
-
-        // Perform click on the EmailListItem "Delete" button
-        composeTestRule
-            .onNodeWithContentDescription(context.getString(R.string.delete))
-            .performClick()
-
-        // Assert lambda was invoked
-        assertTrue(lambdaWasInvoked)
-    }
-
-    @Test
-    fun longClickingEmailListItemDeleteButton_InvokesLambda() {
-        val emails = listOf(
-            Email(
-                id = "0",
-                from = "from@example.com",
-                subject = "Subject",
-                body = "Body",
-                htmlBody = "HtmlBody",
-                date = "Date",
-                viewed = false
             )
         )
 
         var lambdaWasInvoked = false
-        setEmailListState(emails = emails, onItemDeleteButtonLongClick = { email ->
-            if (email == emails[0]) {
+        setEmailListState(uiState = uiState, onItemLongClick = { email ->
+            if (email == uiState.emails[0].item) {
                 lambdaWasInvoked = true
             } else {
                 throw IllegalStateException(
                     "Wrong Email object passed to lambda!\n" +
-                            "Expected: ${emails[0]}\n" +
+                            "Expected: ${uiState.emails[0].item}\n" +
                             "Received: $email"
                 )
             }
@@ -181,7 +161,7 @@ class EmailListTest {
 
         // Perform long click on the EmailListItem "Delete" button
         composeTestRule
-            .onNodeWithContentDescription(context.getString(R.string.delete))
+            .onNodeWithText(uiState.emails[0].item.subject)
             .performTouchInput { longClick() }
 
         // Assert lambda was invoked

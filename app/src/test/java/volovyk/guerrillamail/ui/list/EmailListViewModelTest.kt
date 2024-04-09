@@ -56,7 +56,9 @@ class EmailListViewModelTest {
         assertEquals(defaultUiState, viewModel.uiState.value)
 
         val email = Email("0", "", "", "", "", "", false)
-        val expectedUiState = EmailListUiState(listOf(email))
+        val selectablItemEmail = SelectableItem(item = email)
+
+        val expectedUiState = EmailListUiState(listOf(selectablItemEmail))
 
         emailFlow.emit(listOf(email))
 
@@ -69,31 +71,19 @@ class EmailListViewModelTest {
     }
 
     @Test
-    fun `deleteEmail calls emailRepository`() = runTest {
+    fun `deleteSelectedEmails calls emailRepository`() = runTest {
         // Given
         val emailToDelete = Email("0", "", "", "", "", "", false)
 
         // When
-        viewModel.deleteEmail(emailToDelete)
+        viewModel.toggleEmailSelection(emailToDelete)
+        viewModel.deleteSelectedEmails()
 
         // Simulate action confirmation
         val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
         confirmActionSideEffect.action()
 
         // Then
-        coVerify { emailRepository.deleteEmail(emailToDelete) }
-    }
-
-    @Test
-    fun `deleteAllEmails calls emailRepository`() = runTest {
-        // When
-        viewModel.deleteAllEmails()
-
-        // Simulate action confirmation
-        val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
-        confirmActionSideEffect.action()
-
-        // Then
-        coVerify { emailRepository.deleteAllEmails() }
+        coVerify { emailRepository.deleteEmails(listOf(emailToDelete.id)) }
     }
 }
