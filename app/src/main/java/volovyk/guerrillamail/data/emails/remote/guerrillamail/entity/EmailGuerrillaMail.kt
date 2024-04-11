@@ -2,8 +2,8 @@ package volovyk.guerrillamail.data.emails.remote.guerrillamail.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.util.Base64
-import volovyk.guerrillamail.util.Html
+import volovyk.guerrillamail.util.Base64Encoder
+import volovyk.guerrillamail.util.HtmlTextExtractor
 
 class EmailGuerrillaMail(
     @JsonProperty("mail_id") val mailId: String,
@@ -13,12 +13,13 @@ class EmailGuerrillaMail(
     @JsonProperty("mail_date") val date: String
 )
 
-fun EmailGuerrillaMail.toEmail() = Email(
-    id = mailId,
-    from = from,
-    subject = subject,
-    body = Html.extractTextFromHtml(body),
-    htmlBody = Base64.encodeToBase64String(body),
-    date = date,
-    viewed = false
-)
+fun EmailGuerrillaMail.toEmail(htmlTextExtractor: HtmlTextExtractor, base64Encoder: Base64Encoder) =
+    Email(
+        id = mailId,
+        from = from,
+        subject = subject,
+        body = htmlTextExtractor.extractText(body),
+        htmlBody = base64Encoder.encodeToBase64String(body),
+        date = date,
+        viewed = false
+    )

@@ -14,14 +14,17 @@ import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.toEmail
+import volovyk.guerrillamail.util.Base64Encoder
 import volovyk.guerrillamail.util.State
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
 import java.net.URL
 
-class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
-    RemoteEmailDatabase {
+class MailTmEmailDatabase(
+    private val mailTmApiInterface: MailTmApiInterface,
+    private val base64Encoder: Base64Encoder
+) : RemoteEmailDatabase {
 
     companion object {
         private const val USERNAME_LENGTH = 8
@@ -76,7 +79,7 @@ class MailTmEmailDatabase(private val mailTmApiInterface: MailTmApiInterface) :
             deleteMessageCall.executeAndCatchErrors(checkForNullResponse = false)
         }
 
-        val fullEmails = fullMessages.map { it.toEmail() }
+        val fullEmails = fullMessages.map { it.toEmail(base64Encoder) }
 
         // 3. Update emails flow
         emails.update { fullEmails }

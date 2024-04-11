@@ -12,12 +12,17 @@ import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
+import volovyk.guerrillamail.util.Base64Encoder
+import volovyk.guerrillamail.util.HtmlTextExtractor
 import volovyk.guerrillamail.util.State
 import java.io.IOException
 import javax.inject.Inject
 
-class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInterface: GuerrillaMailApiInterface) :
-    RemoteEmailDatabase {
+class GuerrillaEmailDatabase @Inject constructor(
+    private val guerrillaMailApiInterface: GuerrillaMailApiInterface,
+    private val htmlTextExtractor: HtmlTextExtractor,
+    private val base64Encoder: Base64Encoder
+) : RemoteEmailDatabase {
 
     companion object {
         private const val SITE = "guerrillamail.com"
@@ -134,7 +139,7 @@ class GuerrillaEmailDatabase @Inject constructor(private val guerrillaMailApiInt
 
             val fetchedEmail = call.executeAndCatchErrors()
 
-            fetchedEmailsList.add(fetchedEmail.toEmail())
+            fetchedEmailsList.add(fetchedEmail.toEmail(htmlTextExtractor, base64Encoder))
             seq = seq.coerceAtLeast(fetchedEmail.mailId.toInt())
         }
         return fetchedEmailsList

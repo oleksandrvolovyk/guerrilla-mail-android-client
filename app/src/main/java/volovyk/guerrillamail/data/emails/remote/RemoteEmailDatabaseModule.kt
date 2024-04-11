@@ -8,6 +8,8 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaEmailData
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmEmailDatabase
+import volovyk.guerrillamail.util.Base64Encoder
+import volovyk.guerrillamail.util.HtmlTextExtractor
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
@@ -17,15 +19,22 @@ object RemoteEmailDatabaseModule {
     @Provides
     @MainRemoteEmailDatabase
     @Singleton
-    fun provideMainRemoteEmailDatabase(guerrillaMailApiInterface: GuerrillaMailApiInterface): RemoteEmailDatabase {
-        return GuerrillaEmailDatabase(guerrillaMailApiInterface)
+    fun provideMainRemoteEmailDatabase(
+        guerrillaMailApiInterface: GuerrillaMailApiInterface,
+        htmlTextExtractor: HtmlTextExtractor,
+        base64Encoder: Base64Encoder
+    ): RemoteEmailDatabase {
+        return GuerrillaEmailDatabase(guerrillaMailApiInterface, htmlTextExtractor, base64Encoder)
     }
 
     @Provides
     @BackupRemoteEmailDatabase
     @Singleton
-    fun provideBackupRemoteEmailDatabase(mailTmEmailInterface: MailTmApiInterface): RemoteEmailDatabase {
-        return MailTmEmailDatabase(mailTmEmailInterface)
+    fun provideBackupRemoteEmailDatabase(
+        mailTmEmailInterface: MailTmApiInterface,
+        base64Encoder: Base64Encoder
+    ): RemoteEmailDatabase {
+        return MailTmEmailDatabase(mailTmEmailInterface, base64Encoder)
     }
 }
 

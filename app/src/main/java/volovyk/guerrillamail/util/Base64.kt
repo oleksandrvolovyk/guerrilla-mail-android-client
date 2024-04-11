@@ -2,9 +2,13 @@ package volovyk.guerrillamail.util
 
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object Base64 {
+interface Base64Encoder {
+    fun encodeToBase64String(input: String): String
+}
+
+class Base64EncoderImpl : Base64Encoder {
     @OptIn(ExperimentalEncodingApi::class)
-    fun encodeToBase64String(input: String): String {
+    override fun encodeToBase64String(input: String): String {
         return kotlin.io.encoding.Base64.encode(input.encodeToByteArray())
     }
 }

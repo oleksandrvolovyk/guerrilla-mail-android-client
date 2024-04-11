@@ -21,16 +21,22 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.EmailGuerri
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.GetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.SetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
+import volovyk.guerrillamail.util.AndroidHtmlTextExtractor
+import volovyk.guerrillamail.util.Base64EncoderImpl
+import volovyk.guerrillamail.util.HtmlTextExtractor
 
 class GuerrillaEmailDatabaseTest {
 
     private lateinit var guerrillaMailApiInterface: GuerrillaMailApiInterface
     private lateinit var database: GuerrillaEmailDatabase
+    private val htmlTextExtractor = AndroidHtmlTextExtractor()
+    private val base64Encoder = Base64EncoderImpl()
 
     @Before
     fun setup() {
         guerrillaMailApiInterface = mockk<GuerrillaMailApiInterface>()
-        database = GuerrillaEmailDatabase(guerrillaMailApiInterface)
+        database =
+            GuerrillaEmailDatabase(guerrillaMailApiInterface, htmlTextExtractor, base64Encoder)
     }
 
     @Test
@@ -161,7 +167,7 @@ class GuerrillaEmailDatabaseTest {
 
         // Assert emittedEmails are equal to full remote emails
         assertEquals(
-            fullRemoteEmails.map { it.toEmail() },
+            fullRemoteEmails.map { it.toEmail(htmlTextExtractor, base64Encoder) },
             emittedEmails
         )
 

@@ -23,18 +23,20 @@ import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfDomains
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfMessages
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.LoginResponse
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
+import volovyk.guerrillamail.util.Base64EncoderImpl
 import java.util.Date
 
 class MailTmEmailDatabaseTest {
 
     private lateinit var mailTmApiInterface: MailTmApiInterface
     private lateinit var database: MailTmEmailDatabase
+    private val base64Encoder = Base64EncoderImpl()
 
     @Before
     fun setup() {
         mailTmApiInterface = mockk<MailTmApiInterface>()
 
-        database = MailTmEmailDatabase(mailTmApiInterface)
+        database = MailTmEmailDatabase(mailTmApiInterface, base64Encoder)
     }
 
     @Test(expected = NoEmailAddressAssignedException::class)
