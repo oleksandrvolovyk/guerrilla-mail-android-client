@@ -51,19 +51,19 @@ fun EmailDetailsScreen(
                     .padding(16.dp)
             ) {
                 Text(
+                    text = uiState.email?.subject ?: "",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
                     modifier = Modifier.clickable(onClick = onFromFieldClick),
-                    text = context.getString(R.string.from, uiState.email?.from),
+                    text = uiState.email?.from ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = context.getString(R.string.date, uiState.email?.date),
+                    text = uiState.email?.date ?: "",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = context.getString(R.string.subject, uiState.email?.subject),
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
@@ -84,7 +84,7 @@ fun EmailDetailsScreen(
             Text(
                 modifier = Modifier.padding(start = 8.dp),
                 text = context.getString(R.string.toggle_html_rendering),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
         }
