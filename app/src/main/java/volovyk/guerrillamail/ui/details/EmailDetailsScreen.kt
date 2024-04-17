@@ -19,8 +19,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,6 @@ fun EmailDetailsScreen(
     onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {},
     onFromFieldClick: () -> Unit = {}
 ) {
-    val context = LocalContext.current
     Column(
         modifier = modifier
             .verticalScroll(rememberScrollState())
@@ -76,14 +75,14 @@ fun EmailDetailsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Switch(
-                modifier = Modifier.testTag(context.getString(R.string.test_tag_html_render_switch)),
+                modifier = Modifier.testTag(stringResource(R.string.test_tag_html_render_switch)),
                 checked = uiState.renderHtml,
                 onCheckedChange = onHtmlRenderSwitchCheckedChange
             )
 
             Text(
                 modifier = Modifier.padding(start = 8.dp),
-                text = context.getString(R.string.toggle_html_rendering),
+                text = stringResource(R.string.toggle_html_rendering),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -94,7 +93,7 @@ fun EmailDetailsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White)
-                    .testTag(context.getString(R.string.test_tag_email_body_web_view)),
+                    .testTag(stringResource(R.string.test_tag_email_body_web_view)),
                 onUpdate = {
                     it.loadData(uiState.email?.htmlBody ?: "", "text/html", "base64")
                 }

@@ -20,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +39,6 @@ fun AssignedEmailCard(
     onGetNewAddressButtonClick: () -> Unit = {},
     onEmailUsernameValueChange: (String) -> Unit = {}
 ) {
-    val context = LocalContext.current
     Card(
         modifier = modifier
     ) {
@@ -55,9 +53,9 @@ fun AssignedEmailCard(
         ) {
             Text(
                 text = if (emailUsername == null) {
-                    context.getString(R.string.getting_temporary_email)
+                    stringResource(R.string.getting_temporary_email)
                 } else {
-                    context.getString(R.string.your_temporary_email)
+                    stringResource(R.string.your_temporary_email)
                 },
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onPrimary
@@ -98,7 +96,7 @@ fun AssignedEmailCard(
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                Text(context.getString(R.string.get_new_address))
+                Text(stringResource(R.string.get_new_address))
             }
         }
     }
