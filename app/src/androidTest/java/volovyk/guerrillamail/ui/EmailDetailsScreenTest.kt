@@ -68,17 +68,17 @@ class EmailDetailsScreenTest {
 
         // Assert that email's "from" field is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.from, email.from))
+            .onNodeWithText(email.from)
             .assertExists()
 
         // Assert that email's subject is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.subject, email.subject))
+            .onNodeWithText(email.subject)
             .assertExists()
 
         // Assert that email's date is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.date, email.date))
+            .onNodeWithText(email.date)
             .assertExists()
 
         // Assert that email's body is displayed as text
@@ -113,17 +113,17 @@ class EmailDetailsScreenTest {
 
         // Aseert that email's "from" field is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.from, email.from))
+            .onNodeWithText(email.from)
             .assertExists()
 
         // Assert that email's subject is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.subject, email.subject))
+            .onNodeWithText(email.subject)
             .assertExists()
 
         // Assert that email's date is displayed
         composeTestRule
-            .onNodeWithText(context.getString(R.string.date, email.date))
+            .onNodeWithText(email.date)
             .assertExists()
 
         // Assert that email body WebView is displayed
