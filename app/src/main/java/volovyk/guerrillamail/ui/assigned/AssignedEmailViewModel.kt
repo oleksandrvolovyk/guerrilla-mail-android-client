@@ -63,8 +63,12 @@ class AssignedEmailViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun setEmailAddress(newAddress: String) {
-        if (!emailValidator.isValidEmailAddress(newAddress)) {
+    fun getNewEmailAddress() {
+        val newAddress = uiState.value.emailUsername?.let {
+            "${uiState.value.emailUsername}@${uiState.value.emailDomain}"
+        }
+
+        if (newAddress == null || !emailValidator.isValidEmailAddress(newAddress)) {
             _sideEffectChannel.trySend(SideEffect.ShowToast(R.string.email_invalid))
             return
         }

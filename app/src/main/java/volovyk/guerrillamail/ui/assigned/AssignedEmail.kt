@@ -26,14 +26,8 @@ fun AssignedEmail(
         emailUsername = uiState.emailUsername,
         emailDomain = uiState.emailDomain,
         isGetNewAddressButtonVisible = uiState.isGetNewAddressButtonVisible,
-        onEmailAddressClick = {
-            viewModel.copyEmailAddressToClipboard()
-        },
-        onGetNewAddressButtonClick = {
-            uiState.emailUsername?.let {
-                viewModel.setEmailAddress("${uiState.emailUsername}@${uiState.emailDomain}")
-            }
-        },
+        onEmailAddressClick = { viewModel.copyEmailAddressToClipboard() },
+        onGetNewAddressButtonClick = { viewModel.getNewEmailAddress() },
         onEmailUsernameValueChange = { viewModel.userChangedEmailUsername(it) }
     )
 }
