@@ -113,17 +113,29 @@ class AssignedEmailViewModelTest {
 
     @Test
     fun `setEmailAddress calls emailRepository and hides GetNewAddressButton`() = runTest {
-        val newAddress = "test@example.com"
+        val assignedEmailAddress = "test@example.com"
+        val newAddress = "test2@example.com"
 
+        // An email address is assigned
+        assignedEmailFlow.update { assignedEmailAddress }
+
+        // User changes email username
         viewModel.userChangedEmailUsername(newAddress.emailUsernamePart())
+
+        // GetNewAddressButton is shown
         assertEquals(true, viewModel.uiState.value.isGetNewAddressButtonVisible)
-        viewModel.setEmailAddress(newAddress)
+
+        // User clicks GetNewAddressButton
+        viewModel.getNewEmailAddress()
 
         // Simulate action confirmation
         val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
         confirmActionSideEffect.action()
 
+        // GetNewAddressButton is not shown
         assertEquals(false, viewModel.uiState.value.isGetNewAddressButtonVisible)
+
+        // EmailRepository is called to set email address to new one
         coVerify { emailRepository.setEmailAddress(newAddress) }
     }
 
@@ -158,7 +170,7 @@ class AssignedEmailViewModelTest {
             // EmailRepository fails to set new email address
             coEvery { emailRepository.setEmailAddress(any()) } returns false
 
-            viewModel.setEmailAddress(newAddress)
+            viewModel.getNewEmailAddress()
 
             // Simulate action confirmation
             val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
