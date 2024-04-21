@@ -51,7 +51,6 @@ android {
     }
     buildFeatures {
         compose = true
-        viewBinding = true
     }
     packaging {
         resources.excludes.add("META-INF/LICENSE.md")
