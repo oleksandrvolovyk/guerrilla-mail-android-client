@@ -17,7 +17,6 @@ import org.junit.runner.RunWith
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.FakeEmailRepository
 import volovyk.guerrillamail.data.emails.EmailRepository
-import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
@@ -47,7 +46,7 @@ class MainActivityTest {
     @Test
     fun uiShowsAndDismissesSnackbarDependingOnMainRemoteEmailDatabaseAvailability() {
         // Main remote email database is not available
-        fakeEmailRepository.mainRemoteEmailDatabaseAvailability.update { false }
+        fakeEmailRepository.state.update { it.copy(isMainRemoteEmailDatabaseAvailable = false) }
 
         // Snackbar with correct text and action is shown
         composeTestRule
@@ -59,7 +58,7 @@ class MainActivityTest {
             .assertExists()
 
         // Main remote email database becomes available
-        fakeEmailRepository.mainRemoteEmailDatabaseAvailability.update { true }
+        fakeEmailRepository.state.update { it.copy(isMainRemoteEmailDatabaseAvailable = true) }
 
         // Snackbar is dismissed
         composeTestRule
@@ -74,7 +73,7 @@ class MainActivityTest {
     @Test
     fun uiShowsLoadingIndicator() {
         // Repository is loading data
-        fakeEmailRepository.state.update { State.Loading }
+        fakeEmailRepository.state.update { it.copy(isLoading = true) }
 
         // Loading indicator is shown
         composeTestRule
@@ -82,7 +81,7 @@ class MainActivityTest {
             .assertExists()
 
         // Repository finished loading
-        fakeEmailRepository.state.update { State.Success }
+        fakeEmailRepository.state.update { it.copy(isLoading = false) }
 
         // Loading indicator is not shown
         composeTestRule

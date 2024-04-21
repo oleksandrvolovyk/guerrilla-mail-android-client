@@ -5,17 +5,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import timber.log.Timber
-import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.exception.EmailFetchException
-import volovyk.guerrillamail.data.emails.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
+import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.util.Base64Encoder
 import volovyk.guerrillamail.util.HtmlTextExtractor
-import volovyk.guerrillamail.util.State
-import java.io.IOException
 import javax.inject.Inject
 
 class GuerrillaEmailDatabase @Inject constructor(
@@ -35,8 +31,6 @@ class GuerrillaEmailDatabase @Inject constructor(
 
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     private val emails = MutableStateFlow(emptyList<Email>())
-    private val state: MutableStateFlow<State> =
-        MutableStateFlow(State.Loading)
 
     private var sidToken: String? = null
     private var seq = 0
@@ -44,55 +38,31 @@ class GuerrillaEmailDatabase @Inject constructor(
     override fun isAvailable(): Boolean = try {
         guerrillaMailApiInterface.ping().executeAndCatchErrors()
         true
-    } catch (e: IOException) {
-        state.update { State.Failure(e) }
+    } catch (e: RemoteEmailDatabaseException) {
         false
     }
 
     override fun updateEmails() {
         if (assignedEmail.value != null) {
-            state.update { State.Loading }
-            try {
-                val emailsList = checkForNewEmails()
-                emails.update { emailsList }
-                state.update { State.Success }
-            } catch (e: IOException) {
-                Timber.e(e)
-                state.update { State.Failure(EmailFetchException(e)) }
-            }
+            emails.update { checkForNewEmails() }
         } else {
-            throw NoEmailAddressAssignedException()
+            throw RemoteEmailDatabaseException.NoEmailAddressAssignedException
         }
     }
 
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
-    override fun getRandomEmailAddress() = try {
-        state.update { State.Loading }
-        val email = getEmailAddress()
-        assignedEmail.update { email }
-        state.update { State.Success }
-    } catch (e: IOException) {
-        Timber.e(e)
-        state.update { State.Failure(EmailAddressAssignmentException(e)) }
-    }
+    override fun getRandomEmailAddress() = assignedEmail.update { getEmailAddress() }
 
-    override fun setEmailAddress(requestedEmailAddress: String): Boolean = try {
-        state.update { State.Loading }
+    override fun setEmailAddress(requestedEmailAddress: String): String {
         val assignedEmailAddress =
             makeSetEmailAddressRequest(requestedEmailAddress.substringBefore("@"))
         assignedEmail.update { assignedEmailAddress }
-        state.update { State.Success }
-        true
-    } catch (e: IOException) {
-        Timber.e(e)
-        state.update { State.Failure(EmailAddressAssignmentException(e)) }
-        false
+        return assignedEmailAddress
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
     override fun observeEmails(): Flow<List<Email>> = emails
-    override fun observeState(): Flow<State> = state
 
     fun getSidToken() = sidToken
     fun getSeq() = seq
@@ -150,14 +120,17 @@ class GuerrillaEmailDatabase @Inject constructor(
             val response = this.execute()
 
             val responseBody = response.body()
-            if (response.isSuccessful && responseBody != null) {
-                return responseBody
-            } else {
-                throw IOException("Request was not successful or response body is null")
-            }
-        } catch (e: RuntimeException) {
-            Timber.e(e)
-            throw IOException(e)
+
+            if (!response.isSuccessful)
+                throw RemoteEmailDatabaseException.UnsuccessfulRequestException
+
+            if (responseBody == null)
+                throw RemoteEmailDatabaseException.EmptyResponseException
+
+            return responseBody
+        } catch (t: Throwable) {
+            Timber.e(t)
+            throw RemoteEmailDatabaseException(t)
         }
     }
 }

@@ -16,7 +16,6 @@ import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
-import volovyk.guerrillamail.util.State
 
 @ExperimentalCoroutinesApi
 class MainViewModelTest {
@@ -24,8 +23,7 @@ class MainViewModelTest {
     private lateinit var viewModel: MainViewModel
     private lateinit var emailRepository: EmailRepository
 
-    private lateinit var stateFlow: MutableStateFlow<State>
-    private lateinit var mainRemoteEmailDatabaseAvailability: MutableStateFlow<Boolean>
+    private lateinit var stateFlow: MutableStateFlow<EmailRepository.State>
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -36,11 +34,14 @@ class MainViewModelTest {
     fun setup() {
         emailRepository = mockk<EmailRepository>(relaxed = true)
 
-        stateFlow = MutableStateFlow(State.Loading)
-        mainRemoteEmailDatabaseAvailability = MutableStateFlow(true)
+        stateFlow = MutableStateFlow(
+            EmailRepository.State(
+                isLoading = false,
+                isMainRemoteEmailDatabaseAvailable = true
+            )
+        )
 
         every { emailRepository.observeState() } returns stateFlow
-        every { emailRepository.observeMainRemoteEmailDatabaseAvailability() } returns mainRemoteEmailDatabaseAvailability
         viewModel = MainViewModel(emailRepository)
     }
 
@@ -56,8 +57,7 @@ class MainViewModelTest {
         // Assert default UiState
         assertEquals(defaultUiState, viewModel.uiState.value)
 
-        stateFlow.update { State.Success }
-        mainRemoteEmailDatabaseAvailability.update { false }
+        stateFlow.update { it.copy(isLoading = false, isMainRemoteEmailDatabaseAvailable = false) }
 
         advanceUntilIdle()
 

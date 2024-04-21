@@ -56,9 +56,9 @@ class EmailListViewModelTest {
         assertEquals(defaultUiState, viewModel.uiState.value)
 
         val email = Email("0", "", "", "", "", "", false)
-        val selectablItemEmail = SelectableItem(item = email)
+        val selectableItemEmail = SelectableItem(item = email)
 
-        val expectedUiState = EmailListUiState(listOf(selectablItemEmail))
+        val expectedUiState = EmailListUiState(listOf(selectableItemEmail))
 
         emailFlow.emit(listOf(email))
 

@@ -1,25 +1,26 @@
 package volovyk.guerrillamail.data
 
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.util.State
+import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 
 class FakeEmailRepository(
     initialAssignedEmail: String? = null,
     initialEmails: List<Email> = emptyList(),
-    initialState: State = State.Loading,
-    initialMainRemoteEmailDatabaseAvailability: Boolean = true
+    initialState: EmailRepository.State = EmailRepository.State(
+        isLoading = false,
+        isMainRemoteEmailDatabaseAvailable = true
+    )
 ) : EmailRepository {
 
     val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(initialAssignedEmail)
     val emails = MutableStateFlow(initialEmails)
-    val state: MutableStateFlow<State> =
-        MutableStateFlow(initialState)
-    val mainRemoteEmailDatabaseAvailability =
-        MutableStateFlow(initialMainRemoteEmailDatabaseAvailability)
+    val state: MutableStateFlow<EmailRepository.State> = MutableStateFlow(initialState)
 
     var isSetEmailAddressSuccessful = true
 
@@ -27,12 +28,12 @@ class FakeEmailRepository(
         return emails.value.find { it.id == emailId }
     }
 
-    override suspend fun setEmailAddress(newAddress: String): Boolean {
+    override suspend fun setEmailAddress(newAddress: String): String {
         return if (isSetEmailAddressSuccessful) {
             assignedEmail.update { newAddress }
-            true
+            newAddress
         } else {
-            false
+            throw EmailRepositoryException.EmailAddressAssignmentException(RuntimeException())
         }
     }
 
@@ -41,15 +42,11 @@ class FakeEmailRepository(
     }
 
     override suspend fun retryConnectingToMainDatabase() {
-        mainRemoteEmailDatabaseAvailability.update { true }
+        state.update { it.copy(isMainRemoteEmailDatabaseAvailable = true) }
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
-
     override fun observeEmails(): Flow<List<Email>> = emails
-
-    override fun observeState(): Flow<State> = state
-
-    override fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean> =
-        mainRemoteEmailDatabaseAvailability
+    override fun observeState(): Flow<EmailRepository.State> = state
+    override fun observeErrors(): ReceiveChannel<EmailRepositoryException> = Channel { }
 }

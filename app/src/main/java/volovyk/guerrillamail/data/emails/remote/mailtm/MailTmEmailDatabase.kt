@@ -6,16 +6,13 @@ import kotlinx.coroutines.flow.update
 import retrofit2.Call
 import timber.log.Timber
 import volovyk.guerrillamail.BuildConfig
-import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.exception.EmailFetchException
-import volovyk.guerrillamail.data.emails.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.toEmail
+import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.util.Base64Encoder
-import volovyk.guerrillamail.util.State
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException
@@ -37,8 +34,6 @@ class MailTmEmailDatabase(
 
     private val assignedEmail: MutableStateFlow<String?> = MutableStateFlow(null)
     private val emails = MutableStateFlow(emptyList<Email>())
-    private val state: MutableStateFlow<State> =
-        MutableStateFlow(State.Loading)
 
     private var token: String? = null
 
@@ -49,17 +44,14 @@ class MailTmEmailDatabase(
         true
     } catch (e: IOException) {
         Timber.e(e)
-        state.update { State.Failure(e) }
         false
     } catch (e: SocketTimeoutException) {
         Timber.e(e)
-        state.update { State.Failure(e) }
         false
     }
 
-    override fun updateEmails() = try {
-        state.update { State.Loading }
-        if (token == null) throw NoEmailAddressAssignedException()
+    override fun updateEmails() {
+        if (token == null) throw RemoteEmailDatabaseException.NoEmailAddressAssignedException
 
         // 1. Get all messages
         val getMessagesCall = mailTmApiInterface.getMessages(token = token!!)
@@ -83,41 +75,27 @@ class MailTmEmailDatabase(
 
         // 3. Update emails flow
         emails.update { fullEmails }
-        state.update { State.Success }
-    } catch (exception: IOException) {
-        Timber.e(exception)
-        state.update { State.Failure(EmailFetchException(exception)) }
     }
 
     override fun hasEmailAddressAssigned(): Boolean = assignedEmail.value != null
 
     override fun getRandomEmailAddress() {
-        try {
-            state.update { State.Loading }
-            // 1. Get available domains
-            val getDomainsCall = mailTmApiInterface.getDomains()
+        // 1. Get available domains
+        val getDomainsCall = mailTmApiInterface.getDomains()
 
-            val listOfDomains = getDomainsCall.executeAndCatchErrors()
+        val listOfDomains = getDomainsCall.executeAndCatchErrors()
 
-            if (listOfDomains.totalDomains == 0) {
-                throw EmailAddressAssignmentException(
-                    RuntimeException(
-                        "No domains available"
-                    )
-                )
-            }
-
-            // 2. Create an account with first available domain
-            val domain = listOfDomains.domains[0].domain
-
-            val username = generateRandomLatinString(USERNAME_LENGTH)
-            val address = "$username@$domain"
-
-            setEmailAddress(address)
-        } catch (exception: IOException) {
-            Timber.e(exception)
-            state.update { State.Failure(EmailAddressAssignmentException(exception)) }
+        if (listOfDomains.totalDomains == 0) {
+            throw RemoteEmailDatabaseException("No domains available")
         }
+
+        // 2. Create an account with first available domain
+        val domain = listOfDomains.domains[0].domain
+
+        val username = generateRandomLatinString(USERNAME_LENGTH)
+        val address = "$username@$domain"
+
+        setEmailAddress(address)
     }
 
     private fun generateRandomLatinString(length: Int): String {
@@ -127,8 +105,7 @@ class MailTmEmailDatabase(
             .joinToString("")
     }
 
-    override fun setEmailAddress(requestedEmailAddress: String): Boolean = try {
-        state.update { State.Loading }
+    override fun setEmailAddress(requestedEmailAddress: String): String {
         val requestEmailAddress = requestedEmailAddress.lowercase()
 
         // 1. Create an account with random password
@@ -146,36 +123,29 @@ class MailTmEmailDatabase(
 
         token = "Bearer ${loginResponse.token}"
         assignedEmail.update { requestedEmailAddress }
-        state.update { State.Success }
-        true
-    } catch (exception: IOException) {
-        Timber.e(exception)
-        state.update { State.Failure(EmailAddressAssignmentException(exception)) }
-        false
+        return requestedEmailAddress
     }
 
     override fun observeAssignedEmail(): Flow<String?> = assignedEmail
 
     override fun observeEmails(): Flow<List<Email>> = emails
 
-    override fun observeState(): Flow<State> = state
-
     private fun <T> Call<T>.executeAndCatchErrors(checkForNullResponse: Boolean): T? {
         try {
             val response = this.execute()
 
             val responseBody = response.body()
-            if (response.isSuccessful) {
-                if (checkForNullResponse && responseBody == null) {
-                    throw IOException("Response body is null")
-                }
-                return responseBody
-            } else {
-                throw IOException("Request was not successful")
-            }
-        } catch (e: RuntimeException) {
-            Timber.e(e)
-            throw IOException(e)
+
+            if (!response.isSuccessful)
+                throw RemoteEmailDatabaseException.UnsuccessfulRequestException
+
+            if (checkForNullResponse && responseBody == null)
+                throw RemoteEmailDatabaseException.EmptyResponseException
+
+            return responseBody
+        } catch (t: Throwable) {
+            Timber.e(t)
+            throw RemoteEmailDatabaseException(t)
         }
     }
 

@@ -14,8 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.mock.Calls
-import volovyk.guerrillamail.data.emails.exception.EmailAddressAssignmentException
-import volovyk.guerrillamail.data.emails.exception.NoEmailAddressAssignedException
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Domain
@@ -23,6 +21,7 @@ import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfDomains
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfMessages
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.LoginResponse
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
+import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.util.Base64EncoderImpl
 import java.util.Date
 
@@ -39,15 +38,15 @@ class MailTmEmailDatabaseTest {
         database = MailTmEmailDatabase(mailTmApiInterface, base64Encoder)
     }
 
-    @Test(expected = NoEmailAddressAssignedException::class)
+    @Test(expected = RemoteEmailDatabaseException.NoEmailAddressAssignedException::class)
     fun `updateEmails throws NoEmailAddressAssignedException if called with no email address assigned`(): Unit =
         runTest {
             assertFalse(database.hasEmailAddressAssigned())
             database.updateEmails()
         }
 
-    @Test(expected = EmailAddressAssignmentException::class)
-    fun `getRandomEmailAddress throws EmailAddressAssignmentException if no domains are available`() =
+    @Test(expected = RemoteEmailDatabaseException::class)
+    fun `getRandomEmailAddress throws RemoteEmailDatabaseException if no domains are available`() =
         runTest {
             // Mock the response from the API call
             val getDomainsResponse = Response.success(ListOfDomains(emptyList(), 0))

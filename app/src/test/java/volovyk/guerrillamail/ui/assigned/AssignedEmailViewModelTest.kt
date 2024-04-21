@@ -15,9 +15,9 @@ import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.ui.SideEffect
 import volovyk.guerrillamail.util.EmailValidatorImpl
-import volovyk.guerrillamail.util.State
 
 class AssignedEmailViewModelTest {
 
@@ -25,7 +25,7 @@ class AssignedEmailViewModelTest {
     private lateinit var emailRepository: EmailRepository
 
     private lateinit var assignedEmailFlow: MutableStateFlow<String?>
-    private lateinit var stateFlow: MutableStateFlow<State>
+    private lateinit var stateFlow: MutableStateFlow<EmailRepository.State>
 
     // Set the main coroutines dispatcher for unit testing.
     @ExperimentalCoroutinesApi
@@ -37,7 +37,12 @@ class AssignedEmailViewModelTest {
         emailRepository = mockk<EmailRepository>(relaxed = true)
 
         assignedEmailFlow = MutableStateFlow(null)
-        stateFlow = MutableStateFlow(State.Loading)
+        stateFlow = MutableStateFlow(
+            EmailRepository.State(
+                isLoading = false,
+                isMainRemoteEmailDatabaseAvailable = true
+            )
+        )
 
         every { emailRepository.observeAssignedEmail() } returns assignedEmailFlow
         viewModel = AssignedEmailViewModel(emailRepository, EmailValidatorImpl())
@@ -168,12 +173,15 @@ class AssignedEmailViewModelTest {
             )
 
             // EmailRepository fails to set new email address
-            coEvery { emailRepository.setEmailAddress(any()) } returns false
+            coEvery {
+                emailRepository.setEmailAddress(any())
+            } throws EmailRepositoryException.EmailAddressAssignmentException(RuntimeException())
 
             viewModel.getNewEmailAddress()
 
             // Simulate action confirmation
-            val confirmActionSideEffect = viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
+            val confirmActionSideEffect =
+                viewModel.sideEffectFlow.first() as SideEffect.ConfirmAction
             confirmActionSideEffect.action()
 
             // Assert email username is reverted to last assigned address

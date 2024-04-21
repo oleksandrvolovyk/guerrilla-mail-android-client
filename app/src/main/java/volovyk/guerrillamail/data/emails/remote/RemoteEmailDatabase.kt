@@ -2,7 +2,6 @@ package volovyk.guerrillamail.data.emails.remote
 
 import kotlinx.coroutines.flow.Flow
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.util.State
 
 interface RemoteEmailDatabase {
 
@@ -11,9 +10,8 @@ interface RemoteEmailDatabase {
     fun updateEmails()
     fun hasEmailAddressAssigned(): Boolean
     fun getRandomEmailAddress()
-    fun setEmailAddress(requestedEmailAddress: String): Boolean
+    fun setEmailAddress(requestedEmailAddress: String): String
 
     fun observeAssignedEmail(): Flow<String?>
     fun observeEmails(): Flow<List<Email>>
-    fun observeState(): Flow<State>
 }

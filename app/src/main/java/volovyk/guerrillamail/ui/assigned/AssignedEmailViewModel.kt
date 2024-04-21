@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.EmailRepository
+import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.ui.SideEffect
 import volovyk.guerrillamail.util.EmailValidator
 import javax.inject.Inject
@@ -80,7 +81,9 @@ class AssignedEmailViewModel @Inject constructor(
             ) {
                 viewModelScope.launch {
                     _uiState.update { it.copy(isGetNewAddressButtonVisible = false) }
-                    if (!emailRepository.setEmailAddress(newAddress)) {
+                    try {
+                        emailRepository.setEmailAddress(newAddress)
+                    } catch (e: EmailRepositoryException.EmailAddressAssignmentException) {
                         // If the operation is unsuccessful, revert emailUsername to previous assigned email
                         _uiState.update { it.copy(emailUsername = assignedEmailFlow.value?.emailUsernamePart()) }
                     }

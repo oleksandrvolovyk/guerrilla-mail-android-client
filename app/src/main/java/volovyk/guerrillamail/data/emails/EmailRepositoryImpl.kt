@@ -2,9 +2,12 @@ package volovyk.guerrillamail.data.emails
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -17,9 +20,10 @@ import timber.log.Timber
 import volovyk.guerrillamail.data.IoDispatcher
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
+import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
-import volovyk.guerrillamail.util.State
 import javax.inject.Inject
 
 class EmailRepositoryImpl @Inject constructor(
@@ -31,29 +35,53 @@ class EmailRepositoryImpl @Inject constructor(
     private val preferencesRepository: PreferencesRepository
 ) : EmailRepository {
 
-    private var mainRemoteEmailDatabaseIsAvailable = MutableStateFlow(true)
+    private val _state = MutableStateFlow(
+        EmailRepository.State(
+            isLoading = false,
+            isMainRemoteEmailDatabaseAvailable = true
+        )
+    )
+
+    private val _errorsChannel = Channel<EmailRepositoryException>(capacity = Channel.BUFFERED)
 
     init {
         Timber.d("init ${hashCode()}")
         externalScope.launch(ioDispatcher) {
-            mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
+            _state.updateWithLoading {
+                it.copy(
+                    isMainRemoteEmailDatabaseAvailable = mainRemoteEmailDatabase.isAvailable()
+                )
+            }
         }
         externalScope.launch(ioDispatcher) {
             while (isActive) {
-                val remoteEmailDatabase = if (mainRemoteEmailDatabaseIsAvailable.value) {
+                val remoteEmailDatabase = if (_state.value.isMainRemoteEmailDatabaseAvailable) {
                     mainRemoteEmailDatabase
                 } else {
                     backupRemoteEmailDatabase
                 }
                 if (remoteEmailDatabase.hasEmailAddressAssigned()) {
-                    remoteEmailDatabase.updateEmails()
+                    _state.withLoading {
+                        try {
+                            remoteEmailDatabase.updateEmails()
+                        } catch (e: RemoteEmailDatabaseException) {
+                            _errorsChannel.trySend(EmailRepositoryException.EmailFetchException(e))
+                        }
+                    }
                     delay(REFRESH_INTERVAL)
                 } else {
                     val lastEmailAddress = preferencesRepository.getValue(LAST_EMAIL_ADDRESS_KEY)
-                    if (lastEmailAddress != null && remoteEmailDatabase == mainRemoteEmailDatabase) {
-                        remoteEmailDatabase.setEmailAddress(lastEmailAddress)
-                    } else {
-                        remoteEmailDatabase.getRandomEmailAddress()
+                    _state.withLoading {
+                        try {
+                            if (lastEmailAddress != null && remoteEmailDatabase == mainRemoteEmailDatabase) {
+                                remoteEmailDatabase.setEmailAddress(lastEmailAddress)
+                            } else {
+                                remoteEmailDatabase.getRandomEmailAddress()
+                            }
+                        } catch (e: RemoteEmailDatabaseException) {
+                            _errorsChannel
+                                .trySend(EmailRepositoryException.EmailAddressAssignmentException(e))
+                        }
                     }
                     delay(EMAIL_ASSIGNMENT_INTERVAL)
                 }
@@ -75,14 +103,20 @@ class EmailRepositoryImpl @Inject constructor(
 
     override suspend fun getEmailById(emailId: String): Email? = withContext(ioDispatcher) {
         localEmailDatabase.getEmailDao().setEmailViewed(emailId, true)
-        localEmailDatabase.getEmailDao().getById(emailId)
+        return@withContext localEmailDatabase.getEmailDao().getById(emailId)
     }
 
-    override suspend fun setEmailAddress(newAddress: String): Boolean = withContext(ioDispatcher) {
-        if (mainRemoteEmailDatabaseIsAvailable.value) {
-            mainRemoteEmailDatabase.setEmailAddress(newAddress)
-        } else {
-            backupRemoteEmailDatabase.setEmailAddress(newAddress)
+    override suspend fun setEmailAddress(newAddress: String): String = withContext(ioDispatcher) {
+        _state.withLoading {
+            try {
+                if (_state.value.isMainRemoteEmailDatabaseAvailable) {
+                    mainRemoteEmailDatabase.setEmailAddress(newAddress)
+                } else {
+                    backupRemoteEmailDatabase.setEmailAddress(newAddress)
+                }
+            } catch (e: RemoteEmailDatabaseException) {
+                throw EmailRepositoryException.EmailAddressAssignmentException(e)
+            }
         }
     }
 
@@ -91,20 +125,21 @@ class EmailRepositoryImpl @Inject constructor(
     }
 
     override suspend fun retryConnectingToMainDatabase() = withContext(ioDispatcher) {
-        mainRemoteEmailDatabaseIsAvailable.update { mainRemoteEmailDatabase.isAvailable() }
+        _state.updateWithLoading {
+            it.copy(
+                isMainRemoteEmailDatabaseAvailable = mainRemoteEmailDatabase.isAvailable()
+            )
+        }
     }
 
     override fun observeAssignedEmail(): Flow<String?> =
         combine(
-            mainRemoteEmailDatabase.observeAssignedEmail()
-                .onEach {
-                    it?.let {
-                        preferencesRepository.setValue(LAST_EMAIL_ADDRESS_KEY, it)
-                    }
-                },
+            mainRemoteEmailDatabase.observeAssignedEmail().onEach {
+                it?.let { preferencesRepository.setValue(LAST_EMAIL_ADDRESS_KEY, it) }
+            },
             backupRemoteEmailDatabase.observeAssignedEmail()
         ) { mainEmail, backupEmail ->
-            if (mainRemoteEmailDatabaseIsAvailable.value) {
+            if (_state.value.isMainRemoteEmailDatabaseAvailable) {
                 mainEmail
             } else {
                 backupEmail
@@ -112,24 +147,25 @@ class EmailRepositoryImpl @Inject constructor(
         }
 
     override fun observeEmails(): Flow<List<Email>> = localEmailDatabase.getEmailDao().all
-    override fun observeState(): Flow<State> =
-        combine(
-            mainRemoteEmailDatabase.observeState(),
-            backupRemoteEmailDatabase.observeState()
-        ) { mainState, backupState ->
-            if (mainRemoteEmailDatabaseIsAvailable.value) {
-                mainState
-            } else {
-                backupState
-            }
-        }
-
-    override fun observeMainRemoteEmailDatabaseAvailability(): Flow<Boolean> =
-        mainRemoteEmailDatabaseIsAvailable
+    override fun observeState(): Flow<EmailRepository.State> = _state.asStateFlow()
+    override fun observeErrors(): ReceiveChannel<EmailRepositoryException> = _errorsChannel
 
     // Must be called on a non-UI thread or Room will throw an exception.
     private suspend fun insertAllToLocalDatabase(emails: Collection<Email>) =
         withContext(ioDispatcher) {
             localEmailDatabase.getEmailDao().insertAll(emails)
         }
+
+    private inline fun MutableStateFlow<EmailRepository.State>.updateWithLoading(
+        action: (EmailRepository.State) -> EmailRepository.State
+    ) = withLoading { update { action(it) } }
+
+    private inline fun <T> MutableStateFlow<EmailRepository.State>.withLoading(
+        action: () -> T
+    ): T {
+        update { it.copy(isLoading = true) }
+        val result = action()
+        update { it.copy(isLoading = false) }
+        return result
+    }
 }
