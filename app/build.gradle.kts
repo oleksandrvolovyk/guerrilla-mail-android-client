@@ -47,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources.excludes.add("META-INF/LICENSE.md")
