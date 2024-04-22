@@ -22,8 +22,9 @@ fun Message.toEmail(base64Encoder: Base64Encoder) = Email(
     id = this.id,
     from = this.from.address,
     subject = this.subject,
-    body = this.text ?: "",
-    htmlBody = base64Encoder.encodeToBase64String(this.html?.getOrNull(0) ?: ""),
+    textBody = this.text ?: "",
+    filteredHtmlBody = base64Encoder.encodeToBase64String(this.html?.getOrNull(0) ?: ""),
+    fullHtmlBody = base64Encoder.encodeToBase64String(this.html?.getOrNull(0) ?: ""),
     date = this.createdAt.toString(),
     viewed = false
 )

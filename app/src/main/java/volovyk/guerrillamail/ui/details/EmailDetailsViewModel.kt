@@ -20,7 +20,8 @@ import javax.inject.Inject
 
 data class EmailDetailsUiState(
     val email: Email? = null,
-    val renderHtml: Boolean = true
+    val renderHtml: Boolean = true,
+    val displayImages: Boolean = false
 )
 
 @HiltViewModel
@@ -40,7 +41,8 @@ class EmailDetailsViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 email = emailRepository.getEmailById(emailId),
-                renderHtml = preferencesRepository.getValue(HTML_RENDER_KEY).toBoolean()
+                renderHtml = preferencesRepository.getValue(HTML_RENDER_KEY).toBoolean(),
+                displayImages = preferencesRepository.getValue(DISPLAY_IMAGES_KEY).toBoolean()
             )
         }
     }
@@ -49,6 +51,13 @@ class EmailDetailsViewModel @Inject constructor(
         preferencesRepository.setValue(HTML_RENDER_KEY, render.toString())
         _uiState.update {
             it.copy(renderHtml = render)
+        }
+    }
+
+    fun setDisplayImages(value: Boolean) = viewModelScope.launch {
+        preferencesRepository.setValue(DISPLAY_IMAGES_KEY, value.toString())
+        _uiState.update {
+            it.copy(displayImages = value)
         }
     }
 
@@ -61,5 +70,6 @@ class EmailDetailsViewModel @Inject constructor(
 
     companion object {
         const val HTML_RENDER_KEY = "html_render"
+        const val DISPLAY_IMAGES_KEY = "display_images"
     }
 }

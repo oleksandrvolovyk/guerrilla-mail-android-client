@@ -66,8 +66,9 @@ class EmailListTest {
                         id = "$index",
                         from = "from$index@example.com",
                         subject = "Subject $index",
-                        body = "Body $index",
-                        htmlBody = "HtmlBody $index",
+                        textBody = "Text body $index",
+                        filteredHtmlBody = "Filtered Html Body $index",
+                        fullHtmlBody = "Full Html Body $index",
                         date = "Date $index",
                         viewed = false
                     )
@@ -97,8 +98,9 @@ class EmailListTest {
                         id = "0",
                         from = "from@example.com",
                         subject = "Subject",
-                        body = "Body",
-                        htmlBody = "HtmlBody",
+                        textBody = "Text body",
+                        filteredHtmlBody = "Filtered Html Body",
+                        fullHtmlBody = "Full Html Body",
                         date = "Date",
                         viewed = false
                     )
@@ -137,8 +139,9 @@ class EmailListTest {
                         id = "0",
                         from = "from@example.com",
                         subject = "Subject",
-                        body = "Body",
-                        htmlBody = "HtmlBody",
+                        textBody = "Text body",
+                        filteredHtmlBody = "Filtered Html Body",
+                        fullHtmlBody = "Full Html Body",
                         date = "Date",
                         viewed = false
                     )

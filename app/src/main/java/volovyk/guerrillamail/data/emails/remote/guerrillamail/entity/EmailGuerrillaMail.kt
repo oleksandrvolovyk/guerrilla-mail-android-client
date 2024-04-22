@@ -2,6 +2,7 @@ package volovyk.guerrillamail.data.emails.remote.guerrillamail.entity
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import volovyk.guerrillamail.data.emails.model.Email
+import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailBodyUnfilter
 import volovyk.guerrillamail.util.Base64Encoder
 import volovyk.guerrillamail.util.HtmlTextExtractor
 
@@ -18,8 +19,9 @@ fun EmailGuerrillaMail.toEmail(htmlTextExtractor: HtmlTextExtractor, base64Encod
         id = mailId,
         from = from,
         subject = subject,
-        body = htmlTextExtractor.extractText(body),
-        htmlBody = base64Encoder.encodeToBase64String(body),
+        textBody = htmlTextExtractor.extractText(body),
+        filteredHtmlBody = base64Encoder.encodeToBase64String(body),
+        fullHtmlBody = base64Encoder.encodeToBase64String(GuerrillaMailBodyUnfilter(body)),
         date = date,
         viewed = false
     )

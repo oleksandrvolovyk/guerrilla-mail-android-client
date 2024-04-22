@@ -174,7 +174,7 @@ class MailTmEmailDatabaseTest {
         )
         assertEquals(
             fullMessagesList.map { it.text },
-            result.map { it.body }
+            result.map { it.textBody }
         )
     }
 }

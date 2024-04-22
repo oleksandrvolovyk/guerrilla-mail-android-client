@@ -8,8 +8,9 @@ data class Email(
     @PrimaryKey val id: String,
     val from: String,
     val subject: String,
-    val body: String,
-    val htmlBody: String,
+    val textBody: String,
+    val filteredHtmlBody: String,
+    val fullHtmlBody: String,
     val date: String,
     val viewed: Boolean
 )

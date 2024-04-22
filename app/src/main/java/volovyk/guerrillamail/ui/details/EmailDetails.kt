@@ -31,6 +31,7 @@ fun EmailDetails(
         modifier = modifier,
         uiState = uiState,
         onHtmlRenderSwitchCheckedChange = { viewModel.setHtmlRender(it) },
+        onDisplayImagesSwitchCheckedChange = { viewModel.setDisplayImages(it) },
         onFromFieldClick = { viewModel.copySenderAddressToClipboard() }
     )
 }

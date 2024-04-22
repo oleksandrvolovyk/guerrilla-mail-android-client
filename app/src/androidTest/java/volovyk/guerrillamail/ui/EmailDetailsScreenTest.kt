@@ -53,8 +53,9 @@ class EmailDetailsScreenTest {
             id = "id",
             from = "from",
             subject = "subject",
-            body = "body",
-            htmlBody = "html body",
+            textBody = "text body",
+            filteredHtmlBody = "filtered html body",
+            fullHtmlBody = "full html body",
             date = "date",
             viewed = true
         )
@@ -83,7 +84,7 @@ class EmailDetailsScreenTest {
 
         // Assert that email's body is displayed as text
         composeTestRule
-            .onNodeWithText(email.body)
+            .onNodeWithText(email.textBody)
             .assertExists()
 
         // Assert that email body WebView is not displayed
@@ -98,8 +99,9 @@ class EmailDetailsScreenTest {
             id = "id",
             from = "from",
             subject = "subject",
-            body = "body",
-            htmlBody = "html body",
+            textBody = "text body",
+            filteredHtmlBody = "filtered html body",
+            fullHtmlBody = "full html body",
             date = "date",
             viewed = true
         )
@@ -111,7 +113,7 @@ class EmailDetailsScreenTest {
             )
         )
 
-        // Aseert that email's "from" field is displayed
+        // Assert that email's "from" field is displayed
         composeTestRule
             .onNodeWithText(email.from)
             .assertExists()
@@ -133,7 +135,37 @@ class EmailDetailsScreenTest {
 
         // Assert that email's body is not displayed as text
         composeTestRule
-            .onNodeWithText(email.body)
+            .onNodeWithText(email.textBody)
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun displayImagesSwitch_WhenHtmlRenderIsEnabled_IsShown() {
+        setSpecificEmailScreenState(
+            EmailDetailsUiState(
+                email = null,
+                renderHtml = true
+            )
+        )
+
+        // Assert that 'Display Images' switch is shown
+        composeTestRule
+            .onNode(hasTestTag(context.getString(R.string.test_tag_display_images_switch)))
+            .assertExists()
+    }
+
+    @Test
+    fun displayImagesSwitch_WhenHtmlRenderIsDisabled_IsNotShown() {
+        setSpecificEmailScreenState(
+            EmailDetailsUiState(
+                email = null,
+                renderHtml = false
+            )
+        )
+
+        // Assert that 'Display Images' switch is not shown
+        composeTestRule
+            .onNode(hasTestTag(context.getString(R.string.test_tag_display_images_switch)))
             .assertDoesNotExist()
     }
 

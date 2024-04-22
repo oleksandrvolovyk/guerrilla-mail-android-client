@@ -40,10 +40,11 @@ class EmailDetailsViewModelTest {
     fun `loadEmail(emailId) sets uiState email when emailId is valid`() = runTest {
         // Given
         val emailId = "123"
-        val email = Email("123", "", "", "", "", "", false)
+        val email = Email("123", "", "", "", "", "", "", false)
 
         coEvery { emailRepository.getEmailById(emailId) } returns email
         coEvery { preferencesRepository.getValue(EmailDetailsViewModel.HTML_RENDER_KEY) } returns "true"
+        coEvery { preferencesRepository.getValue(EmailDetailsViewModel.DISPLAY_IMAGES_KEY) } returns "false"
 
         // When
         viewModel.loadEmail(emailId)
@@ -59,6 +60,7 @@ class EmailDetailsViewModelTest {
 
         coEvery { emailRepository.getEmailById(emailId) } returns null
         coEvery { preferencesRepository.getValue(EmailDetailsViewModel.HTML_RENDER_KEY) } returns "true"
+        coEvery { preferencesRepository.getValue(EmailDetailsViewModel.DISPLAY_IMAGES_KEY) } returns "false"
 
         // When
         viewModel.loadEmail(emailId)

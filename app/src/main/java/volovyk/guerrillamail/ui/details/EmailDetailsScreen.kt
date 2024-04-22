@@ -1,12 +1,15 @@
 package volovyk.guerrillamail.ui.details
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -34,6 +37,7 @@ fun EmailDetailsScreen(
     uiState: EmailDetailsUiState,
     modifier: Modifier = Modifier,
     onHtmlRenderSwitchCheckedChange: (Boolean) -> Unit = {},
+    onDisplayImagesSwitchCheckedChange: (Boolean) -> Unit = {},
     onFromFieldClick: () -> Unit = {}
 ) {
     Column(
@@ -86,6 +90,25 @@ fun EmailDetailsScreen(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onBackground
             )
+
+            AnimatedVisibility(visible = uiState.renderHtml) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Spacer(Modifier.width(24.dp))
+
+                    Switch(
+                        modifier = Modifier.testTag(stringResource(R.string.test_tag_display_images_switch)),
+                        checked = uiState.displayImages,
+                        onCheckedChange = onDisplayImagesSwitchCheckedChange
+                    )
+
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = stringResource(R.string.toggle_image_display),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+            }
         }
 
         if (uiState.renderHtml) {
@@ -95,7 +118,15 @@ fun EmailDetailsScreen(
                     .background(Color.White)
                     .testTag(stringResource(R.string.test_tag_email_body_web_view)),
                 onUpdate = {
-                    it.loadData(uiState.email?.htmlBody ?: "", "text/html", "base64")
+                    it.loadData(
+                        if (uiState.displayImages) {
+                            uiState.email?.fullHtmlBody ?: ""
+                        } else {
+                            uiState.email?.filteredHtmlBody ?: ""
+                        },
+                        "text/html",
+                        "base64"
+                    )
                 }
             )
         } else {
@@ -106,7 +137,7 @@ fun EmailDetailsScreen(
             ) {
                 SelectionContainer {
                     Text(
-                        text = uiState.email?.body ?: "",
+                        text = uiState.email?.textBody ?: "",
                         modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
@@ -129,8 +160,9 @@ fun EmailDetailsScreenPreview() {
                     id = "1",
                     from = "from@example.com",
                     subject = "Test subject",
-                    body = "Test body",
-                    htmlBody = "Test html body",
+                    textBody = "Test text body",
+                    filteredHtmlBody = "Test filtered html body",
+                    fullHtmlBody = "Test full html body",
                     date = "Today",
                     viewed = false
                 ),

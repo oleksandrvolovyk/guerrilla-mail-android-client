@@ -192,6 +192,7 @@ fun EmailListPreview() {
                         subject = "Subject $it",
                         "Body $it",
                         "Html body $it",
+                        "Html body $it",
                         "0$it.0$it.2$it",
                         it % 2 == 0
                     )
@@ -205,6 +206,7 @@ fun EmailListPreview() {
                         subject = "Subject $it",
                         "Body $it",
                         "Html body $it",
+                        "Html body $it",
                         "0$it.0$it.2$it",
                         true
                     )
@@ -215,6 +217,7 @@ fun EmailListPreview() {
                     id = "id",
                     from = "test@example.com",
                     subject = "Fusce at dolor nec magna maximus porttitor. Donec accumsan convallis nisl non vulputate.",
+                    "",
                     "",
                     "",
                     "",
