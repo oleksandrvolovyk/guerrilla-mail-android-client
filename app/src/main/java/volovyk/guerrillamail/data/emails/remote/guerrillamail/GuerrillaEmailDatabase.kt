@@ -12,9 +12,8 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.util.Base64Encoder
 import volovyk.guerrillamail.util.HtmlTextExtractor
-import javax.inject.Inject
 
-class GuerrillaEmailDatabase @Inject constructor(
+class GuerrillaEmailDatabase (
     private val guerrillaMailApiInterface: GuerrillaMailApiInterface,
     private val htmlTextExtractor: HtmlTextExtractor,
     private val base64Encoder: Base64Encoder

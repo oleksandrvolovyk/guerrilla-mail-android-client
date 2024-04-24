@@ -17,18 +17,16 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import volovyk.guerrillamail.data.IoDispatcher
 import volovyk.guerrillamail.data.emails.local.LocalEmailDatabase
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
 import volovyk.guerrillamail.data.preferences.PreferencesRepository
-import javax.inject.Inject
 
-class EmailRepositoryImpl @Inject constructor(
+class EmailRepositoryImpl (
     externalScope: CoroutineScope,
-    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
+    private val ioDispatcher: CoroutineDispatcher,
     private val mainRemoteEmailDatabase: RemoteEmailDatabase,
     private val backupRemoteEmailDatabase: RemoteEmailDatabase,
     private val localEmailDatabase: LocalEmailDatabase,
