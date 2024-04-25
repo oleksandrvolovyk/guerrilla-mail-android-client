@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -40,6 +41,7 @@ import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import volovyk.guerrillamail.ui.widgets.IconButton
+import volovyk.guerrillamail.ui.widgets.verticalScrollbar
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -105,7 +107,10 @@ fun EmailListScreen(
             }
         }
 
+        val lazyColumnState = rememberLazyListState()
         LazyColumn(
+            modifier = Modifier.verticalScrollbar(state = lazyColumnState, width = 4.dp),
+            state = lazyColumnState,
             contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
