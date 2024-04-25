@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +19,8 @@ fun EditableEmailRow(
     modifier: Modifier = Modifier,
     emailUsername: String,
     onEmailUsernameValueChange: (String) -> Unit = {},
-    emailDomain: String
+    emailDomain: String,
+    textStyle: TextStyle = LocalTextStyle.current
 ) {
     Row(
         modifier = modifier
@@ -31,16 +32,17 @@ fun EditableEmailRow(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Done
             ),
-            textStyle = TextStyle.Default.copy(
-                color = MaterialTheme.colorScheme.onBackground
-            ),
+            textStyle = textStyle,
             singleLine = true,
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp),
         )
 
-        Text(text = "@$emailDomain")
+        Text(
+            text = "@$emailDomain",
+            style = textStyle
+        )
     }
 }
 
