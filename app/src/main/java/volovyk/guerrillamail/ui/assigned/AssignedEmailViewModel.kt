@@ -20,7 +20,7 @@ import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.ui.SideEffect
-import volovyk.guerrillamail.util.EmailValidator
+import volovyk.guerrillamail.ui.util.EmailValidator
 import javax.inject.Inject
 
 data class AssignedEmailUiState(

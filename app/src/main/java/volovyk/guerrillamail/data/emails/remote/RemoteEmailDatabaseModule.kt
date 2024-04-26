@@ -8,8 +8,8 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaEmailData
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmApiInterface
 import volovyk.guerrillamail.data.emails.remote.mailtm.MailTmEmailDatabase
-import volovyk.guerrillamail.util.Base64Encoder
-import volovyk.guerrillamail.util.HtmlTextExtractor
+import volovyk.guerrillamail.data.util.Base64Encoder
+import volovyk.guerrillamail.data.util.HtmlTextExtractor
 import javax.inject.Qualifier
 import javax.inject.Singleton
 

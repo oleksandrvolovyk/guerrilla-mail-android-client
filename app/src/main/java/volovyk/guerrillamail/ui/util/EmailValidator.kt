@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.util
+package volovyk.guerrillamail.ui.util
 
 import java.util.regex.Pattern
 

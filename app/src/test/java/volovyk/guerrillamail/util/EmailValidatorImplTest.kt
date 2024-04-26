@@ -3,6 +3,8 @@ package volovyk.guerrillamail.util
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import volovyk.guerrillamail.ui.util.EmailValidator
+import volovyk.guerrillamail.ui.util.EmailValidatorImpl
 
 class EmailValidatorImplTest {
 

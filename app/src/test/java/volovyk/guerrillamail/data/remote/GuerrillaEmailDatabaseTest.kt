@@ -21,9 +21,8 @@ import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.EmailGuerri
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.GetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.SetEmailAddressResponse
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
-import volovyk.guerrillamail.util.AndroidHtmlTextExtractor
-import volovyk.guerrillamail.util.Base64EncoderImpl
-import volovyk.guerrillamail.util.HtmlTextExtractor
+import volovyk.guerrillamail.data.util.AndroidHtmlTextExtractor
+import volovyk.guerrillamail.data.util.Base64EncoderImpl
 
 class GuerrillaEmailDatabaseTest {
 

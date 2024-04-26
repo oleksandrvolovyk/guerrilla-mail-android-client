@@ -22,7 +22,7 @@ import volovyk.guerrillamail.data.emails.remote.mailtm.entity.ListOfMessages
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.LoginResponse
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
-import volovyk.guerrillamail.util.Base64EncoderImpl
+import volovyk.guerrillamail.data.util.Base64EncoderImpl
 import java.util.Date
 
 class MailTmEmailDatabaseTest {

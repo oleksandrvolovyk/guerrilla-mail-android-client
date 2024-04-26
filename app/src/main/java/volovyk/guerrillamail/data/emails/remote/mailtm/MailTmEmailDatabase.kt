@@ -12,7 +12,7 @@ import volovyk.guerrillamail.data.emails.remote.mailtm.entity.AuthRequest
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.Message
 import volovyk.guerrillamail.data.emails.remote.mailtm.entity.toEmail
 import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
-import volovyk.guerrillamail.util.Base64Encoder
+import volovyk.guerrillamail.data.util.Base64Encoder
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.SocketTimeoutException

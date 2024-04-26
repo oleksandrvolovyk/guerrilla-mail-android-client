@@ -17,7 +17,7 @@ import volovyk.MainCoroutineRule
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.EmailRepositoryException
 import volovyk.guerrillamail.ui.SideEffect
-import volovyk.guerrillamail.util.EmailValidatorImpl
+import volovyk.guerrillamail.ui.util.EmailValidatorImpl
 
 class AssignedEmailViewModelTest {
 

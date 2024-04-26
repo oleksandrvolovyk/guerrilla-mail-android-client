@@ -3,8 +3,8 @@ package volovyk.guerrillamail.data.emails.remote.guerrillamail.entity
 import com.fasterxml.jackson.annotation.JsonProperty
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.GuerrillaMailBodyUnfilter
-import volovyk.guerrillamail.util.Base64Encoder
-import volovyk.guerrillamail.util.HtmlTextExtractor
+import volovyk.guerrillamail.data.util.Base64Encoder
+import volovyk.guerrillamail.data.util.HtmlTextExtractor
 
 class EmailGuerrillaMail(
     @JsonProperty("mail_id") val mailId: String,

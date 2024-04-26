@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.util
+package volovyk.guerrillamail.ui.util
 
 import dagger.Module
 import dagger.Provides
@@ -8,22 +8,10 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object UtilModule {
+object UiUtilModule {
     @Provides
     @Singleton
     fun provideEmailValidator(): EmailValidator {
         return EmailValidatorImpl()
-    }
-
-    @Provides
-    @Singleton
-    fun provideHtmlTextExtractor(): HtmlTextExtractor {
-        return AndroidHtmlTextExtractor()
-    }
-
-    @Provides
-    @Singleton
-    fun provideBase64Encoder(): Base64Encoder {
-        return Base64EncoderImpl()
     }
 }

@@ -10,8 +10,8 @@ import volovyk.guerrillamail.data.emails.remote.RemoteEmailDatabase
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.BriefEmail
 import volovyk.guerrillamail.data.emails.remote.guerrillamail.entity.toEmail
 import volovyk.guerrillamail.data.emails.remote.model.RemoteEmailDatabaseException
-import volovyk.guerrillamail.util.Base64Encoder
-import volovyk.guerrillamail.util.HtmlTextExtractor
+import volovyk.guerrillamail.data.util.Base64Encoder
+import volovyk.guerrillamail.data.util.HtmlTextExtractor
 
 class GuerrillaEmailDatabase (
     private val guerrillaMailApiInterface: GuerrillaMailApiInterface,

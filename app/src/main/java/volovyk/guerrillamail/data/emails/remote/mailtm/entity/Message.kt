@@ -1,7 +1,7 @@
 package volovyk.guerrillamail.data.emails.remote.mailtm.entity
 
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.util.Base64Encoder
+import volovyk.guerrillamail.data.util.Base64Encoder
 import java.util.Date
 
 data class Message(

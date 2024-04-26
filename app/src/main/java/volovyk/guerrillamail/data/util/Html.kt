@@ -1,4 +1,4 @@
-package volovyk.guerrillamail.util
+package volovyk.guerrillamail.data.util
 
 import android.text.Html
 
