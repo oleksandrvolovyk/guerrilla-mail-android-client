@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -108,7 +109,12 @@ fun MainActivityContent(uiState: UiState, onRetryConnectingToMainDatabase: () ->
                     EmailList(
                         modifier = Modifier.fillMaxSize(),
                         onNavigateToEmail = { emailId ->
-                            navController.navigate("emails/${emailId}")
+                            navController.navigate(
+                                route = "emails/${emailId}",
+                                navOptions = NavOptions.Builder()
+                                    .setLaunchSingleTop(singleTop = true)
+                                    .build()
+                            )
                         }
                     )
                 }
