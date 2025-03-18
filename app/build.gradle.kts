@@ -6,11 +6,12 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics.gradle)
     alias(libs.plugins.room)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
     namespace = "volovyk.guerrillamail"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "volovyk.guerrillamail"

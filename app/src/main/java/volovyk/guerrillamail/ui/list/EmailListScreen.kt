@@ -116,7 +116,7 @@ fun EmailListScreen(
         ) {
             items(uiState.emails, key = { it.item.id }) { email ->
                 EmailListItem(
-                    modifier = Modifier.animateItemPlacement(),
+                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
                     email,
                     onItemClick,
                     onItemLongClick
