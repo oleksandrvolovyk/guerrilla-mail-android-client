@@ -29,6 +29,7 @@ fun EmailList(
         onItemLongClick = { viewModel.toggleEmailSelection(it) },
         onClearSelectionButtonClick = { viewModel.clearSelectedEmails() },
         onSelectAllButtonClick = { viewModel.toggleSelectAllEmails() },
-        onDeleteButtonClick = { viewModel.deleteSelectedEmails() }
+        onDeleteButtonClick = { viewModel.deleteSelectedEmails() },
+        onLoadAd = { adPosition -> viewModel.loadAd(adPosition) },
     )
 }

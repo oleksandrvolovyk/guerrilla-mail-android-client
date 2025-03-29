@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import volovyk.MainCoroutineRule
+import volovyk.guerrillamail.ads.FakeAdManager
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.SideEffect
@@ -40,7 +41,7 @@ class EmailListViewModelTest {
 
         every { emailRepository.observeEmails() } returns emailFlow
 
-        viewModel = EmailListViewModel(emailRepository)
+        viewModel = EmailListViewModel(emailRepository, FakeAdManager)
     }
 
     @Test
@@ -58,7 +59,8 @@ class EmailListViewModelTest {
         val email = Email("0", "", "", "", "", "", "", false)
         val selectableItemEmail = SelectableItem(item = email)
 
-        val expectedUiState = EmailListUiState(listOf(selectableItemEmail))
+        val expectedUiState =
+            EmailListUiState(emails = listOf(selectableItemEmail), ads = emptyList())
 
         emailFlow.emit(listOf(email))
 

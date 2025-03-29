@@ -9,6 +9,38 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
+val ADMOB_TEST_APP_ID = "ca-app-pub-3940256099942544~3347511713"
+val ADMOB_TEST_NATIVE_AD_ID = "ca-app-pub-3940256099942544/2247696110"
+
+// Load environment variables from .env file
+val envFile = rootProject.file(".env")
+var useTestIds = true
+var errorMessage = ""
+
+// Define the keys we need
+val ADMOB_APP_ID_KEY = "ADMOB_APP_ID"
+val ADMOB_NATIVE_AD_ID_KEY = "ADMOB_NATIVE_AD_ID"
+
+// Check if the .env file exists
+if (envFile.exists()) {
+    try {
+        // Check if all required keys exist in the .env file
+        val missingKeys = mutableListOf<String>()
+        if (!env.isPresent(ADMOB_APP_ID_KEY)) missingKeys.add(ADMOB_APP_ID_KEY)
+        if (!env.isPresent(ADMOB_NATIVE_AD_ID_KEY)) missingKeys.add(ADMOB_NATIVE_AD_ID_KEY)
+
+        if (missingKeys.isEmpty()) {
+            useTestIds = false
+        } else {
+            errorMessage = "Missing AdMob IDs in .env file: ${missingKeys.joinToString(", ")}"
+        }
+    } catch (e: Exception) {
+        errorMessage = "Error reading .env file: ${e.message}"
+    }
+} else {
+    errorMessage = ".env file not found in project root"
+}
+
 android {
     namespace = "volovyk.guerrillamail"
     compileSdk = 35
@@ -28,10 +60,32 @@ android {
             "\"https://api.guerrillamail.com/\""
         )
         buildConfigField("String", "MAILTM_API_BASE_URL", "\"https://api.mail.tm/\"")
+
+        // Always use test IDs for debug builds
+        buildConfigField("String", "ADMOB_APP_ID", "\"${ADMOB_TEST_APP_ID}\"")
+        buildConfigField("String", "ADMOB_NATIVE_AD_ID", "\"${ADMOB_TEST_NATIVE_AD_ID}\"")
+        resValue("string", "admob_app_id", ADMOB_TEST_APP_ID)
     }
 
     buildTypes {
         release {
+            if (useTestIds) {
+                println("WARNING: RELEASE BUILD IS USING TEST ADMOB IDs. Reason: ${errorMessage}")
+            }
+            if (!useTestIds) {
+                buildConfigField(
+                    "String",
+                    "ADMOB_APP_ID",
+                    "\"${env.fetch(ADMOB_APP_ID_KEY)}\""
+                )
+                buildConfigField(
+                    "String",
+                    "ADMOB_NATIVE_AD_ID",
+                    "\"${env.fetch(ADMOB_NATIVE_AD_ID_KEY)}\""
+                )
+
+                resValue("string", "admob_app_id", env.fetch(ADMOB_APP_ID_KEY))
+            }
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -107,6 +161,10 @@ dependencies {
 
     // Preferences DataStore
     implementation(libs.datastore.preferences)
+
+    // Ads
+    implementation(libs.play.services.ads)
+    implementation(project(":nativetemplates"))
 
     // Testing
     testImplementation(libs.junit)

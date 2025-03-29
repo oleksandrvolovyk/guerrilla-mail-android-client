@@ -6,4 +6,5 @@ plugins {
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics.gradle) apply false
     alias(libs.plugins.compose.compiler) apply false
+    id("co.uzzu.dotenv.gradle") version "4.0.0"
 }
