@@ -63,9 +63,10 @@ fun EmailListScreen(
         AnimatedVisibility(visible = uiState.selectedEmailsCount > 0) {
             BackHandler { onClearSelectionButtonClick() }
             Card(
-                Modifier
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

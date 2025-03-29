@@ -15,8 +15,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -47,7 +49,8 @@ fun EmailDetailsScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
+                .wrapContentHeight(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
                 modifier = Modifier
@@ -81,7 +84,10 @@ fun EmailDetailsScreen(
             Switch(
                 modifier = Modifier.testTag(stringResource(R.string.test_tag_html_render_switch)),
                 checked = uiState.renderHtml,
-                onCheckedChange = onHtmlRenderSwitchCheckedChange
+                onCheckedChange = onHtmlRenderSwitchCheckedChange,
+                colors = SwitchDefaults.colors(
+                    uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             )
 
             Text(
@@ -133,7 +139,8 @@ fun EmailDetailsScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
+                    .wrapContentHeight(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 SelectionContainer {
                     Text(
