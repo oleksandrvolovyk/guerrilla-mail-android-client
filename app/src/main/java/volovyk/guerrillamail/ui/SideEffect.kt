@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.activity.ComponentActivity
 import androidx.annotation.StringRes
+import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.ui.UiHelper.createConfirmationDialog
 import volovyk.guerrillamail.ui.UiHelper.showToast
@@ -28,11 +29,15 @@ sealed interface SideEffect {
 
 fun handleSideEffect(context: Context, sideEffect: SideEffect) = when (sideEffect) {
     is SideEffect.CopyTextToClipboard -> {
-        val clipboard =
-            context.getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip =
-            ClipData.newPlainText(context.getString(R.string.app_name), sideEffect.text)
-        clipboard.setPrimaryClip(clip)
+        try {
+            val clipboard =
+                context.getSystemService(ComponentActivity.CLIPBOARD_SERVICE) as ClipboardManager
+            val clip =
+                ClipData.newPlainText(context.getString(R.string.app_name), sideEffect.text)
+            clipboard.setPrimaryClip(clip)
+        } catch (e: SecurityException) {
+            Timber.e("Clipboard write caused an exception: $e")
+        }
     }
 
     is SideEffect.ShowToast -> {
