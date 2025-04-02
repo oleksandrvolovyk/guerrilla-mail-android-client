@@ -2,6 +2,7 @@ package volovyk.guerrillamail.ui.details
 
 import android.content.res.Configuration
 import android.webkit.WebView
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -118,40 +119,44 @@ fun EmailDetailsScreen(
             }
         }
 
-        if (uiState.renderHtml) {
-            WebViewWrapper(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.White)
-                    .testTag(stringResource(R.string.test_tag_email_body_web_view)),
-                onUpdate = { webView ->
-                    (webView as? WebView)?.loadData(
-                        if (uiState.displayImages) {
-                            uiState.email?.fullHtmlBody ?: ""
-                        } else {
-                            uiState.email?.filteredHtmlBody ?: ""
-                        },
-                        "text/html",
-                        "base64"
-                    )
-                }
-            )
-        } else {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                SelectionContainer {
-                    Text(
-                        text = uiState.email?.textBody ?: "",
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = Int.MAX_VALUE
-                    )
+        AnimatedContent(
+            targetState = uiState.renderHtml
+        ) { renderHtml ->
+            if (renderHtml) {
+                WebViewWrapper(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.White)
+                        .testTag(stringResource(R.string.test_tag_email_body_web_view)),
+                    onUpdate = { webView ->
+                        (webView as? WebView)?.loadData(
+                            if (uiState.displayImages) {
+                                uiState.email?.fullHtmlBody ?: ""
+                            } else {
+                                uiState.email?.filteredHtmlBody ?: ""
+                            },
+                            "text/html",
+                            "base64"
+                        )
+                    }
+                )
+            } else {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                ) {
+                    SelectionContainer {
+                        Text(
+                            text = uiState.email?.textBody ?: "",
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = Int.MAX_VALUE
+                        )
+                    }
                 }
             }
         }
