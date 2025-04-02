@@ -60,7 +60,7 @@ class EmailListViewModelTest {
         val selectableItemEmail = SelectableItem(item = email)
 
         val expectedUiState =
-            EmailListUiState(emails = listOf(selectableItemEmail), ads = emptyList())
+            EmailListUiState(emails = listOf(selectableItemEmail), ads = emptyMap())
 
         emailFlow.emit(listOf(email))
 

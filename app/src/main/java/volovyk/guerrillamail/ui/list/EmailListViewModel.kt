@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.ads.AdManager
+import volovyk.guerrillamail.data.ads.Position
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.SideEffect
@@ -29,7 +30,7 @@ data class SelectableItem<T>(
 
 data class EmailListUiState(
     val emails: List<SelectableItem<Email>> = emptyList(),
-    val ads: List<NativeAd> = emptyList()
+    val ads: Map<Position, NativeAd> = emptyMap()
 ) {
     val selectedEmailsCount = emails.count { it.selected }
 }

@@ -127,8 +127,7 @@ fun EmailListScreen(
                 // Insert ad after every 5 email items
                 if (index == 0 || ((index + 1) % 5 == 1 && index > 0 && index < itemCount - 1)) {
                     val adPosition = remember(index) { (index + 1) / 5 }
-                    val nativeAd =
-                        remember(adPosition, uiState.ads) { uiState.ads.getOrNull(adPosition) }
+                    val nativeAd = remember(adPosition, uiState.ads) { uiState.ads[adPosition] }
                     LaunchedEffect(adPosition) { onLoadAd(adPosition) }
                     AdView(
                         modifier = Modifier

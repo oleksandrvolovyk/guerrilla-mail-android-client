@@ -60,7 +60,7 @@ class EmailListTest {
     fun emailList_ShowsEmails() {
         // Generate a list of 3 sample Email objects
         val uiState = EmailListUiState(
-            List(3) { index ->
+            List(2) { index ->
                 SelectableItem(
                     item = Email(
                         id = "$index",

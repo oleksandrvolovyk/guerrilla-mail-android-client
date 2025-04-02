@@ -19,13 +19,13 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class AdManagerImpl(private val context: Context) : AdManager {
-    private val _adCache = MutableStateFlow(listOf<NativeAd>())
+    private val _adCache = MutableStateFlow(mapOf<Position, NativeAd>())
     override val ads = _adCache.asStateFlow()
     private val adLoaderMutex = Mutex()
 
     override suspend fun loadAd(position: Int): Unit = withContext(Dispatchers.Main) {
         adLoaderMutex.withLock {
-            if (_adCache.value.getOrNull(position) != null) return@withContext
+            if (_adCache.value[position] != null) return@withContext
 
             val ad = suspendCoroutine { continuation ->
                 AdLoader.Builder(context, BuildConfig.ADMOB_NATIVE_AD_ID)
@@ -43,13 +43,13 @@ class AdManagerImpl(private val context: Context) : AdManager {
             }
 
             if (ad != null) {
-                _adCache.update { it + ad }
+                _adCache.update { it.toMutableMap().apply { set(position, ad) } }
             }
         }
     }
 
     override fun destroyAllAds() {
-        _adCache.value.forEach { it.destroy() }
-        _adCache.update { emptyList() }
+        _adCache.value.values.forEach { it.destroy() }
+        _adCache.update { emptyMap() }
     }
 }
