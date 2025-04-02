@@ -28,15 +28,6 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    # Cache Gradle dependencies and Gradle Wrapper
-    - name: Setup Gradle Cache
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-${{ hashFiles('**/*.gradle*') }}-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}-${{ hashFiles('**/buildSrc/**/*.kt') }}
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
       
