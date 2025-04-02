@@ -35,4 +35,5 @@
     <string name="test_tag_display_images_switch">Display images switch</string>
     <string name="toggle_image_display">Display images</string>
     <string name="ad">Ad</string>
+    <string name="failed_to_initialize_webview">Failed to initialize WebView :(</string>
 </resources>

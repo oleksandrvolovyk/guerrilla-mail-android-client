@@ -1,6 +1,7 @@
 package volovyk.guerrillamail.ui.details
 
 import android.content.res.Configuration
+import android.webkit.WebView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,8 +124,8 @@ fun EmailDetailsScreen(
                     .fillMaxWidth()
                     .background(Color.White)
                     .testTag(stringResource(R.string.test_tag_email_body_web_view)),
-                onUpdate = {
-                    it.loadData(
+                onUpdate = { webView ->
+                    (webView as? WebView)?.loadData(
                         if (uiState.displayImages) {
                             uiState.email?.fullHtmlBody ?: ""
                         } else {
