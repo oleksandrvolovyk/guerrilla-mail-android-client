@@ -15,12 +15,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Create properties file with keys
+    - name: Populate .env file
       env:
-        KEYS_PROPERTIES: ${{ secrets.KEYS_PROPERTIES }}
+        ADMOB_APP_ID: ${{ secrets.ADMOB_APP_ID }}
+        ADMOB_NATIVE_AD_ID: ${{ secrets.ADMOB_NATIVE_AD_ID }}
       run: |
-        echo "$KEYS_PROPERTIES" > keys.properties
-    
+        echo -e "ADMOB_APP_ID=$ADMOB_APP_ID\nADMOB_NATIVE_AD_ID=$ADMOB_NATIVE_AD_ID" > .env
+
     - name: set up JDK 17
       uses: actions/setup-java@v3
       with:
