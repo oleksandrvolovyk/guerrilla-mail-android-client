@@ -2,6 +2,7 @@ package volovyk
 
 import android.app.Application
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,6 +30,14 @@ class GuerrillaMailApplication : Application() {
         }
         backgroundScope.launch {
             // Initialize the Google Mobile Ads SDK on a background thread.
+            val requestConfiguration = MobileAds.getRequestConfiguration()
+                .toBuilder()
+                .setTagForChildDirectedTreatment(
+                    RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+                )
+                .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+                .build()
+            MobileAds.setRequestConfiguration(requestConfiguration)
             MobileAds.initialize(this@GuerrillaMailApplication) {}
         }
     }
