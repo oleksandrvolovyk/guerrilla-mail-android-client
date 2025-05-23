@@ -41,10 +41,10 @@ jobs:
     - name: Build androidTest APK
       run: ./gradlew :app:assembleAndroidTest
 
-    - name: Run Android Tests on Firebase Test Lab (API 24)
+    - name: Run Android Tests on Firebase Test Lab (API 26)
       uses: asadmansr/Firebase-Test-Lab-Action@v1.0
       with:
-        arg-spec: 'android-device.yml:nexus6-api-24'
+        arg-spec: 'android-device.yml:pixel2-api-26'
       env:
         SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT_JSON }}
 
