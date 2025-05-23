@@ -49,8 +49,8 @@ android {
         applicationId = "volovyk.guerrillamail"
         minSdk = 24
         targetSdk = 34
-        versionCode = 45
-        versionName = "3.5.7"
+        versionCode = 46
+        versionName = "3.5.8"
 
         testInstrumentationRunner = "volovyk.MyTestRunner"
 
