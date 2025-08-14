@@ -155,4 +155,3 @@ jobs:
         track: production
         releaseFiles: ${{ steps.sign_aab.outputs.signedReleaseFile }}
         whatsNewDirectory: .
-        changesNotSentForReview: true
