@@ -43,12 +43,12 @@ if (envFile.exists()) {
 
 android {
     namespace = "volovyk.guerrillamail"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "volovyk.guerrillamail"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 36
         versionCode = 47
         versionName = "3.5.9"
 
