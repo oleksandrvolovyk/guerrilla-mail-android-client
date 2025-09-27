@@ -17,4 +17,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Guerrilla Mail"
 include(":app")
-include(":nativetemplates")

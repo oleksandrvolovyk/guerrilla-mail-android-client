@@ -3,7 +3,6 @@ package volovyk.guerrillamail.ui.list
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -30,8 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import volovyk.guerrillamail.R
 import volovyk.guerrillamail.data.emails.model.Email
-import volovyk.guerrillamail.ui.ads.AdView
 import volovyk.guerrillamail.ui.theme.GuerrillaMailTheme
 import volovyk.guerrillamail.ui.widgets.IconButton
 import volovyk.guerrillamail.ui.widgets.verticalScrollbar
@@ -57,7 +53,6 @@ fun EmailListScreen(
     onClearSelectionButtonClick: () -> Unit = {},
     onSelectAllButtonClick: () -> Unit = {},
     onDeleteButtonClick: () -> Unit = {},
-    onLoadAd: suspend (position: Int) -> Unit = { }
 ) {
     Column(modifier) {
         AnimatedVisibility(visible = uiState.selectedEmailsCount > 0) {
@@ -115,7 +110,6 @@ fun EmailListScreen(
             contentPadding = PaddingValues(start = 8.dp, end = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val itemCount = uiState.emails.size
             itemsIndexed(uiState.emails, key = { _, email -> email.item.id }) { index, email ->
                 EmailListItem(
                     modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null),
@@ -123,20 +117,6 @@ fun EmailListScreen(
                     onItemClick,
                     onItemLongClick
                 )
-
-                // Insert ad after every 5 email items
-                if (index == 0 || ((index + 1) % 5 == 1 && index > 0 && index < itemCount - 1)) {
-                    val adPosition = remember(index) { (index + 1) / 5 }
-                    val nativeAd = remember(adPosition, uiState.ads) { uiState.ads[adPosition] }
-                    LaunchedEffect(adPosition) { onLoadAd(adPosition) }
-                    AdView(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .animateItem(fadeInSpec = null, fadeOutSpec = null)
-                            .animateContentSize(),
-                        nativeAd = nativeAd
-                    )
-                }
             }
         }
     }

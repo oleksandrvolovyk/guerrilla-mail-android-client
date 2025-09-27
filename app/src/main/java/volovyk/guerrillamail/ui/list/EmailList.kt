@@ -30,6 +30,5 @@ fun EmailList(
         onClearSelectionButtonClick = { viewModel.clearSelectedEmails() },
         onSelectAllButtonClick = { viewModel.toggleSelectAllEmails() },
         onDeleteButtonClick = { viewModel.deleteSelectedEmails() },
-        onLoadAd = { adPosition -> viewModel.loadAd(adPosition) },
     )
 }

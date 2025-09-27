@@ -2,7 +2,6 @@ package volovyk.guerrillamail.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.ads.nativead.NativeAd
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -16,8 +15,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import volovyk.guerrillamail.R
-import volovyk.guerrillamail.data.ads.AdManager
-import volovyk.guerrillamail.data.ads.Position
 import volovyk.guerrillamail.data.emails.EmailRepository
 import volovyk.guerrillamail.data.emails.model.Email
 import volovyk.guerrillamail.ui.SideEffect
@@ -29,16 +26,14 @@ data class SelectableItem<T>(
 )
 
 data class EmailListUiState(
-    val emails: List<SelectableItem<Email>> = emptyList(),
-    val ads: Map<Position, NativeAd> = emptyMap()
+    val emails: List<SelectableItem<Email>> = emptyList()
 ) {
     val selectedEmailsCount = emails.count { it.selected }
 }
 
 @HiltViewModel
 class EmailListViewModel @Inject constructor(
-    private val emailRepository: EmailRepository,
-    private val adManager: AdManager
+    private val emailRepository: EmailRepository
 ) : ViewModel() {
 
     init {
@@ -49,13 +44,12 @@ class EmailListViewModel @Inject constructor(
 
     val uiState: StateFlow<EmailListUiState> = combine(
         emailRepository.observeEmails(),
-        selectedEmailIds,
-        adManager.ads
-    ) { emails, selectedEmailIds, ads ->
+        selectedEmailIds
+    ) { emails, selectedEmailIds ->
         EmailListUiState(
-            emails = emails
-                .map { email -> SelectableItem(selected = email.id in selectedEmailIds, email) },
-            ads = ads
+            emails = emails.map { email ->
+                SelectableItem(selected = email.id in selectedEmailIds, email)
+            },
         )
     }.stateIn(
         viewModelScope,
@@ -96,6 +90,4 @@ class EmailListViewModel @Inject constructor(
             }
         )
     }
-
-    suspend fun loadAd(adPosition: Int) = adManager.loadAd(adPosition)
 }
