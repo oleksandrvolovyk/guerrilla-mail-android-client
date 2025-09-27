@@ -19,9 +19,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -32,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -73,7 +71,7 @@ fun EmailListScreen(
                                 .padding(8.dp)
                                 .size(32.dp)
                                 .clickable { onClearSelectionButtonClick() },
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            painter = painterResource(R.drawable.ic_arrow_back),
                             contentDescription = stringResource(R.string.clear_selection),
                             iconBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -89,7 +87,7 @@ fun EmailListScreen(
                             .padding(8.dp)
                             .size(32.dp)
                             .clickable { onDeleteButtonClick() },
-                        imageVector = Icons.Default.Delete,
+                        painter = painterResource(R.drawable.ic_delete),
                         contentDescription = stringResource(R.string.clear_selection),
                         iconBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
                     )

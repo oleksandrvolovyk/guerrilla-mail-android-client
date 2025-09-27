@@ -1,20 +1,20 @@
 package volovyk.guerrillamail.ui.widgets
 
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import volovyk.guerrillamail.R
 
 @Composable
 fun IconButton(
     modifier: Modifier = Modifier,
-    imageVector: ImageVector,
+    painter: Painter,
     contentDescription: String,
     iconBackgroundColor: Color
 ) {
@@ -22,7 +22,7 @@ fun IconButton(
         modifier = modifier
     ) {
         Icon(
-            imageVector = imageVector,
+            painter = painter,
             contentDescription = contentDescription,
             modifier = Modifier.background(color = iconBackgroundColor)
         )
@@ -33,7 +33,7 @@ fun IconButton(
 @Preview(showBackground = true)
 fun IconButtonPreview() {
     IconButton(
-        imageVector = Icons.Default.Add,
+        painter = painterResource(R.drawable.ic_add),
         contentDescription = "Description",
         iconBackgroundColor = Color.Green
     )
